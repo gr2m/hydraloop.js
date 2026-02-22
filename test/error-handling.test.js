@@ -37,7 +37,9 @@ describe("error handling", () => {
         path: "/api-root/external-api/list-coupled-devices",
         method: "GET",
       })
-      .reply(401, "Unauthorized");
+      .reply(401, "Unauthorized", {
+        headers: { "content-type": "text/plain" },
+      });
 
     const h = new Hydraloop({ apiKey: "bad-key" });
 
@@ -54,12 +56,12 @@ describe("error handling", () => {
       },
       body: undefined,
     });
-    expect(error.response).toStrictEqual({
-      url: "https://hdm.hydraloop.com/api-root/external-api/list-coupled-devices",
-      status: 401,
-      headers: expect.any(Object),
-      body: "Unauthorized",
-    });
+    expect(error.response.url).toBe(
+      "https://hdm.hydraloop.com/api-root/external-api/list-coupled-devices",
+    );
+    expect(error.response.status).toBe(401);
+    expect(error.response.headers["content-type"]).toBe("text/plain");
+    expect(error.response.body).toBe("Unauthorized");
   });
 
   it("throws when device is not found", async () => {
