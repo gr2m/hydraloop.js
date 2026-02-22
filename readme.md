@@ -26,7 +26,7 @@ const waterData = await hydraloop.getRecycledWaterByYear({
   year: 2025,
 });
 for (const record of waterData.waterRecycled) {
-  console.log(`${record.x}: ${record.y} liters recycled`);
+  console.log(`${record.timestamp}: ${record.liters} liters recycled`);
 }
 
 // Check bypass mode status
@@ -121,15 +121,17 @@ Get monthly water recycling data for a given year.
 
 ```json
 {
-  "waterRecycled": [{ "x": "2025-01-01T00:00:00Z", "y": 1250 }],
-  "waterIntakeOfHouse": [{ "x": "2025-01-01T00:00:00Z", "y": 3200 }]
+  "waterRecycled": [{ "timestamp": "2025-01-01T00:00:00Z", "liters": 1250 }],
+  "waterIntakeOfHouse": [
+    { "timestamp": "2025-01-01T00:00:00Z", "liters": 3200 }
+  ]
 }
 ```
 
-- `waterRecycled[].x` — Timestamp
-- `waterRecycled[].y` — Water recycled in liters
-- `waterIntakeOfHouse[].x` — Timestamp
-- `waterIntakeOfHouse[].y` — Water intake of house in liters
+- `waterRecycled[].timestamp` — ISO 8601 timestamp
+- `waterRecycled[].liters` — Water recycled in liters
+- `waterIntakeOfHouse[].timestamp` — ISO 8601 timestamp
+- `waterIntakeOfHouse[].liters` — Water intake of house in liters
 
 ---
 
@@ -185,20 +187,20 @@ Get backup water usage data for a specific day.
 | `month`    | `number` | The month (1-12) |
 | `day`      | `number` | The day (1-31)   |
 
-**Returns:** `Promise<IoCoordinates[]>`
+**Returns:** `Promise<BackupWaterEntry[]>`
 
 ```json
 [
   {
-    "x": "2025-01-15T06:00:00Z",
-    "y": 5.2,
+    "timestamp": "2025-01-15T06:00:00Z",
+    "liters": 5.2,
     "actorId": "backup-valve-1"
   }
 ]
 ```
 
-- `x` — Timestamp
-- `y` — Water volume in liters
+- `timestamp` — ISO 8601 timestamp
+- `liters` — Water volume in liters
 - `actorId` — Identifier of the backup water actor
 
 ---
@@ -213,7 +215,7 @@ Get backup water usage data for a given month.
 | `year`     | `number` | The year         |
 | `month`    | `number` | The month (1-12) |
 
-**Returns:** `Promise<IoCoordinates[]>`
+**Returns:** `Promise<BackupWaterEntry[]>`
 
 Same response shape as `getBackupWaterByDay`.
 
@@ -263,11 +265,21 @@ The SDK exports the following TypeScript types:
 - `Permission` — Role permission
 - `Organisation` — Organisation information
 - `WaterRecycledRecords` — Water recycling data
-- `WaterRecycledCoordinates` — Water recycled data point
-- `WaterIntakeOfHouseCoordinates` — Water intake data point
+- `WaterRecycledEntry` — Water recycled data point
+- `WaterIntakeOfHouseEntry` — Water intake data point
 - `AuxiliaryOutput` — Auxiliary output event
-- `IoCoordinates` — I/O data point with actor ID
+- `BackupWaterEntry` — Backup water data point with actor ID
 - `BypassMode` — Bypass mode status
+
+## Water Types
+
+The Hydraloop system tracks three types of water flow:
+
+- **Recycled Water** — Water that has been processed and purified by the Hydraloop for reuse in the home (e.g., for toilets, laundry, garden irrigation). This is the system's core purpose. The goal is to maximize recycled water usage.
+- **Backup Water** — Fallback water from the mains supply, used when recycled water is unavailable or insufficient. Each entry tracks which backup valve supplied it (`actorId`). The goal is to minimize backup water usage.
+- **Auxiliary Output** — Water discharged through auxiliary outlets on the device (overflow or disposal). Unlike the other two, auxiliary output tracks time-windowed events with `start`/`end` timestamps. Not all devices support this feature (see `auxiliaryOptionAvailable` on the device object).
+
+In short: high recycled water + low backup water = good system efficiency.
 
 ## How It Works
 

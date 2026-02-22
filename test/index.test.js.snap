@@ -1,0 +1,292 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Hydraloop > getAuxiliaryOutputByDay > returns auxiliary output events for a day 1`] = `
+[
+  {
+    "end": "2025-01-15T08:45:00Z",
+    "liters": 12.5,
+    "start": "2025-01-15T08:30:00Z",
+  },
+  {
+    "end": "2025-01-15T18:20:00Z",
+    "liters": 18.3,
+    "start": "2025-01-15T18:00:00Z",
+  },
+]
+`;
+
+exports[`Hydraloop > getBackupWaterByDay > returns backup water data for a day 1`] = `
+[
+  {
+    "actorId": "backup-valve-1",
+    "liters": 5.2,
+    "timestamp": "2025-01-15T06:00:00Z",
+  },
+  {
+    "actorId": "backup-valve-1",
+    "liters": 3.8,
+    "timestamp": "2025-01-15T12:00:00Z",
+  },
+]
+`;
+
+exports[`Hydraloop > getBackupWaterByMonth > returns backup water data for a month 1`] = `
+[
+  {
+    "actorId": "backup-valve-1",
+    "liters": 15.5,
+    "timestamp": "2025-01-01T00:00:00Z",
+  },
+  {
+    "actorId": "backup-valve-1",
+    "liters": 12.3,
+    "timestamp": "2025-01-02T00:00:00Z",
+  },
+  {
+    "actorId": "backup-valve-1",
+    "liters": 18.7,
+    "timestamp": "2025-01-03T00:00:00Z",
+  },
+]
+`;
+
+exports[`Hydraloop > getBypassMode > returns bypass mode status 1`] = `
+{
+  "bypassActive": false,
+  "minutesRemaining": 0,
+  "remaining": "00:00",
+}
+`;
+
+exports[`Hydraloop > getRecycledWaterByMonth > returns water recycled data for a month 1`] = `
+{
+  "waterIntakeOfHouse": [
+    {
+      "liters": 105,
+      "timestamp": "2025-01-01T00:00:00Z",
+    },
+    {
+      "liters": 98,
+      "timestamp": "2025-01-02T00:00:00Z",
+    },
+    {
+      "liters": 110,
+      "timestamp": "2025-01-03T00:00:00Z",
+    },
+  ],
+  "waterRecycled": [
+    {
+      "liters": 42,
+      "timestamp": "2025-01-01T00:00:00Z",
+    },
+    {
+      "liters": 38,
+      "timestamp": "2025-01-02T00:00:00Z",
+    },
+    {
+      "liters": 45,
+      "timestamp": "2025-01-03T00:00:00Z",
+    },
+  ],
+}
+`;
+
+exports[`Hydraloop > getRecycledWaterByYear > returns water recycled data for a year 1`] = `
+{
+  "waterIntakeOfHouse": [
+    {
+      "liters": 3200,
+      "timestamp": "2025-01-01T00:00:00Z",
+    },
+    {
+      "liters": 2950,
+      "timestamp": "2025-02-01T00:00:00Z",
+    },
+    {
+      "liters": 3100,
+      "timestamp": "2025-03-01T00:00:00Z",
+    },
+  ],
+  "waterRecycled": [
+    {
+      "liters": 1250,
+      "timestamp": "2025-01-01T00:00:00Z",
+    },
+    {
+      "liters": 1180,
+      "timestamp": "2025-02-01T00:00:00Z",
+    },
+    {
+      "liters": 1320,
+      "timestamp": "2025-03-01T00:00:00Z",
+    },
+  ],
+}
+`;
+
+exports[`Hydraloop > listDevices > returns devices from root API 1`] = `
+[
+  {
+    "address": "123 Water Street",
+    "address1": "123 Water Street",
+    "address2": "",
+    "alias": "Home Hydraloop",
+    "auxiliary": false,
+    "auxiliaryOptionAvailable": true,
+    "baseType": "residential",
+    "boardVersions": [
+      "3.0",
+    ],
+    "bootVersion": "1.0",
+    "cascadeGroupConnectedT3": false,
+    "cascadeGroupExternalDistPump": false,
+    "cascadeGroupId": "",
+    "cascadeGroupName": "",
+    "cascadeGroupNumber": 0,
+    "city": "Amsterdam",
+    "color": "white",
+    "commissionDate": "2024-02-01T00:00:00Z",
+    "country": "Netherlands",
+    "countryId": "NL",
+    "currentBranch": "stable",
+    "dealer": "Test Dealer",
+    "deviceName": "Hydraloop H300",
+    "deviceStatus": {
+      "deviceForSpecialUseCases": false,
+      "deviceId": "device-001",
+      "fieldTest": false,
+      "hasMajorIssue": false,
+      "hasMinorIssue": false,
+      "hasNotice": false,
+      "majorIssueInfo": [],
+      "minorIssueInfo": [],
+      "noticeInfo": [],
+      "online": true,
+      "state": "RUNNING",
+      "storedState": "RUNNING",
+    },
+    "deviceTypeId": "h300",
+    "deviceVersion": "2.0",
+    "deviceVersionAsBuild": "2.0.0",
+    "ecuId": "ecu-001",
+    "ecuSerial": "ECU-001",
+    "endOfWarranty": "2026-02-01T00:00:00Z",
+    "ethernetMac": "AA:BB:CC:DD:EE:00",
+    "factoryTestCompletedDate": "2024-01-01T00:00:00Z",
+    "firmwareVersion": "8.3.4",
+    "hardwareVersion": "3.0",
+    "id": "device-001",
+    "inletManifoldType": "standard",
+    "invoice": "INV-001",
+    "kitNumbers": [],
+    "kits": [],
+    "lastMaintenanceDate": "2024-02-01T00:00:00Z",
+    "lastMaintenanceType": "standard",
+    "lastOnline": "2025-01-15T10:30:00Z",
+    "latitude": 52.3676,
+    "liftPumpAfter": false,
+    "liftPumpBefore": false,
+    "localApiUrl": "https://hdm.hydraloop.com/api-local",
+    "localServerId": "server-001",
+    "longitude": 4.9041,
+    "mac": "AA:BB:CC:DD:EE:FF",
+    "maintenancePeriod": 12,
+    "maintenancePlannedDate": "",
+    "manual": false,
+    "neighborDevices": [],
+    "neighbourGroupId": "",
+    "neighbourGroupName": "",
+    "nextMaintenanceDate": "2025-02-01T00:00:00Z",
+    "nickname": "Home Unit",
+    "notes": "",
+    "online": true,
+    "organisation": {
+      "accountManager": null,
+      "accountManagerId": "",
+      "accountManagerName": "",
+      "address1": "123 Water Street",
+      "address2": "",
+      "address3": "",
+      "defaultAssigneeId": "",
+      "defaultAssigneeName": "",
+      "defaultSupervisorId": "",
+      "defaultSupervisorName": "",
+      "email": "",
+      "id": "org-001",
+      "latitude": 52.3676,
+      "longitude": 4.9041,
+      "name": "Test Home",
+      "numberOfDevices": 1,
+      "numberOfPersons": 1,
+      "odooOrganisationId": "",
+      "ownDivision": false,
+      "parent": null,
+      "parentId": "",
+      "parentName": "",
+      "phoneNumber1": "",
+      "phoneNumber2": "",
+      "pipedriveOrganisationId": "",
+      "primaryContactPerson": "",
+      "receiveTicketEmail": false,
+    },
+    "organisationId": "org-001",
+    "organisationName": "Test Home",
+    "organisations": [],
+    "owner": {
+      "allBoundId": "",
+      "displayName": "Test User",
+      "email": "test@example.com",
+      "enabled": true,
+      "givenname": "Test",
+      "id": "owner-001",
+      "odooPersonId": "",
+      "odooUserId": "",
+      "organisationId": "org-001",
+      "organisationName": "Test Home",
+      "phoneNumber1": "+31612345678",
+      "phoneNumber2": "",
+      "pipedrivePersonId": "",
+      "roles": [
+        "owner",
+      ],
+      "surname": "User",
+      "termsAndConditionsAccepted": "2024-01-01T00:00:00Z",
+      "totpEnabled": false,
+      "user": {
+        "enabled": true,
+        "id": "user-001",
+        "password": "",
+        "roles": [],
+        "totpEnabled": false,
+        "username": "testuser",
+      },
+      "userEnabled": true,
+      "userId": "user-001",
+      "username": "testuser",
+    },
+    "ownerId": "owner-001",
+    "ownerName": "Test User",
+    "postalCode": "12345",
+    "productionOrder": "PROD-001",
+    "purchaseOrder": "PO-001",
+    "region": "North Holland",
+    "serial": "HL-2024-001",
+    "serialAlias": "HL001",
+    "settings": {},
+    "status": "active",
+    "subType": "standard",
+    "targetBranch": "stable",
+    "timezones": [
+      "Europe/Amsterdam",
+    ],
+    "toilet": true,
+    "type": "H300",
+    "verificationDate": "2024-01-15T00:00:00Z",
+    "voltage": "230V",
+    "vpnAddress": "",
+    "vpnAddressUpdated": "",
+    "washingMachine": true,
+    "wifiVersion": "2.1.0",
+  },
+]
+`;
