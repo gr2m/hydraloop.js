@@ -271,16 +271,6 @@ The SDK exports the following TypeScript types:
 - `BackupWaterEntry` — Backup water data point with actor ID
 - `BypassMode` — Bypass mode status
 
-## Water Types
-
-The Hydraloop system tracks three types of water flow:
-
-- **Recycled Water** — Water that has been processed and purified by the Hydraloop for reuse in the home (e.g., for toilets, laundry, garden irrigation). This is the system's core purpose. The goal is to maximize recycled water usage.
-- **Backup Water** — Fallback water from the mains supply, used when recycled water is unavailable or insufficient. Each entry tracks which backup valve supplied it (`actorId`). The goal is to minimize backup water usage.
-- **Auxiliary Output** — Water discharged through auxiliary outlets on the device (overflow or disposal). Unlike the other two, auxiliary output tracks time-windowed events with `start`/`end` timestamps. Not all devices support this feature (see `auxiliaryOptionAvailable` on the device object).
-
-In short: high recycled water + low backup water = good system efficiency.
-
 ## Error Handling
 
 API errors throw a `RequestError` with `.request` and `.response` properties for debugging.
@@ -313,6 +303,16 @@ The SDK communicates with two API endpoints:
 When you call any device-specific method, the SDK automatically discovers the device's `localApiUrl` by calling the root API if needed. The URL is cached for subsequent calls.
 
 > **Note:** The `localApiUrl` varies depending on load balancing and regional privacy requirements. The SDK handles this automatically — never hardcode a local API URL.
+
+## Glossary
+
+The Hydraloop system tracks three types of water flow:
+
+- **Recycled Water** — Water that has been processed and purified by the Hydraloop for reuse in the home (e.g., for toilets, laundry, garden irrigation). This is the system's core purpose. The goal is to maximize recycled water usage.
+- **Backup Water** — Fallback water from the mains supply, used when recycled water is unavailable or insufficient. Each entry tracks which backup valve supplied it (`actorId`). The goal is to minimize backup water usage.
+- **Auxiliary Output** — Water discharged through auxiliary outlets on the device (overflow or disposal). Unlike the other two, auxiliary output tracks time-windowed events with `start`/`end` timestamps. Not all devices support this feature (see `auxiliaryOptionAvailable` on the device object).
+
+In short: high recycled water + low backup water = good system efficiency.
 
 ## License
 
