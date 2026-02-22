@@ -1,0 +1,285 @@
+# hydraloop
+
+> JavaScript SDK for the [Hydraloop](https://www.hydraloop.com) home water recycling system API
+
+```js
+import { Hydraloop } from "hydraloop";
+
+const hydraloop = new Hydraloop({
+  apiKey: "your-api-key",
+});
+
+// List all your Hydraloop devices
+const devices = await hydraloop.listDevices();
+console.log(`Found ${devices.length} device(s)`);
+
+for (const device of devices) {
+  console.log(`${device.deviceName} (${device.id})`);
+  console.log(`  Status: ${device.deviceStatus.state}`);
+  console.log(`  Online: ${device.online}`);
+}
+
+// Get water recycling data for the current year
+const deviceId = devices[0].id;
+const waterData = await hydraloop.getRecycledWaterByYear({
+  deviceId,
+  year: 2025,
+});
+for (const record of waterData.waterRecycled) {
+  console.log(`${record.x}: ${record.y} liters recycled`);
+}
+
+// Check bypass mode status
+const bypass = await hydraloop.getBypassMode({ deviceId });
+console.log(`Bypass active: ${bypass.bypassActive}`);
+```
+
+## Install
+
+```
+npm install hydraloop
+```
+
+## API
+
+### Constructor
+
+#### `new Hydraloop(options)`
+
+| Option       | Type     | Required | Description                                                               |
+| ------------ | -------- | -------- | ------------------------------------------------------------------------- |
+| `apiKey`     | `string` | Yes      | Your Hydraloop API key                                                    |
+| `rootApiUrl` | `string` | No       | Override the root API URL (default: `https://hdm.hydraloop.com/api-root`) |
+
+### Methods
+
+#### `hydraloop.listDevices()`
+
+List all devices coupled to your account.
+
+**Returns:** `Promise<Device[]>`
+
+The response includes device information, status, configuration, and the `localApiUrl` used for subsequent API calls. The SDK caches `localApiUrl` per device automatically.
+
+Each device includes a `deviceStatus` object with health information:
+
+- `online` — Whether the device is currently connected
+- `hasNotice` / `noticeInfo` — Informational notices
+- `hasMinorIssue` / `minorIssueInfo` — Minor issues requiring attention
+- `hasMajorIssue` / `majorIssueInfo` — Major issues requiring immediate attention
+- `state` — Current device state (e.g., `"RUNNING"`)
+
+The `noticeInfo`, `minorIssueInfo`, and `majorIssueInfo` arrays contain translation keys. Refer to the Hydraloop dictionary for human-readable translations.
+
+<details>
+<summary>Example response</summary>
+
+```json
+[
+  {
+    "id": "cc20c5fc-...",
+    "deviceName": "Hydraloop H300",
+    "serial": "HL-2024-001",
+    "online": true,
+    "firmwareVersion": "8.3.4",
+    "toilet": true,
+    "washingMachine": true,
+    "auxiliary": false,
+    "localApiUrl": "https://hdm.hydraloop.com/api-local",
+    "deviceStatus": {
+      "deviceId": "cc20c5fc-...",
+      "online": true,
+      "hasNotice": false,
+      "noticeInfo": [],
+      "hasMinorIssue": false,
+      "minorIssueInfo": [],
+      "hasMajorIssue": false,
+      "majorIssueInfo": [],
+      "state": "RUNNING",
+      "storedState": "RUNNING",
+      "fieldTest": false,
+      "deviceForSpecialUseCases": false
+    }
+  }
+]
+```
+
+</details>
+
+---
+
+#### `hydraloop.getRecycledWaterByYear({ deviceId, year })`
+
+Get monthly water recycling data for a given year.
+
+| Option     | Type     | Description             |
+| ---------- | -------- | ----------------------- |
+| `deviceId` | `string` | The device ID           |
+| `year`     | `number` | The year (e.g., `2025`) |
+
+**Returns:** `Promise<WaterRecycledRecords>`
+
+```json
+{
+  "waterRecycled": [{ "x": "2025-01-01T00:00:00Z", "y": 1250 }],
+  "waterIntakeOfHouse": [{ "x": "2025-01-01T00:00:00Z", "y": 3200 }]
+}
+```
+
+- `waterRecycled[].x` — Timestamp
+- `waterRecycled[].y` — Water recycled in liters
+- `waterIntakeOfHouse[].x` — Timestamp
+- `waterIntakeOfHouse[].y` — Water intake of house in liters
+
+---
+
+#### `hydraloop.getRecycledWaterByMonth({ deviceId, year, month })`
+
+Get daily water recycling data for a given month.
+
+| Option     | Type     | Description             |
+| ---------- | -------- | ----------------------- |
+| `deviceId` | `string` | The device ID           |
+| `year`     | `number` | The year (e.g., `2025`) |
+| `month`    | `number` | The month (1-12)        |
+
+**Returns:** `Promise<WaterRecycledRecords>`
+
+Same response shape as `getRecycledWaterByYear`.
+
+---
+
+#### `hydraloop.getAuxiliaryOutputByDay({ deviceId, year, month, day })`
+
+Get auxiliary water output events for a specific day.
+
+| Option     | Type     | Description      |
+| ---------- | -------- | ---------------- |
+| `deviceId` | `string` | The device ID    |
+| `year`     | `number` | The year         |
+| `month`    | `number` | The month (1-12) |
+| `day`      | `number` | The day (1-31)   |
+
+**Returns:** `Promise<AuxiliaryOutput[]>`
+
+```json
+[
+  {
+    "start": "2025-01-15T08:30:00Z",
+    "end": "2025-01-15T08:45:00Z",
+    "liters": 12.5
+  }
+]
+```
+
+---
+
+#### `hydraloop.getBackupWaterByDay({ deviceId, year, month, day })`
+
+Get backup water usage data for a specific day.
+
+| Option     | Type     | Description      |
+| ---------- | -------- | ---------------- |
+| `deviceId` | `string` | The device ID    |
+| `year`     | `number` | The year         |
+| `month`    | `number` | The month (1-12) |
+| `day`      | `number` | The day (1-31)   |
+
+**Returns:** `Promise<IoCoordinates[]>`
+
+```json
+[
+  {
+    "x": "2025-01-15T06:00:00Z",
+    "y": 5.2,
+    "actorId": "backup-valve-1"
+  }
+]
+```
+
+- `x` — Timestamp
+- `y` — Water volume in liters
+- `actorId` — Identifier of the backup water actor
+
+---
+
+#### `hydraloop.getBackupWaterByMonth({ deviceId, year, month })`
+
+Get backup water usage data for a given month.
+
+| Option     | Type     | Description      |
+| ---------- | -------- | ---------------- |
+| `deviceId` | `string` | The device ID    |
+| `year`     | `number` | The year         |
+| `month`    | `number` | The month (1-12) |
+
+**Returns:** `Promise<IoCoordinates[]>`
+
+Same response shape as `getBackupWaterByDay`.
+
+---
+
+#### `hydraloop.getBypassMode({ deviceId })`
+
+Get the current bypass mode status.
+
+| Option     | Type     | Description   |
+| ---------- | -------- | ------------- |
+| `deviceId` | `string` | The device ID |
+
+**Returns:** `Promise<BypassMode>`
+
+```json
+{
+  "bypassActive": false,
+  "minutesRemaining": 0,
+  "remaining": "00:00"
+}
+```
+
+---
+
+#### `hydraloop.setBypassMode({ deviceId, activate })`
+
+Activate or deactivate bypass mode. When bypass mode is active, the Hydraloop unit stops recycling and lets all water pass through directly.
+
+| Option     | Type      | Description                               |
+| ---------- | --------- | ----------------------------------------- |
+| `deviceId` | `string`  | The device ID                             |
+| `activate` | `boolean` | `true` to activate, `false` to deactivate |
+
+**Returns:** `Promise<void>`
+
+### Types
+
+The SDK exports the following TypeScript types:
+
+- `HydraloopOptions` — Constructor options
+- `Device` — Device information
+- `DeviceStatus` — Device status with notice/minor/major issue info
+- `Person` — Person/owner information
+- `LoginUser` — Login user information
+- `Role` — User role
+- `Permission` — Role permission
+- `Organisation` — Organisation information
+- `WaterRecycledRecords` — Water recycling data
+- `WaterRecycledCoordinates` — Water recycled data point
+- `WaterIntakeOfHouseCoordinates` — Water intake data point
+- `AuxiliaryOutput` — Auxiliary output event
+- `IoCoordinates` — I/O data point with actor ID
+- `BypassMode` — Bypass mode status
+
+## How It Works
+
+The SDK communicates with two API endpoints:
+
+1. **Root API** (`https://hdm.hydraloop.com/api-root`) — Lists your coupled devices and returns each device's `localApiUrl`
+2. **Local API** (dynamic per device) — All device-specific data queries
+
+When you call any device-specific method, the SDK automatically discovers the device's `localApiUrl` by calling the root API if needed. The URL is cached for subsequent calls.
+
+> **Note:** The `localApiUrl` varies depending on load balancing and regional privacy requirements. The SDK handles this automatically — never hardcode a local API URL.
+
+## License
+
+[ISC](LICENSE)
