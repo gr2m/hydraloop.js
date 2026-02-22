@@ -1,0 +1,16 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getAuxiliaryOutputByDay > returns auxiliary output events for a day 1`] = `
+[
+  {
+    "end": "2025-01-15T08:45:00Z",
+    "liters": 12.5,
+    "start": "2025-01-15T08:30:00Z",
+  },
+  {
+    "end": "2025-01-15T18:20:00Z",
+    "liters": 18.3,
+    "start": "2025-01-15T18:00:00Z",
+  },
+]
+`;

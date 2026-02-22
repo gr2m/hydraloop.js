@@ -215,7 +215,16 @@ export interface BypassMode {
   remaining: string;
 }
 
+export interface State {
+  apiKey: string;
+  rootApiUrl: string;
+  deviceLocalApiUrls: Map<string, string>;
+}
+
+export declare const VERSION: string;
+
 export declare class Hydraloop {
+  static VERSION: string;
   constructor(options: HydraloopOptions);
 
   listDevices(): Promise<Device[]>;
@@ -250,4 +259,12 @@ export declare class Hydraloop {
     deviceId: string;
     activate: boolean;
   }): Promise<void>;
+}
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv {
+      HYDRALOOP_API_KEY: string;
+    }
+  }
 }

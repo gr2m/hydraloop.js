@@ -1,3 +1,5 @@
+// @ts-check
+
 import { Hydraloop } from "hydraloop";
 
 const hydraloop = new Hydraloop({
@@ -125,6 +127,7 @@ console.log();
 
 // Backup water by actor
 if (backupMonth.length > 0) {
+  /** @type {Record<string, number>} */
   const byActor = {};
   for (const entry of backupMonth) {
     const actor = entry.actorId ?? "unknown";

@@ -4,7 +4,9 @@
     "target": "esnext",
     "module": "node16",
     "moduleResolution": "node16",
-    "noEmit": true
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": true
   },
-  "include": ["test/types.test.ts"]
+  "include": ["index.js", "index.d.ts", "lib/*.js", "examples/*.js"]
 }

@@ -1,0 +1,34 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getRecycledWaterByMonth > returns water recycled data for a month 1`] = `
+{
+  "waterIntakeOfHouse": [
+    {
+      "liters": 105,
+      "timestamp": "2025-01-01T00:00:00Z",
+    },
+    {
+      "liters": 98,
+      "timestamp": "2025-01-02T00:00:00Z",
+    },
+    {
+      "liters": 110,
+      "timestamp": "2025-01-03T00:00:00Z",
+    },
+  ],
+  "waterRecycled": [
+    {
+      "liters": 42,
+      "timestamp": "2025-01-01T00:00:00Z",
+    },
+    {
+      "liters": 38,
+      "timestamp": "2025-01-02T00:00:00Z",
+    },
+    {
+      "liters": 45,
+      "timestamp": "2025-01-03T00:00:00Z",
+    },
+  ],
+}
+`;

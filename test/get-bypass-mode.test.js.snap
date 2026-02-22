@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getBypassMode > returns bypass mode status 1`] = `
+{
+  "bypassActive": false,
+  "minutesRemaining": 0,
+  "remaining": "00:00",
+}
+`;

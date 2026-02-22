@@ -13,13 +13,15 @@
   "types": "index.d.ts",
   "files": [
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "lib/"
   ],
   "scripts": {
     "lint": "prettier --check .",
     "lint:fix": "prettier --write .",
     "test": "vitest run --coverage",
     "test:coverage": "vitest run --coverage --coverage.reporter=html && open coverage/index.html",
+    "test:tsc": "tsc",
     "test:types": "vitest --typecheck.only run",
     "prepare": "husky"
   },
@@ -37,11 +39,13 @@
     "node": ">=22"
   },
   "devDependencies": {
+    "@types/node": "^25.3.0",
     "@vitest/coverage-v8": "^4.0.18",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "semantic-release": "^25.0.3",
+    "semantic-release-plugin-update-version-in-files": "^2.0.1",
     "typescript": "^5.0.0",
     "undici": "^7.0.0",
     "vitest": "^4.0.18"
@@ -55,6 +59,20 @@
         "name": "beta",
         "prerelease": true
       }
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github",
+      [
+        "semantic-release-plugin-update-version-in-files",
+        {
+          "files": [
+            "lib/version.js"
+          ]
+        }
+      ],
+      "@semantic-release/npm"
     ]
   },
   "renovate": {
