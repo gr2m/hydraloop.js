@@ -1,3 +1,5 @@
+// @ts-check
+
 import { Hydraloop } from "hydraloop";
 
 const hydraloop = new Hydraloop({
@@ -32,6 +34,7 @@ function row(label, value, description, indent = "  ") {
   }
 }
 
+/** @param {string} title */
 function header(title) {
   console.log();
   console.log(`${"─".repeat(120)}`);
@@ -39,6 +42,7 @@ function header(title) {
   console.log(`${"─".repeat(120)}`);
 }
 
+/** @param {string} title */
 function subheader(title) {
   console.log();
   console.log(`  ${title}`);

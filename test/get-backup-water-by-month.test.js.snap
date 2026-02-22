@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getBackupWaterByMonth > returns backup water data for a month 1`] = `
+[
+  {
+    "actorId": "backup-valve-1",
+    "liters": 15.5,
+    "timestamp": "2025-01-01T00:00:00Z",
+  },
+  {
+    "actorId": "backup-valve-1",
+    "liters": 12.3,
+    "timestamp": "2025-01-02T00:00:00Z",
+  },
+  {
+    "actorId": "backup-valve-1",
+    "liters": 18.7,
+    "timestamp": "2025-01-03T00:00:00Z",
+  },
+]
+`;

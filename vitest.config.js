@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     resolveSnapshotPath: (testPath, snapExtension) => testPath + snapExtension,
     coverage: {
-      include: ["index.js"],
+      include: ["index.js", "lib/**/*.js"],
       thresholds: {
         lines: 100,
         functions: 100,
