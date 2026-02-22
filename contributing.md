@@ -42,7 +42,7 @@ Thank you for considering contributing to the Hydraloop JavaScript SDK!
 
 - Source code is in JavaScript with JSDoc annotations for IDE support.
 - TypeScript types are maintained in `index.d.ts`.
-- Tests use Node.js built-in test runner (`node:test`) and `undici` MockAgent for HTTP mocking.
+- Tests use [Vitest](https://vitest.dev/) and `undici` MockAgent for HTTP mocking.
 
 ## Reporting Issues
 

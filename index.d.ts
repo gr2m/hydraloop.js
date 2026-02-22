@@ -76,8 +76,8 @@ export interface Organisation {
   defaultSupervisorName: string;
   numberOfPersons: number;
   numberOfDevices: number;
-  accountManager: Person;
-  parent: Organisation;
+  accountManager: Person | null;
+  parent: Organisation | null;
 }
 
 export interface DeviceStatus {

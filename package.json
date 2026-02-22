@@ -31,9 +31,10 @@
     "iot",
     "smart-home"
   ],
+  "repository": "github:gr2m/hydraloop.js",
   "license": "ISC",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",

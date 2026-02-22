@@ -294,4 +294,4 @@ When you call any device-specific method, the SDK automatically discovers the de
 
 ## License
 
-[ISC](LICENSE)
+[ISC](license)
