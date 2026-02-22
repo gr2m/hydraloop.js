@@ -6,6 +6,13 @@ name: Release
       - main
       - next
       - beta
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+  id-token: write
+
 jobs:
   release:
     name: release
