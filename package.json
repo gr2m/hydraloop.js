@@ -20,7 +20,8 @@
     "lint:fix": "prettier --write .",
     "test": "vitest run --coverage",
     "test:coverage": "vitest run --coverage --coverage.reporter=html && open coverage/index.html",
-    "test:types": "vitest --typecheck.only run"
+    "test:types": "vitest --typecheck.only run",
+    "prepare": "husky"
   },
   "keywords": [
     "hydraloop",
@@ -36,6 +37,8 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^4.0.18",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
     "semantic-release": "^25.0.3",
     "typescript": "^5.0.0",
@@ -57,5 +60,8 @@
     "extends": [
       "github>gr2m/.github"
     ]
+  },
+  "lint-staged": {
+    "*.{js,ts,json,md,yml}": "prettier --check"
   }
 }

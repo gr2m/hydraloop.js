@@ -122,7 +122,9 @@ Get monthly water recycling data for a given year.
 ```json
 {
   "waterRecycled": [{ "timestamp": "2025-01-01T00:00:00Z", "liters": 1250 }],
-  "waterIntakeOfHouse": [{ "timestamp": "2025-01-01T00:00:00Z", "liters": 3200 }]
+  "waterIntakeOfHouse": [
+    { "timestamp": "2025-01-01T00:00:00Z", "liters": 3200 }
+  ]
 }
 ```
 
