@@ -62,6 +62,6 @@
     ]
   },
   "lint-staged": {
-    "*.{js,ts,json,md,yml}": "prettier --check"
+    "*.{js,ts,json,md,yml}": "prettier --write"
   }
 }
