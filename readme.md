@@ -281,6 +281,28 @@ The Hydraloop system tracks three types of water flow:
 
 In short: high recycled water + low backup water = good system efficiency.
 
+## Error Handling
+
+API errors throw a `RequestError` with `.request` and `.response` properties for debugging.
+
+```js
+import { Hydraloop, RequestError } from "hydraloop";
+
+const hydraloop = new Hydraloop({ apiKey: "your-api-key" });
+
+try {
+  await hydraloop.listDevices();
+} catch (error) {
+  if (error instanceof RequestError) {
+    console.log(error.message); // "[401] Unauthorized"
+    console.log(error.request); // { method, url, headers, body }
+    console.log(error.response); // { url, status, headers, body }
+  }
+}
+```
+
+The `X-API-KEY` header is automatically redacted in `error.request.headers`.
+
 ## How It Works
 
 The SDK communicates with two API endpoints:

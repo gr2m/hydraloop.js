@@ -223,6 +223,28 @@ export interface State {
 
 export declare const VERSION: string;
 
+export declare class RequestError extends Error {
+  request: {
+    method: string;
+    url: string;
+    headers: Record<string, string>;
+    body?: any;
+  };
+  response: {
+    url: string;
+    status: number;
+    headers: Record<string, string>;
+    body: string;
+  };
+  constructor(
+    message: string,
+    options: {
+      request: RequestError["request"];
+      response: RequestError["response"];
+    },
+  );
+}
+
 export declare class Hydraloop {
   static VERSION: string;
   constructor(options: HydraloopOptions);
