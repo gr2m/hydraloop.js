@@ -19,13 +19,13 @@ exports[`Hydraloop > getBackupWaterByDay > returns backup water data for a day 1
 [
   {
     "actorId": "backup-valve-1",
-    "x": "2025-01-15T06:00:00Z",
-    "y": 5.2,
+    "liters": 5.2,
+    "timestamp": "2025-01-15T06:00:00Z",
   },
   {
     "actorId": "backup-valve-1",
-    "x": "2025-01-15T12:00:00Z",
-    "y": 3.8,
+    "liters": 3.8,
+    "timestamp": "2025-01-15T12:00:00Z",
   },
 ]
 `;
@@ -34,18 +34,18 @@ exports[`Hydraloop > getBackupWaterByMonth > returns backup water data for a mon
 [
   {
     "actorId": "backup-valve-1",
-    "x": "2025-01-01T00:00:00Z",
-    "y": 15.5,
+    "liters": 15.5,
+    "timestamp": "2025-01-01T00:00:00Z",
   },
   {
     "actorId": "backup-valve-1",
-    "x": "2025-01-02T00:00:00Z",
-    "y": 12.3,
+    "liters": 12.3,
+    "timestamp": "2025-01-02T00:00:00Z",
   },
   {
     "actorId": "backup-valve-1",
-    "x": "2025-01-03T00:00:00Z",
-    "y": 18.7,
+    "liters": 18.7,
+    "timestamp": "2025-01-03T00:00:00Z",
   },
 ]
 `;
@@ -62,30 +62,30 @@ exports[`Hydraloop > getRecycledWaterByMonth > returns water recycled data for a
 {
   "waterIntakeOfHouse": [
     {
-      "x": "2025-01-01T00:00:00Z",
-      "y": 105,
+      "liters": 105,
+      "timestamp": "2025-01-01T00:00:00Z",
     },
     {
-      "x": "2025-01-02T00:00:00Z",
-      "y": 98,
+      "liters": 98,
+      "timestamp": "2025-01-02T00:00:00Z",
     },
     {
-      "x": "2025-01-03T00:00:00Z",
-      "y": 110,
+      "liters": 110,
+      "timestamp": "2025-01-03T00:00:00Z",
     },
   ],
   "waterRecycled": [
     {
-      "x": "2025-01-01T00:00:00Z",
-      "y": 42,
+      "liters": 42,
+      "timestamp": "2025-01-01T00:00:00Z",
     },
     {
-      "x": "2025-01-02T00:00:00Z",
-      "y": 38,
+      "liters": 38,
+      "timestamp": "2025-01-02T00:00:00Z",
     },
     {
-      "x": "2025-01-03T00:00:00Z",
-      "y": 45,
+      "liters": 45,
+      "timestamp": "2025-01-03T00:00:00Z",
     },
   ],
 }
@@ -95,30 +95,30 @@ exports[`Hydraloop > getRecycledWaterByYear > returns water recycled data for a 
 {
   "waterIntakeOfHouse": [
     {
-      "x": "2025-01-01T00:00:00Z",
-      "y": 3200,
+      "liters": 3200,
+      "timestamp": "2025-01-01T00:00:00Z",
     },
     {
-      "x": "2025-02-01T00:00:00Z",
-      "y": 2950,
+      "liters": 2950,
+      "timestamp": "2025-02-01T00:00:00Z",
     },
     {
-      "x": "2025-03-01T00:00:00Z",
-      "y": 3100,
+      "liters": 3100,
+      "timestamp": "2025-03-01T00:00:00Z",
     },
   ],
   "waterRecycled": [
     {
-      "x": "2025-01-01T00:00:00Z",
-      "y": 1250,
+      "liters": 1250,
+      "timestamp": "2025-01-01T00:00:00Z",
     },
     {
-      "x": "2025-02-01T00:00:00Z",
-      "y": 1180,
+      "liters": 1180,
+      "timestamp": "2025-02-01T00:00:00Z",
     },
     {
-      "x": "2025-03-01T00:00:00Z",
-      "y": 1320,
+      "liters": 1320,
+      "timestamp": "2025-03-01T00:00:00Z",
     },
   ],
 }

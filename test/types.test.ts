@@ -11,10 +11,10 @@ import type {
   Permission,
   Organisation,
   WaterRecycledRecords,
-  WaterRecycledCoordinates,
-  WaterIntakeOfHouseCoordinates,
+  WaterRecycledEntry,
+  WaterIntakeOfHouseEntry,
   AuxiliaryOutput,
-  IoCoordinates,
+  BackupWaterEntry,
   BypassMode,
 } from "../index.js";
 
@@ -62,14 +62,14 @@ describe("Hydraloop types", () => {
         month: 1,
         day: 15,
       }),
-    ).toMatchTypeOf<Promise<IoCoordinates[]>>();
+    ).toMatchTypeOf<Promise<BackupWaterEntry[]>>();
     expectTypeOf(
       hydraloop.getBackupWaterByMonth({
         deviceId: "id",
         year: 2025,
         month: 1,
       }),
-    ).toMatchTypeOf<Promise<IoCoordinates[]>>();
+    ).toMatchTypeOf<Promise<BackupWaterEntry[]>>();
     expectTypeOf(hydraloop.getBypassMode({ deviceId: "id" })).toMatchTypeOf<
       Promise<BypassMode>
     >();
@@ -109,16 +109,14 @@ describe("Hydraloop types", () => {
 
   it("WaterRecycledRecords type shape", () => {
     const records = {} as WaterRecycledRecords;
-    expectTypeOf(records.waterRecycled).toMatchTypeOf<
-      WaterRecycledCoordinates[]
-    >();
+    expectTypeOf(records.waterRecycled).toMatchTypeOf<WaterRecycledEntry[]>();
     expectTypeOf(records.waterIntakeOfHouse).toMatchTypeOf<
-      WaterIntakeOfHouseCoordinates[]
+      WaterIntakeOfHouseEntry[]
     >();
 
-    const coord = {} as WaterRecycledCoordinates;
-    expectTypeOf(coord.x).toBeString();
-    expectTypeOf(coord.y).toBeNumber();
+    const entry = {} as WaterRecycledEntry;
+    expectTypeOf(entry.timestamp).toBeString();
+    expectTypeOf(entry.liters).toBeNumber();
   });
 
   it("AuxiliaryOutput type shape", () => {
@@ -128,11 +126,11 @@ describe("Hydraloop types", () => {
     expectTypeOf(aux.liters).toBeNumber();
   });
 
-  it("IoCoordinates type shape", () => {
-    const io = {} as IoCoordinates;
-    expectTypeOf(io.x).toBeString();
-    expectTypeOf(io.y).toBeNumber();
-    expectTypeOf(io.actorId).toBeString();
+  it("BackupWaterEntry type shape", () => {
+    const entry = {} as BackupWaterEntry;
+    expectTypeOf(entry.timestamp).toBeString();
+    expectTypeOf(entry.liters).toBeNumber();
+    expectTypeOf(entry.actorId).toBeString();
   });
 
   it("BypassMode type shape", () => {

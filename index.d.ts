@@ -182,23 +182,19 @@ export interface Device {
   vpnAddressUpdated: string;
 }
 
-export interface WaterRecycledCoordinates {
-  /** Timestamp */
-  x: string;
-  /** Water recycled in liters */
-  y: number;
+export interface WaterRecycledEntry {
+  timestamp: string;
+  liters: number;
 }
 
-export interface WaterIntakeOfHouseCoordinates {
-  /** Timestamp */
-  x: string;
-  /** Water intake of house in liters */
-  y: number;
+export interface WaterIntakeOfHouseEntry {
+  timestamp: string;
+  liters: number;
 }
 
 export interface WaterRecycledRecords {
-  waterRecycled: WaterRecycledCoordinates[];
-  waterIntakeOfHouse: WaterIntakeOfHouseCoordinates[];
+  waterRecycled: WaterRecycledEntry[];
+  waterIntakeOfHouse: WaterIntakeOfHouseEntry[];
 }
 
 export interface AuxiliaryOutput {
@@ -207,10 +203,9 @@ export interface AuxiliaryOutput {
   liters: number;
 }
 
-export interface IoCoordinates {
-  /** Timestamp */
-  x: string;
-  y: number;
+export interface BackupWaterEntry {
+  timestamp: string;
+  liters: number;
   actorId: string;
 }
 
@@ -244,12 +239,12 @@ export declare class Hydraloop {
     year: number;
     month: number;
     day: number;
-  }): Promise<IoCoordinates[]>;
+  }): Promise<BackupWaterEntry[]>;
   getBackupWaterByMonth(options: {
     deviceId: string;
     year: number;
     month: number;
-  }): Promise<IoCoordinates[]>;
+  }): Promise<BackupWaterEntry[]>;
   getBypassMode(options: { deviceId: string }): Promise<BypassMode>;
   setBypassMode(options: {
     deviceId: string;

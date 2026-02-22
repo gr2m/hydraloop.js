@@ -92,6 +92,14 @@ export class Hydraloop {
   }
 
   /**
+   * @param {{ x: string, y: number }[]} records
+   * @returns {{ timestamp: string, liters: number }[]}
+   */
+  #mapTimestampLiters(records) {
+    return records.map(({ x, y }) => ({ timestamp: x, liters: y }));
+  }
+
+  /**
    * Get recycled water data by year.
    * @param {{ deviceId: string, year: number }} options
    * @returns {Promise<import("./index.d.ts").WaterRecycledRecords>}
@@ -102,9 +110,13 @@ export class Hydraloop {
       deviceId,
       year: String(year),
     });
-    return this.#request(
+    const data = await this.#request(
       `${localApiUrl}/external-api/recycled-water-by-year?${params}`,
     );
+    return {
+      waterRecycled: this.#mapTimestampLiters(data.waterRecycled),
+      waterIntakeOfHouse: this.#mapTimestampLiters(data.waterIntakeOfHouse),
+    };
   }
 
   /**
@@ -119,9 +131,13 @@ export class Hydraloop {
       year: String(year),
       month: String(month),
     });
-    return this.#request(
+    const data = await this.#request(
       `${localApiUrl}/external-api/recycled-water-by-month?${params}`,
     );
+    return {
+      waterRecycled: this.#mapTimestampLiters(data.waterRecycled),
+      waterIntakeOfHouse: this.#mapTimestampLiters(data.waterIntakeOfHouse),
+    };
   }
 
   /**
@@ -145,7 +161,7 @@ export class Hydraloop {
   /**
    * Get backup water data by day.
    * @param {{ deviceId: string, year: number, month: number, day: number }} options
-   * @returns {Promise<import("./index.d.ts").IoCoordinates[]>}
+   * @returns {Promise<import("./index.d.ts").BackupWaterEntry[]>}
    */
   async getBackupWaterByDay({ deviceId, year, month, day }) {
     const localApiUrl = await this.#getLocalApiUrl(deviceId);
@@ -155,15 +171,20 @@ export class Hydraloop {
       month: String(month),
       day: String(day),
     });
-    return this.#request(
+    const data = await this.#request(
       `${localApiUrl}/external-api/backup-water-by-day?${params}`,
     );
+    return data.map(({ x, y, actorId }) => ({
+      timestamp: x,
+      liters: y,
+      actorId,
+    }));
   }
 
   /**
    * Get backup water data by month.
    * @param {{ deviceId: string, year: number, month: number }} options
-   * @returns {Promise<import("./index.d.ts").IoCoordinates[]>}
+   * @returns {Promise<import("./index.d.ts").BackupWaterEntry[]>}
    */
   async getBackupWaterByMonth({ deviceId, year, month }) {
     const localApiUrl = await this.#getLocalApiUrl(deviceId);
@@ -172,9 +193,14 @@ export class Hydraloop {
       year: String(year),
       month: String(month),
     });
-    return this.#request(
+    const data = await this.#request(
       `${localApiUrl}/external-api/backup-water-by-month?${params}`,
     );
+    return data.map(({ x, y, actorId }) => ({
+      timestamp: x,
+      liters: y,
+      actorId,
+    }));
   }
 
   /**
