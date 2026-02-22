@@ -41,6 +41,10 @@ const auxToday = device.auxiliaryOptionAvailable
   : [];
 const bypass = await hydraloop.getBypassMode({ deviceId });
 
+// The API may return bypassActive: true with a negative minutesRemaining,
+// which means bypass expired long ago. Treat this as inactive.
+const bypassActive = bypass.bypassActive && bypass.minutesRemaining >= 0;
+
 // ── Yearly summary ──────────────────────────────────────────────
 
 const totalRecycledYear = yearData.waterRecycled.reduce(
@@ -51,35 +55,41 @@ const totalIntakeYear = yearData.waterIntakeOfHouse.reduce(
   (sum, e) => sum + e.liters,
   0,
 );
-const recyclingRateYear =
-  totalIntakeYear > 0
-    ? ((totalRecycledYear / totalIntakeYear) * 100).toFixed(1)
-    : "N/A";
+const hasIntakeData = totalIntakeYear > 0;
 
 console.log(`── Year-to-date (${year}) ──`);
-console.log(`  Total household water intake:  ${totalIntakeYear.toFixed(0)} L`);
 console.log(
   `  Total water recycled:          ${totalRecycledYear.toFixed(0)} L`,
 );
-console.log(`  Recycling rate:                ${recyclingRateYear}%`);
+if (hasIntakeData) {
+  const recyclingRateYear = (
+    (totalRecycledYear / totalIntakeYear) *
+    100
+  ).toFixed(1);
+  console.log(
+    `  Total household water intake:  ${totalIntakeYear.toFixed(0)} L`,
+  );
+  console.log(`  Recycling rate:                ${recyclingRateYear}%`);
+}
 console.log();
 
-// Monthly breakdown
-if (yearData.waterRecycled.length > 0) {
+// Monthly breakdown (only if we have per-month data, not just a total)
+const monthlyRecycled = yearData.waterRecycled.filter((e) => e.timestamp);
+if (monthlyRecycled.length > 0) {
   console.log("  Monthly breakdown:");
-  for (let i = 0; i < yearData.waterRecycled.length; i++) {
-    const recycled = yearData.waterRecycled[i];
-    const intake = yearData.waterIntakeOfHouse[i];
-    const monthName = new Date(recycled.timestamp).toLocaleDateString("en", {
+  for (const recycled of monthlyRecycled) {
+    const intake = yearData.waterIntakeOfHouse.find(
+      (e) => e.timestamp === recycled.timestamp,
+    );
+    const monthLabel = new Date(recycled.timestamp).toLocaleDateString("en", {
       month: "short",
     });
-    const rate =
-      intake && intake.liters > 0
-        ? ((recycled.liters / intake.liters) * 100).toFixed(0)
-        : "N/A";
-    console.log(
-      `    ${monthName}:  ${recycled.liters.toFixed(0)} L recycled / ${intake?.liters.toFixed(0) ?? "?"} L intake  (${rate}%)`,
-    );
+    let line = `    ${monthLabel}:  ${recycled.liters.toFixed(0)} L recycled`;
+    if (intake && intake.liters > 0) {
+      const rate = ((recycled.liters / intake.liters) * 100).toFixed(0);
+      line += ` / ${intake.liters.toFixed(0)} L intake  (${rate}%)`;
+    }
+    console.log(line);
   }
   console.log();
 }
@@ -95,20 +105,22 @@ const totalIntakeMonth = monthData.waterIntakeOfHouse.reduce(
   0,
 );
 const totalBackupMonth = backupMonth.reduce((sum, e) => sum + e.liters, 0);
-const recyclingRateMonth =
-  totalIntakeMonth > 0
-    ? ((totalRecycledMonth / totalIntakeMonth) * 100).toFixed(1)
-    : "N/A";
 
 const monthName = now.toLocaleDateString("en", {
   month: "long",
   year: "numeric",
 });
 console.log(`── This month (${monthName}) ──`);
-console.log(`  Household water intake:  ${totalIntakeMonth.toFixed(0)} L`);
 console.log(`  Water recycled:          ${totalRecycledMonth.toFixed(0)} L`);
+if (totalIntakeMonth > 0) {
+  const recyclingRateMonth = (
+    (totalRecycledMonth / totalIntakeMonth) *
+    100
+  ).toFixed(1);
+  console.log(`  Household water intake:  ${totalIntakeMonth.toFixed(0)} L`);
+  console.log(`  Recycling rate:          ${recyclingRateMonth}%`);
+}
 console.log(`  Backup water used:       ${totalBackupMonth.toFixed(0)} L`);
-console.log(`  Recycling rate:          ${recyclingRateMonth}%`);
 console.log();
 
 // Backup water by actor
@@ -155,7 +167,7 @@ if (device.auxiliaryOptionAvailable) {
   }
 }
 
-if (bypass.bypassActive) {
+if (bypassActive) {
   console.log(
     `  !! Bypass mode is ACTIVE (${bypass.remaining} remaining) — no water is being recycled`,
   );
@@ -166,55 +178,70 @@ console.log();
 
 console.log("── Assessment ──");
 
-const rate = totalIntakeMonth > 0 ? totalRecycledMonth / totalIntakeMonth : 0;
-
-if (bypass.bypassActive) {
+if (bypassActive) {
   console.log("  BYPASS ACTIVE: Your system is not recycling water right now.");
   console.log(
     "  Deactivate bypass mode to resume water recycling and improve efficiency.",
   );
-} else if (rate >= 0.4) {
-  console.log(
-    `  EXCELLENT: Your system is recycling ${recyclingRateMonth}% of household water.`,
-  );
-  console.log("  The Hydraloop is performing well.");
-} else if (rate >= 0.25) {
-  console.log(
-    `  GOOD: Your system is recycling ${recyclingRateMonth}% of household water.`,
-  );
-  console.log(
-    "  Consider connecting more water sources (toilet, washing machine) to increase recycling.",
-  );
-} else if (rate > 0) {
-  console.log(
-    `  LOW: Your system is only recycling ${recyclingRateMonth}% of household water.`,
-  );
-  console.log("  Possible causes:");
-  console.log("  - Not enough greywater sources connected");
-  console.log(
-    "  - High backup water usage may indicate the tank empties often",
-  );
-  console.log(
-    "  - Check device status for maintenance issues that reduce recycling capacity",
-  );
+} else if (totalRecycledMonth > 0) {
+  if (totalIntakeMonth > 0) {
+    // We have intake data — assess based on recycling rate
+    const rate = totalRecycledMonth / totalIntakeMonth;
+    if (rate >= 0.4) {
+      console.log(
+        `  EXCELLENT: Your system is recycling ${(rate * 100).toFixed(1)}% of household water.`,
+      );
+      console.log("  The Hydraloop is performing well.");
+    } else if (rate >= 0.25) {
+      console.log(
+        `  GOOD: Your system is recycling ${(rate * 100).toFixed(1)}% of household water.`,
+      );
+      console.log(
+        "  Consider connecting more water sources (toilet, washing machine) to increase recycling.",
+      );
+    } else {
+      console.log(
+        `  LOW: Your system is only recycling ${(rate * 100).toFixed(1)}% of household water.`,
+      );
+      console.log("  Possible causes:");
+      console.log("  - Not enough greywater sources connected");
+      console.log(
+        "  - High backup water usage may indicate the tank empties often",
+      );
+      console.log(
+        "  - Check device status for maintenance issues that reduce recycling capacity",
+      );
+    }
+  } else {
+    // No intake data — assess based on recycled volume and backup usage
+    console.log(
+      `  System is actively recycling water: ${totalRecycledMonth.toFixed(0)} L this month.`,
+    );
+
+    if (totalBackupMonth > 0) {
+      const backupRatio = totalBackupMonth / totalRecycledMonth;
+      if (backupRatio > 0.5) {
+        console.log(
+          `  Backup water is ${(backupRatio * 100).toFixed(0)}% of recycled volume — tank may be emptying frequently.`,
+        );
+        console.log(
+          "  Spreading water usage more evenly throughout the day can help.",
+        );
+      } else if (backupRatio > 0.1) {
+        console.log(
+          `  Backup water usage is moderate (${totalBackupMonth.toFixed(0)} L, ${(backupRatio * 100).toFixed(0)}% of recycled).`,
+        );
+      } else {
+        console.log(
+          `  Backup water usage is low (${totalBackupMonth.toFixed(0)} L) — the system is meeting demand well.`,
+        );
+      }
+    } else {
+      console.log("  No backup water used this month — great efficiency.");
+    }
+  }
 } else {
   console.log("  No recycling data available for this month yet.");
-}
-
-if (totalBackupMonth > 0 && totalRecycledMonth > 0) {
-  const backupRatio = totalBackupMonth / totalRecycledMonth;
-  if (backupRatio > 0.5) {
-    console.log();
-    console.log(
-      `  NOTE: Backup water usage is high (${(backupRatio * 100).toFixed(0)}% of recycled volume).`,
-    );
-    console.log(
-      "  This suggests the recycled water tank frequently runs empty.",
-    );
-    console.log(
-      "  Spreading water usage more evenly throughout the day can help.",
-    );
-  }
 }
 
 if (device.auxiliaryOptionAvailable && totalAuxToday > 20) {
