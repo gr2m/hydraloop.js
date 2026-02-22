@@ -11,6 +11,7 @@ import { getBypassMode } from "./lib/get-bypass-mode.js";
 import { setBypassMode } from "./lib/set-bypass-mode.js";
 
 export { VERSION } from "./lib/version.js";
+export { RequestError } from "./lib/request-error.js";
 
 const ROOT_API_URL = "https://hdm.hydraloop.com/api-root";
 

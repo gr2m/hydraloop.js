@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { readFile } from "node:fs/promises";
 import { MockAgent, setGlobalDispatcher } from "undici";
 
-import { Hydraloop } from "../index.js";
+import { Hydraloop, RequestError } from "../index.js";
 
 const ROOT_ORIGIN = "https://hdm.hydraloop.com";
 
@@ -37,11 +37,31 @@ describe("error handling", () => {
         path: "/api-root/external-api/list-coupled-devices",
         method: "GET",
       })
-      .reply(401, "Unauthorized");
+      .reply(401, "Unauthorized", {
+        headers: { "content-type": "text/plain" },
+      });
 
     const h = new Hydraloop({ apiKey: "bad-key" });
 
-    await expect(h.listDevices()).rejects.toThrowError(/401/);
+    const error = await h.listDevices().catch((e) => e);
+
+    expect(error).toBeInstanceOf(RequestError);
+    expect(error.message).toMatch(/401/);
+    expect(error.request).toStrictEqual({
+      method: "GET",
+      url: "https://hdm.hydraloop.com/api-root/external-api/list-coupled-devices",
+      headers: {
+        accept: "application/json",
+        "X-API-KEY": "***",
+      },
+      body: undefined,
+    });
+    expect(error.response.url).toBe(
+      "https://hdm.hydraloop.com/api-root/external-api/list-coupled-devices",
+    );
+    expect(error.response.status).toBe(401);
+    expect(error.response.headers["content-type"]).toBe("text/plain");
+    expect(error.response.body).toBe("Unauthorized");
   });
 
   it("throws when device is not found", async () => {
