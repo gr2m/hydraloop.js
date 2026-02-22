@@ -4,6 +4,11 @@ name: Update Prettier
     branches:
       - renovate/prettier-*
   workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   update_prettier:
     runs-on: ubuntu-latest
