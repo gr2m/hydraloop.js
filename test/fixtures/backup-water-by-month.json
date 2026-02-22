@@ -1,0 +1,5 @@
+[
+  { "x": "2025-01-01T00:00:00Z", "y": 15.5, "actorId": "backup-valve-1" },
+  { "x": "2025-01-02T00:00:00Z", "y": 12.3, "actorId": "backup-valve-1" },
+  { "x": "2025-01-03T00:00:00Z", "y": 18.7, "actorId": "backup-valve-1" }
+]

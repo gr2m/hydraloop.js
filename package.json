@@ -1,0 +1,61 @@
+{
+  "name": "hydraloop",
+  "version": "0.0.0-development",
+  "description": "JavaScript SDK for the Hydraloop home water recycling system API",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "scripts": {
+    "lint": "prettier --check .",
+    "lint:fix": "prettier --write .",
+    "test": "vitest run --coverage",
+    "test:coverage": "vitest run --coverage --coverage.reporter=html && open coverage/index.html",
+    "test:types": "vitest --typecheck.only run"
+  },
+  "keywords": [
+    "hydraloop",
+    "water",
+    "recycling",
+    "greywater",
+    "iot",
+    "smart-home"
+  ],
+  "license": "ISC",
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.0.18",
+    "prettier": "^3.8.1",
+    "semantic-release": "^25.0.3",
+    "typescript": "^5.0.0",
+    "undici": "^7.0.0",
+    "vitest": "^4.0.18"
+  },
+  "release": {
+    "branches": [
+      "+([0-9]).x",
+      "main",
+      "next",
+      {
+        "name": "beta",
+        "prerelease": true
+      }
+    ]
+  },
+  "renovate": {
+    "extends": [
+      "github>gr2m/.github"
+    ]
+  }
+}
