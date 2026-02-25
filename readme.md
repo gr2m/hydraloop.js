@@ -2,6 +2,15 @@
 
 > JavaScript SDK for the [Hydraloop](https://www.hydraloop.com) home water recycling system API
 
+## Prerequisites
+
+Request an Hydroloop API key by contacting them:
+https://info.hydraloop.com/docs/how-to-use-the-hydraloop-api/
+
+## Usage
+
+Find more examples in [examples/](examples/).
+
 ```js
 import { Hydraloop } from "hydraloop";
 
