@@ -1,0 +1,548 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/external-api/recycled-water-by-year": {
+      "get": {
+        "operationId": "ExternalApiController_getRecycledWaterByYear",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": false,
+            "in": "query",
+            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterRecycledRecords"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": [
+          "external-api"
+        ]
+      }
+    },
+    "/external-api/recycled-water-by-month": {
+      "get": {
+        "operationId": "ExternalApiController_getRecycledWaterByMonth",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": false,
+            "in": "query",
+            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterRecycledRecords"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": [
+          "external-api"
+        ]
+      }
+    },
+    "/external-api/auxiliary-output-by-day": {
+      "get": {
+        "operationId": "ExternalApiController_getAuxiliaryOutputByDay",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "day",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": false,
+            "in": "query",
+            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuxiliaryOutput"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": [
+          "external-api"
+        ]
+      }
+    },
+    "/external-api/backup-water-by-day": {
+      "get": {
+        "operationId": "ExternalApiController_getBackupWaterByDay",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "day",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": false,
+            "in": "query",
+            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IoCoordinates"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": [
+          "external-api"
+        ]
+      }
+    },
+    "/external-api/backup-water-by-month": {
+      "get": {
+        "operationId": "ExternalApiController_getBackupWaterByMonth",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IoCoordinates"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": [
+          "external-api"
+        ]
+      }
+    },
+    "/external-api/bypass-mode": {
+      "post": {
+        "operationId": "ExternalApiController_changeBypassMode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeBypassModeCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": [
+          "external-api"
+        ]
+      },
+      "get": {
+        "operationId": "ExternalApiController_getBypassMode",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BypassMode"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": [
+          "external-api"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "HDM - External Local API",
+    "description": "Hydraloop Device Manager External Local API description",
+    "version": "8.3.8-202602270415",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://hdm-dev.hydraloop.com/api-local/",
+      "description": "Development"
+    },
+    {
+      "url": "https://hdm-acc.hydraloop.com/api-local/",
+      "description": "Acceptation"
+    },
+    {
+      "url": "https://hdm.hydraloop.com/api-local/",
+      "description": "Production"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "external-api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY",
+        "description": "HDM API KEY"
+      }
+    },
+    "schemas": {
+      "WaterRecycledCoordinates": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "Timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Water recycled in liters"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
+      },
+      "WaterIntakeOfHouseCoordinates": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "Timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Water intake of house in liters"
+          }
+        },
+        "required": [
+          "x",
+          "y"
+        ]
+      },
+      "WaterRecycledRecords": {
+        "type": "object",
+        "properties": {
+          "waterRecycled": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WaterRecycledCoordinates"
+            }
+          },
+          "waterIntakeOfHouse": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WaterIntakeOfHouseCoordinates"
+            }
+          }
+        },
+        "required": [
+          "waterRecycled",
+          "waterIntakeOfHouse"
+        ]
+      },
+      "AuxiliaryOutput": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string"
+          },
+          "end": {
+            "type": "string"
+          },
+          "liters": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "start",
+          "end",
+          "liters"
+        ]
+      },
+      "IoCoordinates": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "Timestamp"
+          },
+          "y": {
+            "type": "number"
+          },
+          "actorId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "x",
+          "y",
+          "actorId"
+        ]
+      },
+      "ChangeBypassModeCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "activate": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "deviceId",
+          "activate"
+        ]
+      },
+      "BypassMode": {
+        "type": "object",
+        "properties": {
+          "bypassActive": {
+            "type": "boolean"
+          },
+          "minutesRemaining": {
+            "type": "number"
+          },
+          "remaining": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bypassActive",
+          "minutesRemaining",
+          "remaining"
+        ]
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "External Root API",
+    "url": "../../api-root/external-api/"
+  }
+}

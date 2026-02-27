@@ -1,0 +1,789 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/external-api/list-coupled-devices": {
+      "get": {
+        "operationId": "ExternalApiController_listCoupledDevices",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Device"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": [
+          "external-api"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "HDM - External Root API",
+    "description": "Hydraloop Device Manager External Root API description",
+    "version": "8.4.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://hdm-dev.hydraloop.com/api-root/",
+      "description": "Development"
+    },
+    {
+      "url": "https://hdm-acc.hydraloop.com/api-root/",
+      "description": "Acceptation"
+    },
+    {
+      "url": "https://hdm.hydraloop.com/api-root/",
+      "description": "Production"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "external-api-key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY",
+        "description": "HDM API KEY"
+      }
+    },
+    "schemas": {
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "main": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "main",
+          "description",
+          "roles",
+          "permissions"
+        ]
+      },
+      "LoginUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "totpEnabled": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "enabled",
+          "username",
+          "password",
+          "totpEnabled",
+          "roles"
+        ]
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "givenname": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber1": {
+            "type": "string"
+          },
+          "phoneNumber2": {
+            "type": "string"
+          },
+          "pipedrivePersonId": {
+            "type": "string"
+          },
+          "odooPersonId": {
+            "type": "string"
+          },
+          "odooUserId": {
+            "type": "string"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "organisationName": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "userEnabled": {
+            "type": "boolean"
+          },
+          "username": {
+            "type": "string"
+          },
+          "totpEnabled": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allBoundId": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "termsAndConditionsAccepted": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/LoginUser"
+          }
+        },
+        "required": [
+          "id",
+          "givenname",
+          "surname",
+          "displayName",
+          "email",
+          "phoneNumber1",
+          "phoneNumber2",
+          "pipedrivePersonId",
+          "odooPersonId",
+          "odooUserId",
+          "organisationId",
+          "organisationName",
+          "userId",
+          "userEnabled",
+          "username",
+          "totpEnabled",
+          "roles",
+          "allBoundId",
+          "enabled",
+          "termsAndConditionsAccepted",
+          "user"
+        ]
+      },
+      "Organisation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string"
+          },
+          "parentName": {
+            "type": "string"
+          },
+          "address1": {
+            "type": "string"
+          },
+          "address2": {
+            "type": "string"
+          },
+          "address3": {
+            "type": "string"
+          },
+          "phoneNumber1": {
+            "type": "string"
+          },
+          "phoneNumber2": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "pipedriveOrganisationId": {
+            "type": "string"
+          },
+          "odooOrganisationId": {
+            "type": "string"
+          },
+          "primaryContactPerson": {
+            "type": "string"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "ownDivision": {
+            "type": "boolean"
+          },
+          "receiveTicketEmail": {
+            "type": "boolean"
+          },
+          "accountManagerId": {
+            "type": "string"
+          },
+          "accountManagerName": {
+            "type": "string"
+          },
+          "defaultAssigneeId": {
+            "type": "string"
+          },
+          "defaultAssigneeName": {
+            "type": "string"
+          },
+          "defaultSupervisorId": {
+            "type": "string"
+          },
+          "defaultSupervisorName": {
+            "type": "string"
+          },
+          "numberOfPersons": {
+            "type": "number"
+          },
+          "numberOfDevices": {
+            "type": "number"
+          },
+          "accountManager": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/Organisation"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "parentId",
+          "parentName",
+          "address1",
+          "address2",
+          "address3",
+          "phoneNumber1",
+          "phoneNumber2",
+          "email",
+          "pipedriveOrganisationId",
+          "odooOrganisationId",
+          "primaryContactPerson",
+          "longitude",
+          "latitude",
+          "ownDivision",
+          "receiveTicketEmail",
+          "accountManagerId",
+          "accountManagerName",
+          "defaultAssigneeId",
+          "defaultAssigneeName",
+          "defaultSupervisorId",
+          "defaultSupervisorName",
+          "numberOfPersons",
+          "numberOfDevices",
+          "accountManager",
+          "parent"
+        ]
+      },
+      "DeviceStatus": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "hasNotice": {
+            "type": "boolean"
+          },
+          "noticeInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasMinorIssue": {
+            "type": "boolean"
+          },
+          "minorIssueInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasMajorIssue": {
+            "type": "boolean"
+          },
+          "majorIssueInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "state": {
+            "type": "string"
+          },
+          "storedState": {
+            "type": "string"
+          },
+          "fieldTest": {
+            "type": "boolean"
+          },
+          "deviceForSpecialUseCases": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "deviceId",
+          "online",
+          "hasNotice",
+          "noticeInfo",
+          "hasMinorIssue",
+          "minorIssueInfo",
+          "hasMajorIssue",
+          "majorIssueInfo",
+          "state",
+          "storedState",
+          "fieldTest",
+          "deviceForSpecialUseCases"
+        ]
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "ecuId": {
+            "type": "string"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "organisationName": {
+            "type": "string"
+          },
+          "serial": {
+            "type": "string"
+          },
+          "serialAlias": {
+            "type": "string"
+          },
+          "ecuSerial": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "deviceVersion": {
+            "type": "string"
+          },
+          "deviceVersionAsBuild": {
+            "type": "string"
+          },
+          "deviceName": {
+            "type": "string"
+          },
+          "mac": {
+            "type": "string"
+          },
+          "ethernetMac": {
+            "type": "string"
+          },
+          "hardwareVersion": {
+            "type": "string"
+          },
+          "bootVersion": {
+            "type": "string"
+          },
+          "deviceTypeId": {
+            "type": "string"
+          },
+          "baseType": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "subType": {
+            "type": "string"
+          },
+          "voltage": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "address1": {
+            "type": "string"
+          },
+          "address2": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "countryId": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "inletManifoldType": {
+            "type": "string"
+          },
+          "toilet": {
+            "type": "boolean"
+          },
+          "washingMachine": {
+            "type": "boolean"
+          },
+          "auxiliary": {
+            "type": "boolean"
+          },
+          "auxiliaryOptionAvailable": {
+            "type": "boolean"
+          },
+          "liftPumpBefore": {
+            "type": "boolean"
+          },
+          "liftPumpAfter": {
+            "type": "boolean"
+          },
+          "targetBranch": {
+            "type": "string"
+          },
+          "dealer": {
+            "type": "string"
+          },
+          "purchaseOrder": {
+            "type": "string"
+          },
+          "productionOrder": {
+            "type": "string"
+          },
+          "invoice": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "lastOnline": {
+            "type": "string"
+          },
+          "currentBranch": {
+            "type": "string"
+          },
+          "firmwareVersion": {
+            "type": "string"
+          },
+          "wifiVersion": {
+            "type": "string"
+          },
+          "manual": {
+            "type": "boolean"
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "factoryTestCompletedDate": {
+            "type": "string"
+          },
+          "verificationDate": {
+            "type": "string"
+          },
+          "commissionDate": {
+            "type": "string"
+          },
+          "endOfWarranty": {
+            "type": "string"
+          },
+          "neighbourGroupId": {
+            "type": "string"
+          },
+          "neighbourGroupName": {
+            "type": "string"
+          },
+          "cascadeGroupId": {
+            "type": "string"
+          },
+          "cascadeGroupName": {
+            "type": "string"
+          },
+          "cascadeGroupConnectedT3": {
+            "type": "boolean"
+          },
+          "cascadeGroupExternalDistPump": {
+            "type": "boolean"
+          },
+          "cascadeGroupNumber": {
+            "type": "number"
+          },
+          "maintenancePeriod": {
+            "type": "number"
+          },
+          "nextMaintenanceDate": {
+            "type": "string"
+          },
+          "maintenancePlannedDate": {
+            "type": "string"
+          },
+          "lastMaintenanceDate": {
+            "type": "string"
+          },
+          "lastMaintenanceType": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "ownerName": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "neighborDevices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "timezones": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "organisation": {
+            "$ref": "#/components/schemas/Organisation"
+          },
+          "organisations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "boardVersions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "settings": {
+            "type": "object"
+          },
+          "deviceStatus": {
+            "$ref": "#/components/schemas/DeviceStatus"
+          },
+          "localApiUrl": {
+            "type": "string"
+          },
+          "localServerId": {
+            "type": "string"
+          },
+          "kits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "kitNumbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "vpnAddress": {
+            "type": "string"
+          },
+          "vpnAddressUpdated": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ecuId",
+          "organisationId",
+          "organisationName",
+          "serial",
+          "serialAlias",
+          "ecuSerial",
+          "alias",
+          "deviceVersion",
+          "deviceVersionAsBuild",
+          "deviceName",
+          "mac",
+          "ethernetMac",
+          "hardwareVersion",
+          "bootVersion",
+          "deviceTypeId",
+          "baseType",
+          "type",
+          "subType",
+          "voltage",
+          "color",
+          "status",
+          "address",
+          "address1",
+          "address2",
+          "postalCode",
+          "city",
+          "region",
+          "countryId",
+          "country",
+          "longitude",
+          "latitude",
+          "inletManifoldType",
+          "toilet",
+          "washingMachine",
+          "auxiliary",
+          "auxiliaryOptionAvailable",
+          "liftPumpBefore",
+          "liftPumpAfter",
+          "targetBranch",
+          "dealer",
+          "purchaseOrder",
+          "productionOrder",
+          "invoice",
+          "notes",
+          "lastOnline",
+          "currentBranch",
+          "firmwareVersion",
+          "wifiVersion",
+          "manual",
+          "online",
+          "factoryTestCompletedDate",
+          "verificationDate",
+          "commissionDate",
+          "endOfWarranty",
+          "neighbourGroupId",
+          "neighbourGroupName",
+          "cascadeGroupId",
+          "cascadeGroupName",
+          "cascadeGroupConnectedT3",
+          "cascadeGroupExternalDistPump",
+          "cascadeGroupNumber",
+          "maintenancePeriod",
+          "nextMaintenanceDate",
+          "maintenancePlannedDate",
+          "lastMaintenanceDate",
+          "lastMaintenanceType",
+          "nickname",
+          "ownerId",
+          "ownerName",
+          "owner",
+          "organisation",
+          "organisations",
+          "boardVersions",
+          "settings",
+          "deviceStatus",
+          "localApiUrl",
+          "localServerId",
+          "kits",
+          "kitNumbers",
+          "vpnAddress",
+          "vpnAddressUpdated"
+        ]
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "External Local API",
+    "url": "../../api-local/external-api/"
+  }
+}
