@@ -48,9 +48,7 @@
             "external-api-key": []
           }
         ],
-        "tags": [
-          "external-api"
-        ]
+        "tags": ["external-api"]
       }
     },
     "/external-api/recycled-water-by-month": {
@@ -108,9 +106,7 @@
             "external-api-key": []
           }
         ],
-        "tags": [
-          "external-api"
-        ]
+        "tags": ["external-api"]
       }
     },
     "/external-api/auxiliary-output-by-day": {
@@ -179,9 +175,7 @@
             "external-api-key": []
           }
         ],
-        "tags": [
-          "external-api"
-        ]
+        "tags": ["external-api"]
       }
     },
     "/external-api/backup-water-by-day": {
@@ -250,9 +244,7 @@
             "external-api-key": []
           }
         ],
-        "tags": [
-          "external-api"
-        ]
+        "tags": ["external-api"]
       }
     },
     "/external-api/backup-water-by-month": {
@@ -312,9 +304,7 @@
             "external-api-key": []
           }
         ],
-        "tags": [
-          "external-api"
-        ]
+        "tags": ["external-api"]
       }
     },
     "/external-api/bypass-mode": {
@@ -341,9 +331,7 @@
             "external-api-key": []
           }
         ],
-        "tags": [
-          "external-api"
-        ]
+        "tags": ["external-api"]
       },
       "get": {
         "operationId": "ExternalApiController_getBypassMode",
@@ -374,9 +362,7 @@
             "external-api-key": []
           }
         ],
-        "tags": [
-          "external-api"
-        ]
+        "tags": ["external-api"]
       }
     }
   },
@@ -423,10 +409,7 @@
             "description": "Water recycled in liters"
           }
         },
-        "required": [
-          "x",
-          "y"
-        ]
+        "required": ["x", "y"]
       },
       "WaterIntakeOfHouseCoordinates": {
         "type": "object",
@@ -440,10 +423,7 @@
             "description": "Water intake of house in liters"
           }
         },
-        "required": [
-          "x",
-          "y"
-        ]
+        "required": ["x", "y"]
       },
       "WaterRecycledRecords": {
         "type": "object",
@@ -461,10 +441,7 @@
             }
           }
         },
-        "required": [
-          "waterRecycled",
-          "waterIntakeOfHouse"
-        ]
+        "required": ["waterRecycled", "waterIntakeOfHouse"]
       },
       "AuxiliaryOutput": {
         "type": "object",
@@ -479,11 +456,7 @@
             "type": "number"
           }
         },
-        "required": [
-          "start",
-          "end",
-          "liters"
-        ]
+        "required": ["start", "end", "liters"]
       },
       "IoCoordinates": {
         "type": "object",
@@ -499,11 +472,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "x",
-          "y",
-          "actorId"
-        ]
+        "required": ["x", "y", "actorId"]
       },
       "ChangeBypassModeCommand": {
         "type": "object",
@@ -515,10 +484,7 @@
             "type": "boolean"
           }
         },
-        "required": [
-          "deviceId",
-          "activate"
-        ]
+        "required": ["deviceId", "activate"]
       },
       "BypassMode": {
         "type": "object",
@@ -533,11 +499,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "bypassActive",
-          "minutesRemaining",
-          "remaining"
-        ]
+        "required": ["bypassActive", "minutesRemaining", "remaining"]
       }
     }
   },

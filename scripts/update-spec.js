@@ -32,7 +32,8 @@ function extractSwaggerDoc(code) {
   if (markerIdx === -1) throw new Error('Could not find "swaggerDoc" key');
 
   const jsonStart = code.indexOf("{", markerIdx + marker.length);
-  if (jsonStart === -1) throw new Error("Could not find opening brace for swaggerDoc");
+  if (jsonStart === -1)
+    throw new Error("Could not find opening brace for swaggerDoc");
 
   let depth = 0;
   let inString = false;
@@ -73,7 +74,9 @@ for (const { url, filename } of SOURCES) {
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status} ${response.statusText} for ${url}`);
+    throw new Error(
+      `HTTP ${response.status} ${response.statusText} for ${url}`,
+    );
   }
 
   const code = await response.text();
