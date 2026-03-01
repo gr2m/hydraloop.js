@@ -25,9 +25,7 @@
             "external-api-key": []
           }
         ],
-        "tags": [
-          "external-api"
-        ]
+        "tags": ["external-api"]
       }
     }
   },
@@ -72,10 +70,7 @@
             "type": "string"
           }
         },
-        "required": [
-          "id",
-          "name"
-        ]
+        "required": ["id", "name"]
       },
       "Role": {
         "type": "object",
