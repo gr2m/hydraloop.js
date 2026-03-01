@@ -17,18 +17,32 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: lts/*
+      - run: npm ci
 
       - name: Fetch latest specs
         run: node scripts/update-spec.js
 
+      - name: Format
+        run: npm run lint:fix
+
       - name: Check for changes
         id: changes
         run: |
-          if git diff --quiet -- spec/; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-          fi
+          changed=false
+          for f in $(git diff --name-only -- spec/); do
+            if [[ "$f" == *.json ]]; then
+              before=$(git show HEAD:"$f" | jq 'del(.info.version)')
+              after=$(jq 'del(.info.version)' "$f")
+              if [ "$before" != "$after" ]; then
+                changed=true
+                break
+              fi
+            else
+              changed=true
+              break
+            fi
+          done
+          echo "changed=$changed" >> $GITHUB_OUTPUT
 
       - name: Open or update pull request
         if: steps.changes.outputs.changed == 'true'
