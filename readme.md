@@ -323,6 +323,16 @@ The Hydraloop system tracks three types of water flow:
 
 In short: high recycled water + low backup water = good system efficiency.
 
+> **Note:** The API does not report the volume of water flowing _into_ the Hydraloop unit. This is intentional — measuring inlet volume accurately is not feasible for several reasons:
+>
+> - The inlet valve closes during certain stages of the cleaning process, making continuous measurement impossible.
+> - Water flowing through the bypass cannot be measured at all.
+> - Level-based measurement (comparing T1 middle tank and T2 top-sides tank) only works when both tanks are equalized, which typically happens for only a couple of minutes per hour.
+> - Incoming water is usually warm (from showers or baths), so levels shift as the water cools — a reading taken immediately after the inlet closes will differ from one taken minutes later.
+> - During cleaning, debris is skimmed off the top, causing some water loss that further complicates any volume estimate.
+>
+> Waiting for ideal measurement conditions would delay the cleaning cycle and reduce the total amount of water recycled. The API therefore omits this value rather than reporting an unreliable figure.
+
 ## License
 
 [ISC](license)
