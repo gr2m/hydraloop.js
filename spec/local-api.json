@@ -369,7 +369,7 @@
   "info": {
     "title": "HDM - External Local API",
     "description": "Hydraloop Device Manager External Local API description",
-    "version": "8.4.1-202602280415",
+    "version": "8.9.0-202609060415",
     "contact": {}
   },
   "tags": [],
