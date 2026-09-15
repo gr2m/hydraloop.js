@@ -32,11 +32,15 @@
   "info": {
     "title": "HDM - External Root API",
     "description": "Hydraloop Device Manager External Root API description",
-    "version": "8.4.0",
+    "version": "8.8.9",
     "contact": {}
   },
   "tags": [],
   "servers": [
+    {
+      "url": "https://hades.lan:8181/api-root/",
+      "description": "Pieter Home Test"
+    },
     {
       "url": "https://hdm-dev.hydraloop.com/api-root/",
       "description": "Development"
@@ -388,6 +392,15 @@
               "type": "string"
             }
           },
+          "hasBlockingIssue": {
+            "type": "boolean"
+          },
+          "blockingInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
           "state": {
             "type": "string"
           },
@@ -410,6 +423,8 @@
           "minorIssueInfo",
           "hasMajorIssue",
           "majorIssueInfo",
+          "hasBlockingIssue",
+          "blockingInfo",
           "state",
           "storedState",
           "fieldTest",
@@ -521,6 +536,9 @@
           "toilet": {
             "type": "boolean"
           },
+          "connectedToilets": {
+            "type": "number"
+          },
           "washingMachine": {
             "type": "boolean"
           },
@@ -528,6 +546,9 @@
             "type": "boolean"
           },
           "auxiliaryOptionAvailable": {
+            "type": "boolean"
+          },
+          "hasTransferUpgradeKit": {
             "type": "boolean"
           },
           "liftPumpBefore": {
@@ -725,9 +746,11 @@
           "latitude",
           "inletManifoldType",
           "toilet",
+          "connectedToilets",
           "washingMachine",
           "auxiliary",
           "auxiliaryOptionAvailable",
+          "hasTransferUpgradeKit",
           "liftPumpBefore",
           "liftPumpAfter",
           "targetBranch",
