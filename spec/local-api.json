@@ -109,204 +109,6 @@
         "tags": ["external-api"]
       }
     },
-    "/external-api/auxiliary-output-by-day": {
-      "get": {
-        "operationId": "ExternalApiController_getAuxiliaryOutputByDay",
-        "parameters": [
-          {
-            "name": "deviceId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "year",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "month",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "day",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "zone",
-            "required": false,
-            "in": "query",
-            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AuxiliaryOutput"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "external-api-key": []
-          }
-        ],
-        "tags": ["external-api"]
-      }
-    },
-    "/external-api/backup-water-by-day": {
-      "get": {
-        "operationId": "ExternalApiController_getBackupWaterByDay",
-        "parameters": [
-          {
-            "name": "deviceId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "year",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "month",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "day",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "zone",
-            "required": false,
-            "in": "query",
-            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/IoCoordinates"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "external-api-key": []
-          }
-        ],
-        "tags": ["external-api"]
-      }
-    },
-    "/external-api/backup-water-by-month": {
-      "get": {
-        "operationId": "ExternalApiController_getBackupWaterByMonth",
-        "parameters": [
-          {
-            "name": "deviceId",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "year",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "month",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "zone",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/IoCoordinates"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "external-api-key": []
-          }
-        ],
-        "tags": ["external-api"]
-      }
-    },
     "/external-api/bypass-mode": {
       "post": {
         "operationId": "ExternalApiController_changeBypassMode",
@@ -364,12 +166,123 @@
         ],
         "tags": ["external-api"]
       }
+    },
+    "/external-api/tank-levels": {
+      "get": {
+        "description": "Returns the latest known tank levels of a Hydraloop device: tank2 (leveled) and tank3, plus tank2b for H600 devices (the B-side of the T2 pair). Each tank reports a percentage (integer 0-100, same window definition as the device dashboard: T2/T2B over the calibrated pressure window 80→590 hPa (V1_5) / 80→596 hPa (V2_0); T3 from its minimum (87 hPa) up to the dashboard-full level) and the calibrated liters (one decimal). Tanks without data are returned as `null`. For H600 devices `tank2b` is a separate entry with its own percentage and liters; it is `null` for all other device types and for H600 devices without B-side data. Non-Hydraloop devices are rejected with 400 (tank levels do not apply to that device type).",
+        "operationId": "ExternalApiController_getTankLevels",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "description": "Id of the device. Must be a device assigned to the API key.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TankLevelsLatest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "deviceId is missing or not valid, or the device is not a Hydraloop device (tank levels do not apply to that device type)."
+          },
+          "401": {
+            "description": "API key missing or invalid, or the deviceId is not assigned to the API key."
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "summary": "Latest tank levels",
+        "tags": ["external-api"]
+      }
+    },
+    "/external-api/tank-levels-by-month": {
+      "get": {
+        "description": "Returns the tank level history of a Hydraloop device for a calendar month: one point per hour (average of the readings within the hour; hours without data are omitted) for tank2, tank3 and tank2b (H600 only). `x` is the hour bucket start as UTC ISO-8601, in the same style as the recycled-water endpoints. The percentage and liters use the same definition as `tank-levels`, applied to the hourly average pressure. Notes: tank2 is leveled only when the T1/T2 tanks are leveled (typically 1-2 samples per day, so the series is sparse by design); the tank3 series is served from a continuously refreshed one-hour aggregate that lags by about a day, so the most recent hours of the current month may be missing or incomplete; in half-hour timezones the tank2/tank2b hour labels are shifted 30 minutes relative to the tank3 labels. Non-Hydraloop devices are rejected with 400.",
+        "operationId": "ExternalApiController_getTankLevelsByMonth",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "description": "Id of the device. Must be a device assigned to the API key.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "description": "Year of the month (2000-3000).",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "description": "Month of the year (1-12).",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": false,
+            "in": "query",
+            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TankLevelsMonth"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "deviceId is missing or not valid, the device is not a Hydraloop device, or year/month is out of range."
+          },
+          "401": {
+            "description": "API key missing or invalid, or the deviceId is not assigned to the API key."
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "summary": "Tank levels by month",
+        "tags": ["external-api"]
+      }
     }
   },
   "info": {
     "title": "HDM - External Local API",
     "description": "Hydraloop Device Manager External Local API description",
-    "version": "8.4.1-202602280415",
+    "version": "8.9.6-202610310315",
     "contact": {}
   },
   "tags": [],
@@ -443,37 +356,6 @@
         },
         "required": ["waterRecycled", "waterIntakeOfHouse"]
       },
-      "AuxiliaryOutput": {
-        "type": "object",
-        "properties": {
-          "start": {
-            "type": "string"
-          },
-          "end": {
-            "type": "string"
-          },
-          "liters": {
-            "type": "number"
-          }
-        },
-        "required": ["start", "end", "liters"]
-      },
-      "IoCoordinates": {
-        "type": "object",
-        "properties": {
-          "x": {
-            "type": "string",
-            "description": "Timestamp"
-          },
-          "y": {
-            "type": "number"
-          },
-          "actorId": {
-            "type": "string"
-          }
-        },
-        "required": ["x", "y", "actorId"]
-      },
       "ChangeBypassModeCommand": {
         "type": "object",
         "properties": {
@@ -500,6 +382,111 @@
           }
         },
         "required": ["bypassActive", "minutesRemaining", "remaining"]
+      },
+      "TankLevelLatest": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string",
+            "example": "2026-10-28T09:12:40.000Z",
+            "description": "Source-row timestamp, UTC ISO-8601."
+          },
+          "percentage": {
+            "type": "number",
+            "example": 64,
+            "description": "Integer 0-100, same window definition as the device dashboard."
+          },
+          "liters": {
+            "type": "number",
+            "example": 57.3,
+            "description": "Calibrated liters, one decimal."
+          }
+        },
+        "required": ["time", "percentage", "liters"]
+      },
+      "TankLevelsLatest": {
+        "type": "object",
+        "properties": {
+          "tank2": {
+            "nullable": true,
+            "description": "Latest leveled tank2 reading. Null when no data.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TankLevelLatest"
+              }
+            ]
+          },
+          "tank2b": {
+            "nullable": true,
+            "description": "Latest leveled tank2b reading. H600 only; null for other types and when no B-side data.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TankLevelLatest"
+              }
+            ]
+          },
+          "tank3": {
+            "nullable": true,
+            "description": "Latest tank3 reading. Null when no data.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TankLevelLatest"
+              }
+            ]
+          }
+        },
+        "required": ["tank2", "tank2b", "tank3"]
+      },
+      "TankLevelMonthPoint": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "example": "2026-10-01T09:00:00.000Z",
+            "description": "Hour bucket start, UTC ISO-8601."
+          },
+          "percentage": {
+            "type": "number",
+            "example": 63,
+            "description": "Integer 0-100, same window definition as the device dashboard."
+          },
+          "liters": {
+            "type": "number",
+            "example": 56.8,
+            "description": "Calibrated liters, one decimal."
+          }
+        },
+        "required": ["x", "percentage", "liters"]
+      },
+      "TankLevelsMonth": {
+        "type": "object",
+        "properties": {
+          "tank2": {
+            "description": "Hourly points (average of the readings within the hour); hours without data are omitted.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankLevelMonthPoint"
+            }
+          },
+          "tank2b": {
+            "description": "H600 only; empty array for other types and when no B-side data.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankLevelMonthPoint"
+            }
+          },
+          "tank3": {
+            "description": "Hourly points (average of the readings within the hour); hours without data are omitted.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankLevelMonthPoint"
+            }
+          }
+        },
+        "required": ["tank2", "tank2b", "tank3"]
       }
     }
   },
