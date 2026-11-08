@@ -275,12 +275,12 @@ export class Viewer {
       const m = s.material;
       const isP = primary.has(id);
       const isS = !isP && secondary.has(id);
-      const ghost = (focused && !isP && !isS) || (this.xray && !isP && !isS);
+      const ghost = this.xray && !isP && !isS;
       m.color.copy(isP ? this.colors.primary : isS ? this.colors.secondary : s.baseColor);
       m.emissive.copy(isP ? this.colors.primary : isS ? this.colors.secondary : new THREE.Color(0));
       m.emissiveIntensity = isP || isS ? 0.35 : 0;
       m.transparent = ghost;
-      m.opacity = ghost ? (this.xray && !focused ? 0.18 : 0.1) : 1;
+      m.opacity = ghost ? (focused ? 0.1 : 0.18) : 1;
       m.depthWrite = !ghost;
       s.mesh.renderOrder = ghost ? 1 : 0;
       if (id === this.hoverId && !ghost) m.emissive.addScalar(0.12), (m.emissiveIntensity = Math.max(m.emissiveIntensity, 1));

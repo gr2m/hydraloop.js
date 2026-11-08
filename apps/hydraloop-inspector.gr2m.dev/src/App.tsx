@@ -106,6 +106,9 @@ export function App() {
 
   useEffect(() => viewerRef.current?.setExplode(explode), [explode, solids]);
   useEffect(() => viewerRef.current?.setCoversHidden(coversHidden), [coversHidden, solids]);
+  // Each new selection starts in X-ray so highlighted parts inside the unit are
+  // visible; the toolbar button can still turn it off.
+  useEffect(() => setXray(scene.highlight.primary.length + scene.highlight.secondary.length > 0), [scene]);
   useEffect(() => viewerRef.current?.setXray(xray), [xray, solids]);
 
   // Full screen hides the panel. Where the browser supports it (not iPhone Safari),

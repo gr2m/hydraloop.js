@@ -616,7 +616,16 @@
   grid-template-columns: max-content minmax(0, 1fr);
   column-gap: var(--vbg-space-4);
   row-gap: var(--vbg-space-1);
+  align-items: baseline;
   margin: 0;
+}
+
+.h6-causes dt,
+.h6-causes dd,
+.h6-facts dt,
+.h6-facts dd {
+  margin: 0;
+  padding: 0;
 }
 
 .h6-causes dt,
