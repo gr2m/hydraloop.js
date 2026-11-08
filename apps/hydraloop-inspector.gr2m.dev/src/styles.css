@@ -62,8 +62,9 @@
   top: 0;
   left: 0;
   max-width: 220px;
-  padding: 2px var(--vbg-space-2);
-  margin: -12px 0 0 10px;
+  /* The dot sits inside the label, centered on the anchor point. */
+  padding: 2px var(--vbg-space-2) 2px 20px;
+  margin: -12px 0 0 -10px;
   border-radius: var(--vbg-radius-small);
   background: var(--vbg-surface-primary);
   color: var(--vbg-text-primary);
@@ -78,7 +79,7 @@
 .h6-marker::before {
   content: "";
   position: absolute;
-  left: -14px;
+  left: 6px;
   top: 50%;
   width: 8px;
   height: 8px;
@@ -86,10 +87,6 @@
   border-radius: 50%;
   background: var(--h6-primary);
   box-shadow: 0 0 0 2px var(--vbg-surface-primary);
-}
-
-.h6-marker {
-  overflow: visible;
 }
 
 .h6-marker[data-tone="secondary"]::before {
@@ -754,7 +751,6 @@
 
   .h6-marker {
     max-width: 42vw;
-    overflow: hidden;
   }
 
   .h6-tool {

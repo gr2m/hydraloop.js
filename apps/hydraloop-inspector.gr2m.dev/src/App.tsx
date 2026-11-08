@@ -24,6 +24,7 @@ import {
 } from "./data";
 import { FIDELITY_LABEL, type Fidelity } from "./mapping";
 import { parseHash, sceneFor, toHash, type Selection } from "./selection";
+import { cssColorToHex } from "./color";
 
 type Tab = "problems" | "components" | "parts";
 
@@ -60,9 +61,16 @@ export function App() {
     applyTheme();
     const mq = matchMedia("(prefers-color-scheme: dark)");
     mq.addEventListener("change", applyTheme);
-    v.load(MODEL_URL, setProgress).then(setSolids, (e) => setLoadError(String(e?.message ?? e)));
+    // Safari may run this before the brand stylesheet has applied, so resolve
+    // the tokens again once the page and the model have loaded.
+    addEventListener("load", applyTheme);
+    v.load(MODEL_URL, setProgress).then(
+      (solids) => (applyTheme(), setSolids(solids)),
+      (e) => setLoadError(String(e?.message ?? e)),
+    );
     return () => {
       mq.removeEventListener("change", applyTheme);
+      removeEventListener("load", applyTheme);
       v.dispose();
     };
   }, []);
@@ -245,17 +253,15 @@ export function App() {
 
 /** Resolves a CSS color token (oklch, light-dark) to a hex string three.js understands. */
 function resolveColor(el: HTMLElement, token: string, fallback: string) {
+  // An undefined token makes `var()` fall back to the inherited color (black text),
+  // which would silently turn highlights black.
+  if (!getComputedStyle(el).getPropertyValue(token).trim()) return fallback;
   const probe = document.createElement("span");
   probe.style.color = `var(${token})`;
   el.appendChild(probe);
   const computed = getComputedStyle(probe).color;
   probe.remove();
-  const ctx = document.createElement("canvas").getContext("2d");
-  if (!ctx || !computed) return fallback;
-  ctx.fillStyle = computed;
-  ctx.fillRect(0, 0, 1, 1);
-  const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
-  return `rgb(${r}, ${g}, ${b})`;
+  return cssColorToHex(computed) ?? fallback;
 }
 
 function pickHit(h: SearchHit, select: (s: Selection) => void) {
