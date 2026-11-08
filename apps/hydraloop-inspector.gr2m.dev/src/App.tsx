@@ -44,6 +44,8 @@ export function App() {
   const [xray, setXray] = useState(false);
   const [hover, setHover] = useState<{ id: string; x: number; y: number } | null>(null);
   const [sheet, setSheet] = useState<"peek" | "full">("peek");
+  const [fullscreen, setFullscreen] = useState(false);
+  const appRef = useRef<HTMLDivElement>(null);
 
   const model = useMemo<ModelIndex | null>(() => (solids.length ? buildModelIndex(solids) : null), [solids]);
   const solidById = useMemo(() => new Map(solids.map((s) => [s.id, s])), [solids]);
@@ -106,11 +108,31 @@ export function App() {
   useEffect(() => viewerRef.current?.setCoversHidden(coversHidden), [coversHidden, solids]);
   useEffect(() => viewerRef.current?.setXray(xray), [xray, solids]);
 
+  // Full screen hides the panel. Where the browser supports it (not iPhone Safari),
+  // the app also enters native full screen; leaving it with Esc exits our mode too.
+  const toggleFullscreen = () => {
+    const next = !fullscreen;
+    setFullscreen(next);
+    if (next && !document.fullscreenElement) appRef.current?.requestFullscreen?.().catch(() => {});
+    if (!next && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  };
+
+  useEffect(() => {
+    const onChange = () => !document.fullscreenElement && setFullscreen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && !document.fullscreenElement && setFullscreen(false);
+    document.addEventListener("fullscreenchange", onChange);
+    addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange);
+      removeEventListener("keydown", onKey);
+    };
+  }, []);
+
   const hoverSolid = hover ? solidById.get(hover.id) : null;
   const hasHighlight = scene.highlight.primary.length + scene.highlight.secondary.length > 0;
 
   return (
-    <div className="vbg-report h6-app">
+    <div className="vbg-report h6-app" ref={appRef} data-fullscreen={fullscreen || undefined}>
       <a className="vbg-skip-link" href="#h6-panel">
         Skip to search
       </a>
@@ -160,6 +182,8 @@ export function App() {
             viewerRef.current?.focus(ids.length ? ids : undefined);
           }}
           onZoom={(f) => viewerRef.current?.zoom(f)}
+          fullscreen={fullscreen}
+          onFullscreen={toggleFullscreen}
         />
       </section>
 
@@ -250,6 +274,8 @@ function Toolbar(props: {
   onView: (p: ViewPreset) => void;
   onFit: () => void;
   onZoom: (f: number) => void;
+  fullscreen: boolean;
+  onFullscreen: () => void;
 }) {
   const [views, setViews] = useState(false);
   return (
@@ -299,6 +325,9 @@ function Toolbar(props: {
           −
         </button>
       </span>
+      <button type="button" className="h6-tool" aria-pressed={props.fullscreen} onClick={props.onFullscreen}>
+        {props.fullscreen ? "Exit full screen" : "Full screen"}
+      </button>
     </div>
   );
 }

@@ -753,6 +753,42 @@
   }
 }
 
+/* ------------------------------------------------------------------------ */
+/* Full screen: only the model and its toolbar. Placed after the narrow-screen
+   rules so it also overrides the bottom-sheet layout on phones. */
+
+.h6-app[data-fullscreen] {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "stage";
+}
+
+.h6-app[data-fullscreen] .h6-panel,
+.h6-app[data-fullscreen] .vbg-skip-link {
+  display: none;
+}
+
+.h6-app[data-fullscreen] .h6-stage {
+  height: 100%;
+}
+
+.h6-app[data-fullscreen] .h6-toolbar {
+  top: auto;
+  bottom: calc(var(--vbg-space-4) + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 820px) {
+  .h6-app[data-fullscreen] .h6-menu {
+    top: auto;
+    bottom: calc(72px + env(safe-area-inset-bottom));
+  }
+}
+
+.h6-app[data-fullscreen] .h6-legend {
+  top: calc(var(--vbg-space-4) + env(safe-area-inset-top));
+  left: auto;
+  right: var(--vbg-space-4);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .h6-panel {
     transition: none;
