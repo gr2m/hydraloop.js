@@ -68,8 +68,11 @@ if (monthlyRecycled.length > 0) {
     const intake = yearData.waterIntakeOfHouse.find(
       (e) => e.timestamp === recycled.timestamp,
     );
+    // Timestamps are UTC month starts; format in UTC so the label doesn't
+    // shift to the previous month in timezones west of UTC.
     const monthLabel = new Date(recycled.timestamp).toLocaleDateString("en", {
       month: "short",
+      timeZone: "UTC",
     });
     let line = `    ${monthLabel}:  ${recycled.liters.toFixed(0)} L recycled`;
     if (intake && intake.liters > 0) {
@@ -164,17 +167,23 @@ if (hasBlockingIssue) {
   console.log(
     "  WARNING: Device has a blocking issue — recycling may be stopped.",
   );
-  console.log(`  Details: ${device.deviceStatus.blockingInfo.join(", ")}`);
+  console.log(
+    `  Details: ${device.deviceStatus.blockingInfo.map((i) => i.issue).join(", ")}`,
+  );
 } else if (hasMajorIssue) {
   console.log();
   console.log(
     "  WARNING: Device has a major issue — recycling efficiency may be impacted.",
   );
-  console.log(`  Details: ${device.deviceStatus.majorIssueInfo.join(", ")}`);
+  console.log(
+    `  Details: ${device.deviceStatus.majorIssueInfo.map((i) => i.issue).join(", ")}`,
+  );
 } else if (hasMinorIssue) {
   console.log();
   console.log("  NOTE: Device has a minor issue that may affect performance.");
-  console.log(`  Details: ${device.deviceStatus.minorIssueInfo.join(", ")}`);
+  console.log(
+    `  Details: ${device.deviceStatus.minorIssueInfo.map((i) => i.issue).join(", ")}`,
+  );
 }
 
 console.log();

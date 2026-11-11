@@ -65,10 +65,12 @@ for (const [name, points] of Object.entries(history)) {
   /** @type {Map<string, number[]>} */
   const byDay = new Map();
   for (const point of points) {
+    // Group by UTC day to match the API's UTC month boundaries
     const day = new Date(point.timestamp).toLocaleDateString("en", {
       weekday: "short",
       month: "short",
       day: "numeric",
+      timeZone: "UTC",
     });
     const values = byDay.get(day) ?? [];
     values.push(point.percentage);

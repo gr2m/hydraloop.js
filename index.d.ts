@@ -80,23 +80,39 @@ export interface Organisation {
   parent: Organisation | null;
 }
 
+// The OpenAPI spec declares the `*Info` arrays as `string[]`, but the API
+// returns issue objects.
+export interface DeviceIssue {
+  id: string;
+  ticketId: string;
+  created: string;
+  lastDetected: string;
+  /** Translation key, e.g. "deviceSignals.releaseAirStuckClosed" */
+  info: string;
+  /** e.g. "release_air_stuck_closed" */
+  issue: string;
+  /** e.g. "HL0035" */
+  publicIdentification: string;
+  data: Record<string, unknown>;
+}
+
 export interface DeviceStatus {
   deviceId: string;
   online: boolean;
   hasNotice: boolean;
-  noticeInfo: string[];
+  noticeInfo: DeviceIssue[];
   hasMinorIssue: boolean;
-  minorIssueInfo: string[];
+  minorIssueInfo: DeviceIssue[];
   hasMajorIssue: boolean;
-  majorIssueInfo: string[];
+  majorIssueInfo: DeviceIssue[];
   hasBlockingIssue: boolean;
-  blockingInfo: string[];
+  blockingInfo: DeviceIssue[];
   state: string;
   storedState: string;
   fieldTest: boolean;
   deviceForSpecialUseCases: boolean;
   hasAttentionRequired: boolean;
-  attentionRequiredInfo: string[];
+  attentionRequiredInfo: DeviceIssue[];
 }
 
 export interface Device {

@@ -4,6 +4,7 @@ import { Hydraloop } from "../index.js";
 import type {
   HydraloopOptions,
   Device,
+  DeviceIssue,
   DeviceStatus,
   Person,
   LoginUser,
@@ -85,9 +86,9 @@ describe("Hydraloop types", () => {
   it("DeviceStatus type shape", () => {
     const status = {} as DeviceStatus;
     expectTypeOf(status.hasBlockingIssue).toBeBoolean();
-    expectTypeOf(status.blockingInfo).toEqualTypeOf<string[]>();
+    expectTypeOf(status.blockingInfo).toEqualTypeOf<DeviceIssue[]>();
     expectTypeOf(status.hasAttentionRequired).toBeBoolean();
-    expectTypeOf(status.attentionRequiredInfo).toEqualTypeOf<string[]>();
+    expectTypeOf(status.attentionRequiredInfo).toEqualTypeOf<DeviceIssue[]>();
   });
 
   it("Person type shape", () => {
