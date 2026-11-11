@@ -71,6 +71,11 @@ for (const device of devices) {
   row("online", device.online, "Whether the device is currently reachable");
   row("lastOnline", device.lastOnline, "Last time the device was seen online");
   row("firmwareVersion", device.firmwareVersion, "Current firmware version");
+  row(
+    "firmwareCoreVersion",
+    device.firmwareCoreVersion,
+    "Current firmware core version",
+  );
   row("hardwareVersion", device.hardwareVersion, "Hardware revision");
   row("mac", device.mac, "WiFi MAC address");
   row("ethernetMac", device.ethernetMac, "Ethernet MAC address");
@@ -96,6 +101,11 @@ for (const device of devices) {
   );
   row("toilet", device.toilet, "Toilet water source connected");
   row(
+    "connectedToilets",
+    device.connectedToilets,
+    "Number of connected toilets",
+  );
+  row(
     "washingMachine",
     device.washingMachine,
     "Washing machine water source connected",
@@ -105,6 +115,11 @@ for (const device of devices) {
     "auxiliaryOptionAvailable",
     device.auxiliaryOptionAvailable,
     "Whether auxiliary output can be enabled",
+  );
+  row(
+    "hasTransferUpgradeKit",
+    device.hasTransferUpgradeKit,
+    "Transfer upgrade kit installed",
   );
   row(
     "liftPumpBefore",
@@ -179,6 +194,18 @@ for (const device of devices) {
     "      ",
   );
   row(
+    "hasBlockingIssue",
+    device.deviceStatus.hasBlockingIssue,
+    "Blocking issues detected",
+    "      ",
+  );
+  row(
+    "hasAttentionRequired",
+    device.deviceStatus.hasAttentionRequired,
+    "Attention required",
+    "      ",
+  );
+  row(
     "fieldTest",
     device.deviceStatus.fieldTest,
     "Device is in field-test mode",
@@ -249,91 +276,57 @@ if (monthData.waterIntakeOfHouse.length === 0) {
 }
 
 // ============================================================
-// 4. getAuxiliaryOutputByDay
+// 4. getTankLevels
+// ============================================================
+header("getTankLevels()  —  latest known tank levels");
+console.log("  tank2b is only reported for H600 devices.");
+
+const tankLevels = await hydraloop.getTankLevels({ deviceId });
+
+console.log();
+for (const [name, level] of Object.entries(tankLevels)) {
+  if (!level) {
+    row(name, "(no data)", "");
+    continue;
+  }
+  row(
+    name,
+    `${level.percentage}%  /  ${level.liters} L`,
+    `measured at ${level.timestamp}`,
+  );
+}
+
+// ============================================================
+// 5. getTankLevelsByMonth
 // ============================================================
 header(
-  `getAuxiliaryOutputByDay({ year: ${year}, month: ${month}, day: ${day} })  —  auxiliary output sessions for today`,
+  `getTankLevelsByMonth({ year: ${year}, month: ${month} })  —  hourly tank levels for a month`,
 );
 console.log(
-  "  Each entry is a time range when recycled water was sent to the auxiliary output",
+  "  tank2 is only measured when the tanks are leveled (1-2 times per day).",
 );
-console.log("  (e.g. garden irrigation, pool top-up)");
+console.log("  tank3 lags by about a day.");
 
-const auxData = await hydraloop.getAuxiliaryOutputByDay({
-  deviceId,
-  year,
-  month,
-  day,
-});
-
-if (auxData.length === 0) {
-  console.log("\n  (no auxiliary output sessions today)");
-} else {
-  console.log();
-  for (const entry of auxData) {
-    row(`${entry.start} → ${entry.end}`, `${entry.liters} L`, "");
-  }
-}
-
-// ============================================================
-// 5. getBackupWaterByDay
-// ============================================================
-header(
-  `getBackupWaterByDay({ year: ${year}, month: ${month}, day: ${day} })  —  backup (mains) water usage events for today`,
-);
-console.log(
-  "  When the Hydraloop tank is empty, mains water is used as backup.",
-);
-console.log("  actorId identifies which outlet triggered the backup water.");
-
-const backupDayData = await hydraloop.getBackupWaterByDay({
-  deviceId,
-  year,
-  month,
-  day,
-});
-
-if (backupDayData.length === 0) {
-  console.log("\n  (no backup water usage today)");
-} else {
-  console.log();
-  for (const entry of backupDayData) {
-    row(
-      entry.timestamp,
-      `${entry.liters} L`,
-      `actorId: ${entry.actorId ?? "—"}`,
-    );
-  }
-}
-
-// ============================================================
-// 6. getBackupWaterByMonth
-// ============================================================
-header(
-  `getBackupWaterByMonth({ year: ${year}, month: ${month} })  —  backup (mains) water usage per day for a month`,
-);
-
-const backupMonthData = await hydraloop.getBackupWaterByMonth({
+const tankLevelsMonth = await hydraloop.getTankLevelsByMonth({
   deviceId,
   year,
   month,
 });
 
-if (backupMonthData.length === 0) {
-  console.log("\n  (no backup water usage this month)");
-} else {
-  console.log();
-  for (const entry of backupMonthData) {
-    row(
-      entry.timestamp,
-      `${entry.liters} L`,
-      `actorId: ${entry.actorId ?? "—"}`,
-    );
+for (const [name, points] of Object.entries(tankLevelsMonth)) {
+  subheader(`${name}  —  ${points.length} hourly point(s)`);
+  if (points.length === 0) {
+    console.log("  (no data)");
+    continue;
+  }
+  // only print the most recent points to keep the output short
+  for (const point of points.slice(-5)) {
+    row(point.timestamp, `${point.percentage}%  /  ${point.liters} L`, "");
   }
 }
 
 // ============================================================
-// 7. getBypassMode
+// 6. getBypassMode
 // ============================================================
 header("getBypassMode()  —  current bypass mode status");
 console.log(

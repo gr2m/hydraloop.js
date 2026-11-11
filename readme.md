@@ -76,9 +76,11 @@ Each device includes a `deviceStatus` object with health information:
 - `hasNotice` / `noticeInfo` — Informational notices
 - `hasMinorIssue` / `minorIssueInfo` — Minor issues requiring attention
 - `hasMajorIssue` / `majorIssueInfo` — Major issues requiring immediate attention
+- `hasBlockingIssue` / `blockingInfo` — Blocking issues
+- `hasAttentionRequired` / `attentionRequiredInfo` — Situations that require attention
 - `state` — Current device state (e.g., `"RUNNING"`)
 
-The `noticeInfo`, `minorIssueInfo`, and `majorIssueInfo` arrays contain translation keys. Refer to the Hydraloop dictionary for human-readable translations.
+The `noticeInfo`, `minorIssueInfo`, `majorIssueInfo`, `blockingInfo`, and `attentionRequiredInfo` arrays contain translation keys. Refer to the Hydraloop dictionary for human-readable translations.
 
 <details>
 <summary>Example response</summary>
@@ -91,9 +93,12 @@ The `noticeInfo`, `minorIssueInfo`, and `majorIssueInfo` arrays contain translat
     "serial": "HL-2024-001",
     "online": true,
     "firmwareVersion": "8.3.4",
+    "firmwareCoreVersion": null,
     "toilet": true,
+    "connectedToilets": 1,
     "washingMachine": true,
     "auxiliary": false,
+    "hasTransferUpgradeKit": false,
     "localApiUrl": "https://hdm.hydraloop.com/api-local",
     "deviceStatus": {
       "deviceId": "cc20c5fc-...",
@@ -104,10 +109,14 @@ The `noticeInfo`, `minorIssueInfo`, and `majorIssueInfo` arrays contain translat
       "minorIssueInfo": [],
       "hasMajorIssue": false,
       "majorIssueInfo": [],
+      "hasBlockingIssue": false,
+      "blockingInfo": [],
       "state": "RUNNING",
       "storedState": "RUNNING",
       "fieldTest": false,
-      "deviceForSpecialUseCases": false
+      "deviceForSpecialUseCases": false,
+      "hasAttentionRequired": false,
+      "attentionRequiredInfo": []
     }
   }
 ]
@@ -160,73 +169,78 @@ Same response shape as `getRecycledWaterByYear`.
 
 ---
 
-#### `hydraloop.getAuxiliaryOutputByDay({ deviceId, year, month, day })`
+#### `hydraloop.getTankLevels({ deviceId })`
 
-Get auxiliary water output events for a specific day.
+Get the latest known tank levels of a Hydraloop device.
 
-| Option     | Type     | Description      |
-| ---------- | -------- | ---------------- |
-| `deviceId` | `string` | The device ID    |
-| `year`     | `number` | The year         |
-| `month`    | `number` | The month (1-12) |
-| `day`      | `number` | The day (1-31)   |
+| Option     | Type     | Description   |
+| ---------- | -------- | ------------- |
+| `deviceId` | `string` | The device ID |
 
-**Returns:** `Promise<AuxiliaryOutput[]>`
+**Returns:** `Promise<TankLevels>`
 
 ```json
-[
-  {
-    "start": "2025-01-15T08:30:00Z",
-    "end": "2025-01-15T08:45:00Z",
-    "liters": 12.5
+{
+  "tank2": {
+    "timestamp": "2025-01-15T09:12:40.000Z",
+    "percentage": 64,
+    "liters": 57.3
+  },
+  "tank2b": null,
+  "tank3": {
+    "timestamp": "2025-01-15T10:00:00.000Z",
+    "percentage": 41,
+    "liters": 36.2
   }
-]
+}
 ```
+
+- `timestamp` — UTC ISO 8601 timestamp of the reading
+- `percentage` — Integer 0-100, using the same definition as the device dashboard
+- `liters` — Calibrated liters, one decimal
+
+A tank without data is `null`. `tank2b` (the B-side of the T2 pair) is only set for H600 devices. The request fails with a `400` error for devices that are not Hydraloop units.
 
 ---
 
-#### `hydraloop.getBackupWaterByDay({ deviceId, year, month, day })`
+#### `hydraloop.getTankLevelsByMonth({ deviceId, year, month })`
 
-Get backup water usage data for a specific day.
+Get the hourly tank level history for a given month.
 
 | Option     | Type     | Description      |
 | ---------- | -------- | ---------------- |
 | `deviceId` | `string` | The device ID    |
 | `year`     | `number` | The year         |
 | `month`    | `number` | The month (1-12) |
-| `day`      | `number` | The day (1-31)   |
 
-**Returns:** `Promise<BackupWaterEntry[]>`
+**Returns:** `Promise<TankLevelsByMonth>`
 
 ```json
-[
-  {
-    "timestamp": "2025-01-15T06:00:00Z",
-    "liters": 5.2,
-    "actorId": "backup-valve-1"
-  }
-]
+{
+  "tank2": [
+    {
+      "timestamp": "2025-01-01T09:00:00.000Z",
+      "percentage": 63,
+      "liters": 56.8
+    }
+  ],
+  "tank2b": [],
+  "tank3": [
+    {
+      "timestamp": "2025-01-01T09:00:00.000Z",
+      "percentage": 40,
+      "liters": 35.4
+    }
+  ]
+}
 ```
 
-- `timestamp` — ISO 8601 timestamp
-- `liters` — Water volume in liters
-- `actorId` — Identifier of the backup water actor
+Each point is the average of the readings within one hour. `timestamp` is the start of that hour. Hours without data are omitted. `tank2b` is an empty array for devices other than the H600.
 
----
+Some things to be aware of:
 
-#### `hydraloop.getBackupWaterByMonth({ deviceId, year, month })`
-
-Get backup water usage data for a given month.
-
-| Option     | Type     | Description      |
-| ---------- | -------- | ---------------- |
-| `deviceId` | `string` | The device ID    |
-| `year`     | `number` | The year         |
-| `month`    | `number` | The month (1-12) |
-
-**Returns:** `Promise<BackupWaterEntry[]>`
-
-Same response shape as `getBackupWaterByDay`.
+- `tank2` is only measured when the T1/T2 tanks are leveled, typically 1-2 times per day, so the series is sparse.
+- `tank3` lags by about a day, so the most recent hours of the current month may be missing or incomplete.
 
 ---
 
@@ -276,8 +290,9 @@ The SDK exports the following TypeScript types:
 - `WaterRecycledRecords` — Water recycling data
 - `WaterRecycledEntry` — Water recycled data point
 - `WaterIntakeOfHouseEntry` — Water intake data point
-- `AuxiliaryOutput` — Auxiliary output event
-- `BackupWaterEntry` — Backup water data point with actor ID
+- `TankLevels` — Latest tank levels
+- `TankLevelsByMonth` — Hourly tank level history
+- `TankLevel` — Tank level data point
 - `BypassMode` — Bypass mode status
 
 ## Error Handling
@@ -315,13 +330,8 @@ When you call any device-specific method, the SDK automatically discovers the de
 
 ## Glossary
 
-The Hydraloop system tracks three types of water flow:
-
 - **Recycled Water** — Water that has been processed and purified by the Hydraloop for reuse in the home (e.g., for toilets, laundry, garden irrigation). This is the system's core purpose. The goal is to maximize recycled water usage.
-- **Backup Water** — Fallback water from the mains supply, used when recycled water is unavailable or insufficient. Each entry tracks which backup valve supplied it (`actorId`). The goal is to minimize backup water usage.
-- **Auxiliary Output** — Water discharged through auxiliary outlets on the device (overflow or disposal). Unlike the other two, auxiliary output tracks time-windowed events with `start`/`end` timestamps. Not all devices support this feature (see `auxiliaryOptionAvailable` on the device object).
-
-In short: high recycled water + low backup water = good system efficiency.
+- **Tank Levels** — Fill levels of the unit's tanks: `tank2` (the top-side tank, T2) and `tank3` (T3). H600 devices have a second T2 tank, reported as `tank2b`. Levels are reported as a percentage and in liters.
 
 > **Note:** The API does not report the volume of water flowing _into_ the Hydraloop unit. This is intentional — measuring inlet volume accurately is not feasible for several reasons:
 >

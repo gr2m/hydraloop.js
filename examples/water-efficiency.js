@@ -9,7 +9,6 @@ const hydraloop = new Hydraloop({
 const now = new Date();
 const year = now.getFullYear();
 const month = now.getMonth() + 1;
-const day = now.getDate();
 
 // ── Fetch all data ──────────────────────────────────────────────
 
@@ -27,20 +26,6 @@ const monthData = await hydraloop.getRecycledWaterByMonth({
   year,
   month,
 });
-const backupMonth = await hydraloop.getBackupWaterByMonth({
-  deviceId,
-  year,
-  month,
-});
-const backupToday = await hydraloop.getBackupWaterByDay({
-  deviceId,
-  year,
-  month,
-  day,
-});
-const auxToday = device.auxiliaryOptionAvailable
-  ? await hydraloop.getAuxiliaryOutputByDay({ deviceId, year, month, day })
-  : [];
 const bypass = await hydraloop.getBypassMode({ deviceId });
 
 // The API may return bypassActive: true with a negative minutesRemaining,
@@ -106,7 +91,6 @@ const totalIntakeMonth = monthData.waterIntakeOfHouse.reduce(
   (sum, e) => sum + e.liters,
   0,
 );
-const totalBackupMonth = backupMonth.reduce((sum, e) => sum + e.liters, 0);
 
 const monthName = now.toLocaleDateString("en", {
   month: "long",
@@ -122,54 +106,6 @@ if (totalIntakeMonth > 0) {
   console.log(`  Household water intake:  ${totalIntakeMonth.toFixed(0)} L`);
   console.log(`  Recycling rate:          ${recyclingRateMonth}%`);
 }
-console.log(`  Backup water used:       ${totalBackupMonth.toFixed(0)} L`);
-console.log();
-
-// Backup water by actor
-if (backupMonth.length > 0) {
-  /** @type {Record<string, number>} */
-  const byActor = {};
-  for (const entry of backupMonth) {
-    const actor = entry.actorId ?? "unknown";
-    byActor[actor] = (byActor[actor] ?? 0) + entry.liters;
-  }
-  console.log("  Backup water by source:");
-  for (const [actor, liters] of Object.entries(byActor)) {
-    console.log(`    ${actor}:  ${liters.toFixed(1)} L`);
-  }
-  console.log();
-}
-
-// ── Today's detail ──────────────────────────────────────────────
-
-const todayLabel = now.toLocaleDateString("en", {
-  weekday: "long",
-  month: "long",
-  day: "numeric",
-});
-const totalBackupToday = backupToday.reduce((sum, e) => sum + e.liters, 0);
-const totalAuxToday = auxToday.reduce((sum, e) => sum + e.liters, 0);
-
-console.log(`── Today (${todayLabel}) ──`);
-console.log(`  Backup water used:     ${totalBackupToday.toFixed(1)} L`);
-
-if (device.auxiliaryOptionAvailable) {
-  console.log(`  Auxiliary output:      ${totalAuxToday.toFixed(1)} L`);
-  if (auxToday.length > 0) {
-    for (const event of auxToday) {
-      const start = new Date(event.start).toLocaleTimeString("en", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      const end = new Date(event.end).toLocaleTimeString("en", {
-        hour: "2-digit",
-        minute: "2-digit",
-      });
-      console.log(`    ${start} - ${end}:  ${event.liters.toFixed(1)} L`);
-    }
-  }
-}
-
 if (bypassActive) {
   console.log(
     `  !! Bypass mode is ACTIVE (${bypass.remaining} remaining) — no water is being recycled`,
@@ -209,56 +145,27 @@ if (bypassActive) {
       console.log("  Possible causes:");
       console.log("  - Not enough greywater sources connected");
       console.log(
-        "  - High backup water usage may indicate the tank empties often",
-      );
-      console.log(
         "  - Check device status for maintenance issues that reduce recycling capacity",
       );
     }
   } else {
-    // No intake data — assess based on recycled volume and backup usage
+    // No intake data — assess based on recycled volume
     console.log(
       `  System is actively recycling water: ${totalRecycledMonth.toFixed(0)} L this month.`,
     );
-
-    if (totalBackupMonth > 0) {
-      const backupRatio = totalBackupMonth / totalRecycledMonth;
-      if (backupRatio > 0.5) {
-        console.log(
-          `  Backup water is ${(backupRatio * 100).toFixed(0)}% of recycled volume — tank may be emptying frequently.`,
-        );
-        console.log(
-          "  Spreading water usage more evenly throughout the day can help.",
-        );
-      } else if (backupRatio > 0.1) {
-        console.log(
-          `  Backup water usage is moderate (${totalBackupMonth.toFixed(0)} L, ${(backupRatio * 100).toFixed(0)}% of recycled).`,
-        );
-      } else {
-        console.log(
-          `  Backup water usage is low (${totalBackupMonth.toFixed(0)} L) — the system is meeting demand well.`,
-        );
-      }
-    } else {
-      console.log("  No backup water used this month — great efficiency.");
-    }
   }
 } else {
   console.log("  No recycling data available for this month yet.");
 }
 
-if (device.auxiliaryOptionAvailable && totalAuxToday > 20) {
+const { hasMinorIssue, hasMajorIssue, hasBlockingIssue } = device.deviceStatus;
+if (hasBlockingIssue) {
   console.log();
   console.log(
-    `  NOTE: ${totalAuxToday.toFixed(0)} L discharged through auxiliary output today.`,
+    "  WARNING: Device has a blocking issue — recycling may be stopped.",
   );
-  console.log(
-    "  Verify that auxiliary usage is intentional (e.g., garden irrigation).",
-  );
-}
-
-const { hasMinorIssue, hasMajorIssue } = device.deviceStatus;
-if (hasMajorIssue) {
+  console.log(`  Details: ${device.deviceStatus.blockingInfo.join(", ")}`);
+} else if (hasMajorIssue) {
   console.log();
   console.log(
     "  WARNING: Device has a major issue — recycling efficiency may be impacted.",

@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getTankLevels > returns latest tank levels 1`] = `
+{
+  "tank2": {
+    "liters": 57.3,
+    "percentage": 64,
+    "timestamp": "2025-01-15T09:12:40.000Z",
+  },
+  "tank2b": null,
+  "tank3": {
+    "liters": 36.2,
+    "percentage": 41,
+    "timestamp": "2025-01-15T10:00:00.000Z",
+  },
+}
+`;

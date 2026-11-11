@@ -13,8 +13,9 @@ import type {
   WaterRecycledRecords,
   WaterRecycledEntry,
   WaterIntakeOfHouseEntry,
-  AuxiliaryOutput,
-  BackupWaterEntry,
+  TankLevel,
+  TankLevels,
+  TankLevelsByMonth,
   BypassMode,
 } from "../index.js";
 
@@ -47,29 +48,16 @@ describe("Hydraloop types", () => {
         month: 1,
       }),
     ).toMatchTypeOf<Promise<WaterRecycledRecords>>();
+    expectTypeOf(hydraloop.getTankLevels({ deviceId: "id" })).toMatchTypeOf<
+      Promise<TankLevels>
+    >();
     expectTypeOf(
-      hydraloop.getAuxiliaryOutputByDay({
-        deviceId: "id",
-        year: 2025,
-        month: 1,
-        day: 15,
-      }),
-    ).toMatchTypeOf<Promise<AuxiliaryOutput[]>>();
-    expectTypeOf(
-      hydraloop.getBackupWaterByDay({
-        deviceId: "id",
-        year: 2025,
-        month: 1,
-        day: 15,
-      }),
-    ).toMatchTypeOf<Promise<BackupWaterEntry[]>>();
-    expectTypeOf(
-      hydraloop.getBackupWaterByMonth({
+      hydraloop.getTankLevelsByMonth({
         deviceId: "id",
         year: 2025,
         month: 1,
       }),
-    ).toMatchTypeOf<Promise<BackupWaterEntry[]>>();
+    ).toMatchTypeOf<Promise<TankLevelsByMonth>>();
     expectTypeOf(hydraloop.getBypassMode({ deviceId: "id" })).toMatchTypeOf<
       Promise<BypassMode>
     >();
@@ -87,8 +75,19 @@ describe("Hydraloop types", () => {
     expectTypeOf(device.online).toBeBoolean();
     expectTypeOf(device.toilet).toBeBoolean();
     expectTypeOf(device.washingMachine).toBeBoolean();
+    expectTypeOf(device.connectedToilets).toBeNumber();
+    expectTypeOf(device.hasTransferUpgradeKit).toBeBoolean();
+    expectTypeOf(device.firmwareCoreVersion).toEqualTypeOf<string | null>();
     expectTypeOf(device.neighborDevices).toMatchTypeOf<Device[]>();
     expectTypeOf(device.settings).toMatchTypeOf<Record<string, unknown>>();
+  });
+
+  it("DeviceStatus type shape", () => {
+    const status = {} as DeviceStatus;
+    expectTypeOf(status.hasBlockingIssue).toBeBoolean();
+    expectTypeOf(status.blockingInfo).toEqualTypeOf<string[]>();
+    expectTypeOf(status.hasAttentionRequired).toBeBoolean();
+    expectTypeOf(status.attentionRequiredInfo).toEqualTypeOf<string[]>();
   });
 
   it("Person type shape", () => {
@@ -119,18 +118,23 @@ describe("Hydraloop types", () => {
     expectTypeOf(entry.liters).toBeNumber();
   });
 
-  it("AuxiliaryOutput type shape", () => {
-    const aux = {} as AuxiliaryOutput;
-    expectTypeOf(aux.start).toBeString();
-    expectTypeOf(aux.end).toBeString();
-    expectTypeOf(aux.liters).toBeNumber();
+  it("TankLevels type shape", () => {
+    const levels = {} as TankLevels;
+    expectTypeOf(levels.tank2).toEqualTypeOf<TankLevel | null>();
+    expectTypeOf(levels.tank2b).toEqualTypeOf<TankLevel | null>();
+    expectTypeOf(levels.tank3).toEqualTypeOf<TankLevel | null>();
+
+    const level = {} as TankLevel;
+    expectTypeOf(level.timestamp).toBeString();
+    expectTypeOf(level.percentage).toBeNumber();
+    expectTypeOf(level.liters).toBeNumber();
   });
 
-  it("BackupWaterEntry type shape", () => {
-    const entry = {} as BackupWaterEntry;
-    expectTypeOf(entry.timestamp).toBeString();
-    expectTypeOf(entry.liters).toBeNumber();
-    expectTypeOf(entry.actorId).toBeString();
+  it("TankLevelsByMonth type shape", () => {
+    const levels = {} as TankLevelsByMonth;
+    expectTypeOf(levels.tank2).toEqualTypeOf<TankLevel[]>();
+    expectTypeOf(levels.tank2b).toEqualTypeOf<TankLevel[]>();
+    expectTypeOf(levels.tank3).toEqualTypeOf<TankLevel[]>();
   });
 
   it("BypassMode type shape", () => {
