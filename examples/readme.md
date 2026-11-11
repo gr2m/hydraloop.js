@@ -24,8 +24,8 @@ Exercises every API method with formatted output. Useful for verifying your API 
 
 ### `water-efficiency.js`
 
-Generates a water efficiency report with year-to-date totals, monthly breakdown, today's detail, and an assessment of your system's recycling performance.
+Generates a water efficiency report with year-to-date totals, monthly breakdown, current month detail, and an assessment of your system's recycling performance.
 
-### `auxiliary-output.js`
+### `tank-levels.js`
 
-Fetches auxiliary output data for the past 30 days and prints a per-day breakdown with a summary. Exits early if your device does not support auxiliary output.
+Prints the latest tank levels and a per-day summary (min / average / max) of the hourly tank levels for the current month.

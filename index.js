@@ -4,9 +4,8 @@ import { VERSION } from "./lib/version.js";
 import { listDevices } from "./lib/list-devices.js";
 import { getRecycledWaterByYear } from "./lib/get-recycled-water-by-year.js";
 import { getRecycledWaterByMonth } from "./lib/get-recycled-water-by-month.js";
-import { getAuxiliaryOutputByDay } from "./lib/get-auxiliary-output-by-day.js";
-import { getBackupWaterByDay } from "./lib/get-backup-water-by-day.js";
-import { getBackupWaterByMonth } from "./lib/get-backup-water-by-month.js";
+import { getTankLevels } from "./lib/get-tank-levels.js";
+import { getTankLevelsByMonth } from "./lib/get-tank-levels-by-month.js";
 import { getBypassMode } from "./lib/get-bypass-mode.js";
 import { setBypassMode } from "./lib/set-bypass-mode.js";
 
@@ -35,9 +34,8 @@ export class Hydraloop {
     this.listDevices = listDevices.bind(null, state);
     this.getRecycledWaterByYear = getRecycledWaterByYear.bind(null, state);
     this.getRecycledWaterByMonth = getRecycledWaterByMonth.bind(null, state);
-    this.getAuxiliaryOutputByDay = getAuxiliaryOutputByDay.bind(null, state);
-    this.getBackupWaterByDay = getBackupWaterByDay.bind(null, state);
-    this.getBackupWaterByMonth = getBackupWaterByMonth.bind(null, state);
+    this.getTankLevels = getTankLevels.bind(null, state);
+    this.getTankLevelsByMonth = getTankLevelsByMonth.bind(null, state);
     this.getBypassMode = getBypassMode.bind(null, state);
     this.setBypassMode = setBypassMode.bind(null, state);
   }

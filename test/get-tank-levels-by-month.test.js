@@ -15,7 +15,7 @@ async function loadFixture(name) {
   return JSON.parse(content);
 }
 
-describe("getBackupWaterByDay", () => {
+describe("getTankLevelsByMonth", () => {
   /** @type {import("undici").MockAgent} */
   let mockAgent;
   /** @type {import("undici").Interceptable} */
@@ -32,9 +32,9 @@ describe("getBackupWaterByDay", () => {
     await mockAgent.close();
   });
 
-  it("returns backup water data for a day", async () => {
+  it("returns hourly tank levels for a month", async () => {
     const devicesFixture = await loadFixture("list-coupled-devices");
-    const backupFixture = await loadFixture("backup-water-by-day");
+    const tankLevelsFixture = await loadFixture("tank-levels-by-month");
 
     pool
       .intercept({
@@ -45,17 +45,16 @@ describe("getBackupWaterByDay", () => {
 
     pool
       .intercept({
-        path: `/api-local/external-api/backup-water-by-day?deviceId=${DEVICE_ID}&year=2025&month=1&day=15`,
+        path: `/api-local/external-api/tank-levels-by-month?deviceId=${DEVICE_ID}&year=2025&month=1`,
         method: "GET",
       })
-      .reply(200, backupFixture);
+      .reply(200, tankLevelsFixture);
 
     const h = new Hydraloop({ apiKey: "test-key" });
-    const result = await h.getBackupWaterByDay({
+    const result = await h.getTankLevelsByMonth({
       deviceId: DEVICE_ID,
       year: 2025,
       month: 1,
-      day: 15,
     });
 
     expect(result).toMatchSnapshot();

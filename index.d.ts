@@ -89,10 +89,14 @@ export interface DeviceStatus {
   minorIssueInfo: string[];
   hasMajorIssue: boolean;
   majorIssueInfo: string[];
+  hasBlockingIssue: boolean;
+  blockingInfo: string[];
   state: string;
   storedState: string;
   fieldTest: boolean;
   deviceForSpecialUseCases: boolean;
+  hasAttentionRequired: boolean;
+  attentionRequiredInfo: string[];
 }
 
 export interface Device {
@@ -130,9 +134,11 @@ export interface Device {
   latitude: number;
   inletManifoldType: string;
   toilet: boolean;
+  connectedToilets: number;
   washingMachine: boolean;
   auxiliary: boolean;
   auxiliaryOptionAvailable: boolean;
+  hasTransferUpgradeKit: boolean;
   liftPumpBefore: boolean;
   liftPumpAfter: boolean;
   targetBranch: string;
@@ -144,6 +150,7 @@ export interface Device {
   lastOnline: string;
   currentBranch: string;
   firmwareVersion: string;
+  firmwareCoreVersion: string | null;
   wifiVersion: string;
   manual: boolean;
   online: boolean;
@@ -197,16 +204,27 @@ export interface WaterRecycledRecords {
   waterIntakeOfHouse: WaterIntakeOfHouseEntry[];
 }
 
-export interface AuxiliaryOutput {
-  start: string;
-  end: string;
+export interface TankLevel {
+  /** UTC ISO 8601 timestamp */
+  timestamp: string;
+  /** Integer 0-100, same window definition as the device dashboard */
+  percentage: number;
+  /** Calibrated liters, one decimal */
   liters: number;
 }
 
-export interface BackupWaterEntry {
-  timestamp: string;
-  liters: number;
-  actorId: string;
+export interface TankLevels {
+  tank2: TankLevel | null;
+  /** H600 only, `null` for other device types */
+  tank2b: TankLevel | null;
+  tank3: TankLevel | null;
+}
+
+export interface TankLevelsByMonth {
+  tank2: TankLevel[];
+  /** H600 only, empty for other device types */
+  tank2b: TankLevel[];
+  tank3: TankLevel[];
 }
 
 export interface BypassMode {
@@ -259,23 +277,12 @@ export declare class Hydraloop {
     year: number;
     month: number;
   }): Promise<WaterRecycledRecords>;
-  getAuxiliaryOutputByDay(options: {
+  getTankLevels(options: { deviceId: string }): Promise<TankLevels>;
+  getTankLevelsByMonth(options: {
     deviceId: string;
     year: number;
     month: number;
-    day: number;
-  }): Promise<AuxiliaryOutput[]>;
-  getBackupWaterByDay(options: {
-    deviceId: string;
-    year: number;
-    month: number;
-    day: number;
-  }): Promise<BackupWaterEntry[]>;
-  getBackupWaterByMonth(options: {
-    deviceId: string;
-    year: number;
-    month: number;
-  }): Promise<BackupWaterEntry[]>;
+  }): Promise<TankLevelsByMonth>;
   getBypassMode(options: { deviceId: string }): Promise<BypassMode>;
   setBypassMode(options: {
     deviceId: string;

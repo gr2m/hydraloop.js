@@ -1,0 +1,31 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`getTankLevelsByMonth > returns hourly tank levels for a month 1`] = `
+{
+  "tank2": [
+    {
+      "liters": 56.8,
+      "percentage": 63,
+      "timestamp": "2025-01-01T09:00:00.000Z",
+    },
+    {
+      "liters": 52.1,
+      "percentage": 58,
+      "timestamp": "2025-01-02T09:00:00.000Z",
+    },
+  ],
+  "tank2b": [],
+  "tank3": [
+    {
+      "liters": 35.4,
+      "percentage": 40,
+      "timestamp": "2025-01-01T09:00:00.000Z",
+    },
+    {
+      "liters": 37,
+      "percentage": 42,
+      "timestamp": "2025-01-01T10:00:00.000Z",
+    },
+  ],
+}
+`;

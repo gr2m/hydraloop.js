@@ -15,7 +15,7 @@ async function loadFixture(name) {
   return JSON.parse(content);
 }
 
-describe("getAuxiliaryOutputByDay", () => {
+describe("getTankLevels", () => {
   /** @type {import("undici").MockAgent} */
   let mockAgent;
   /** @type {import("undici").Interceptable} */
@@ -32,9 +32,9 @@ describe("getAuxiliaryOutputByDay", () => {
     await mockAgent.close();
   });
 
-  it("returns auxiliary output events for a day", async () => {
+  it("returns latest tank levels", async () => {
     const devicesFixture = await loadFixture("list-coupled-devices");
-    const auxFixture = await loadFixture("auxiliary-output-by-day");
+    const tankLevelsFixture = await loadFixture("tank-levels");
 
     pool
       .intercept({
@@ -45,18 +45,13 @@ describe("getAuxiliaryOutputByDay", () => {
 
     pool
       .intercept({
-        path: `/api-local/external-api/auxiliary-output-by-day?deviceId=${DEVICE_ID}&year=2025&month=1&day=15`,
+        path: `/api-local/external-api/tank-levels?deviceId=${DEVICE_ID}`,
         method: "GET",
       })
-      .reply(200, auxFixture);
+      .reply(200, tankLevelsFixture);
 
     const h = new Hydraloop({ apiKey: "test-key" });
-    const result = await h.getAuxiliaryOutputByDay({
-      deviceId: DEVICE_ID,
-      year: 2025,
-      month: 1,
-      day: 15,
-    });
+    const result = await h.getTankLevels({ deviceId: DEVICE_ID });
 
     expect(result).toMatchSnapshot();
   });
