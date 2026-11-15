@@ -1,0 +1,4923 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "HdmLocalController_get",
+        "parameters": [],
+        "responses": {
+          "302": {
+            "description": "Redirect to API documentation"
+          }
+        },
+        "summary": "Redirect to API documentation",
+        "tags": ["HdmLocal"]
+      }
+    },
+    "/ping": {
+      "get": {
+        "operationId": "HdmLocalController_ping",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Ping endpoint for health checks",
+        "tags": ["HdmLocal"]
+      }
+    },
+    "/load-files": {
+      "get": {
+        "operationId": "HdmLocalController_loadFiles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["HdmLocal"]
+      }
+    },
+    "/load-import": {
+      "get": {
+        "operationId": "HdmLocalController_loadImport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["HdmLocal"]
+      }
+    },
+    "/root-connect/device": {
+      "get": {
+        "operationId": "RootConnectController_storeDeviceProgress",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get device",
+        "tags": ["root-connect"]
+      }
+    },
+    "/graph/config": {
+      "get": {
+        "operationId": "GraphController_getGraphConfig",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "debugData",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphConfig"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves graph config for a specific device",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/data": {
+      "get": {
+        "operationId": "GraphController_getData",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minutesInView",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "debugData",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphRecords"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves graph data in a specific period",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/io": {
+      "get": {
+        "operationId": "GraphController_getIo",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IoRecordsByType"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves io data in a specific period",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/routines": {
+      "get": {
+        "operationId": "GraphController_getRoutineData",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoutineRecords"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves routine data in a specific period",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/jump-to": {
+      "post": {
+        "operationId": "GraphController_calculateJumpTo",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JumpTo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Calculate jump to date",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/status-log": {
+      "get": {
+        "operationId": "GraphController_getStatusLogData",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StatusLogEntryRecords"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves status log data in a specific period",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/water-recycled": {
+      "get": {
+        "operationId": "GraphController_getWaterRecycledData",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "zone",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterRecycledRecords"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves water recycled data in a specific period",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/incoming-water": {
+      "get": {
+        "operationId": "GraphController_getIncomingWaterData",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "unit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncomingWaterRecords"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves incoming water data in a specific period",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/power-usage": {
+      "get": {
+        "operationId": "GraphController_getPowerUsageData",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PowerUsageRecords"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves power usage data in a specific period",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/io-names-sensor-only": {
+      "get": {
+        "operationId": "GraphController_getIoNamesSensorOnly",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves the io names which are a sensor",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/last-io": {
+      "get": {
+        "operationId": "GraphController_getLastKnownIoState",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Retrieves the last know io state",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/io-manual": {
+      "post": {
+        "operationId": "GraphController_setIoManual",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetIoManual"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Set io manual state",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/io-value": {
+      "post": {
+        "operationId": "GraphController_setIoValue",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetIoValue"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Set io value state",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/active-heart-beat": {
+      "post": {
+        "operationId": "GraphController_setActiveHeartBeat",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetActiveHeartBeat"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Set active heart beat",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/device-date-range": {
+      "get": {
+        "operationId": "GraphController_getDeviceDateRange",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceDateRange"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves the date of the first and de last log data of the device",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/device-levels": {
+      "get": {
+        "operationId": "GraphController_getDeviceLevels",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceLevels"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retrieves the device levels",
+        "tags": ["graph"]
+      }
+    },
+    "/device-sync-root/devices": {
+      "post": {
+        "operationId": "DeviceSyncRootController_syncDevices",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Sync devices",
+        "tags": ["device-sync-root"]
+      }
+    },
+    "/device-sync-root/device": {
+      "post": {
+        "operationId": "DeviceSyncRootController_syncDevice",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Sync singular device",
+        "tags": ["device-sync-root"]
+      }
+    },
+    "/log-data/store": {
+      "post": {
+        "operationId": "LogDataController_store",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Stores log data",
+        "tags": ["log-data"]
+      }
+    },
+    "/log-data/online": {
+      "post": {
+        "operationId": "LogDataController_storeDeviceOnline",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataWithDeviceId"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LazyLoadingResult"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["log-data"]
+      }
+    },
+    "/log-data/offline": {
+      "post": {
+        "operationId": "LogDataController_storeDeviceOffline",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataWithDeviceId"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LazyLoadingResult"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["log-data"]
+      }
+    },
+    "/log-data/connectivity-event": {
+      "post": {
+        "operationId": "LogDataController_storeConnectivityEvent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectivityEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Stores a structured connectivity event",
+        "tags": ["log-data"]
+      }
+    },
+    "/log-data/device-progress": {
+      "post": {
+        "operationId": "LogDataController_storeDeviceProgress",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceProgress"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Stores device progress (firmware upload or settings update)",
+        "tags": ["log-data"]
+      }
+    },
+    "/log-data-external/device-power": {
+      "post": {
+        "operationId": "LogDataExternalController_storeDevicePower",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["log-data-external"]
+      }
+    },
+    "/device-dashboard/local-data": {
+      "get": {
+        "operationId": "DeviceDashboardController_getLocalData",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get device dashboard data",
+        "tags": ["device-dashboard"]
+      }
+    },
+    "/settings/list": {
+      "get": {
+        "operationId": "SettingsController_listPossibleSettings",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Settings"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Lists possible settings",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/last": {
+      "get": {
+        "operationId": "SettingsController_getLastKnownSettings",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SettingValue"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get last know setting values",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/last-specific": {
+      "get": {
+        "operationId": "SettingsController_getLastKnownSpecificSetting",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "groupId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "valueId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingValue"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get last known setting values from specific settings",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/last-dist-pump-settings": {
+      "get": {
+        "operationId": "SettingsController_getLastKnownDistPumpSetting",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingValue"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get last known distribution pump setting value",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/refresh-dist-pump-settings": {
+      "post": {
+        "operationId": "SettingsController_refreshDistPumpSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Refresh distribution pump setting value from device",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-dist-pump-setting": {
+      "post": {
+        "operationId": "SettingsController_changeDistPumpSetting",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeDistPumpSpeedCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the distribution pump speed setting of a Hydraloop",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/last-priority-setting": {
+      "get": {
+        "operationId": "SettingsController_getLastKnownPrioritySetting",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingValue"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get last known priority setting value",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/refresh-priority-setting": {
+      "post": {
+        "operationId": "SettingsController_refreshPrioritySetting",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Refresh priority setting value from device",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-priority-setting": {
+      "post": {
+        "operationId": "SettingsController_changePrioritySetting",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangePrioritySettingCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the priority setting of a Hydraloop",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/last-state-settings": {
+      "get": {
+        "operationId": "SettingsController_getLastKnownStateSettings",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StateSettings"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get last known state setting values",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/refresh-state-settings": {
+      "post": {
+        "operationId": "SettingsController_refreshStateSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Refresh state setting values from device",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/update-device-setting": {
+      "post": {
+        "operationId": "SettingsController_updateDeviceSetting",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["settings"]
+      }
+    },
+    "/settings/last-before-date": {
+      "get": {
+        "operationId": "SettingsController_getLastKnownSettingsBeforeDate",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SettingValue"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get last known setting values before date",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-system-active": {
+      "post": {
+        "operationId": "SettingsController_changeSystemActive",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeSystemActiveCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the Hydraloop system active setting",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-factory-state": {
+      "post": {
+        "operationId": "SettingsController_changeFactoryState",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeFactoryStateCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the Hydraloop factory state setting",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-recycle-after-date": {
+      "post": {
+        "operationId": "SettingsController_changeRecycleAfterDate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeRecycleAfterDateCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the Hydraloop recycle after date setting",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-soap-bomb-active": {
+      "post": {
+        "operationId": "SettingsController_changeSoapBombActive",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeSystemActiveCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the Hydraloop soap bomb setting",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/simulation-scenario": {
+      "get": {
+        "operationId": "SettingsController_getSimulationScenario",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SettingValue"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get the ECU-simulator scenario of a simulator device",
+        "tags": ["settings"]
+      },
+      "post": {
+        "operationId": "SettingsController_changeSimulationScenario",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeSimulationScenarioCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the ECU-simulator scenario of a simulator device",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change": {
+      "post": {
+        "operationId": "SettingsController_changeSetting",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change a Hydraloop device setting",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/refresh": {
+      "post": {
+        "operationId": "SettingsController_refreshSetting",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingRefreshCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Ask Hydraloop device to send the setting",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/history": {
+      "get": {
+        "operationId": "SettingsController_getHistory",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "groupId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "time",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SettingValue"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List value history of setting",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/request-app-authentication": {
+      "post": {
+        "operationId": "SettingsController_requestAppAuthorisation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestAppAuthenticationCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Request App Authentication",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/migrate-ecu-data": {
+      "post": {
+        "operationId": "SettingsController_migrateEcuData",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrateEcuDataCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Migrate ECU data",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-bypass-mode": {
+      "post": {
+        "operationId": "SettingsController_changeBypassMode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeBypassModeCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change bypass mode (activate/deactivate bleach or hair dye mode)",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-buzzer-setting": {
+      "post": {
+        "operationId": "SettingsController_changeBuzzerSetting",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeBuzzerSettingCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "change buzzer setting",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-washing-machine-mode": {
+      "post": {
+        "operationId": "SettingsController_changeWashingMachineMode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeWashingMachineModeSettingCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change washing machine mode (backup water usage)",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/change-operation-mode": {
+      "post": {
+        "operationId": "SettingsController_changeOperationMode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingChangeOperationModeSettingCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change washing machine mode (backup water usage)",
+        "tags": ["settings"]
+      }
+    },
+    "/logging/log": {
+      "post": {
+        "operationId": "LoggingController_storeLogging",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewLoggingCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["Logging"]
+      },
+      "get": {
+        "operationId": "LoggingController_getDeviceLogging",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LoggingEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Logging"]
+      }
+    },
+    "/fsm/submit-choice": {
+      "post": {
+        "operationId": "FsmController_submitChoice",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitChoiceCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Submit choice",
+        "tags": ["fsm"]
+      }
+    },
+    "/fsm/clear-stale": {
+      "post": {
+        "operationId": "FsmController_clearStale",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Clear Stale",
+        "tags": ["fsm"]
+      }
+    },
+    "/connectivity/events": {
+      "get": {
+        "operationId": "ConnectivityController_getEvents",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Gets recent connectivity evidence for a device",
+        "tags": ["connectivity"]
+      }
+    },
+    "/connectivity/server-events": {
+      "get": {
+        "operationId": "ConnectivityController_getServerEvents",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Gets recent BoardServer lifecycle evidence",
+        "tags": ["connectivity"]
+      }
+    },
+    "/connectivity/incidents": {
+      "get": {
+        "operationId": "ConnectivityController_getIncidents",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "offset",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Gets classified connectivity incidents for a device",
+        "tags": ["connectivity"]
+      }
+    },
+    "/maintenance/list-actions": {
+      "get": {
+        "operationId": "MaintenanceController_list",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List maintenance actions",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/force-upload": {
+      "post": {
+        "operationId": "MaintenanceController_forceUpload",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForceUploadCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Force firmware upload",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/restart-device": {
+      "post": {
+        "operationId": "MaintenanceController_restartDevice",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestartDeviceCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Restart device",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/update-device-settings-if-needed": {
+      "post": {
+        "operationId": "MaintenanceController_updateDeviceSettingsIfNeeded",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestartDeviceCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Update device settings if needed",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/reset-wifi": {
+      "post": {
+        "operationId": "MaintenanceController_resetWifi",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetWifiCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Reset WIFI",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/start-action": {
+      "post": {
+        "operationId": "MaintenanceController_startAction",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartActionCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Start Maintenance Action",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/version-read": {
+      "post": {
+        "operationId": "MaintenanceController_versionRead",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReadFirmwareVersionCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Read firmware version",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/restart-wifi": {
+      "post": {
+        "operationId": "MaintenanceController_restartWifi",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WifiRestartCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Request wifi restart",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/request-wifi-rssi": {
+      "post": {
+        "operationId": "MaintenanceController_requestWifiRssi",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestWifiRssiCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Request Wifi RSSI - Signal strength",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/possible-branches": {
+      "get": {
+        "operationId": "MaintenanceController_getPossibleBranches",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get possible branches of device",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/status-log": {
+      "get": {
+        "operationId": "MaintenanceController_getStatusLog",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verbose",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fsmInstanceIds",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StatusLogEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get status log of device",
+        "tags": ["maintenance"]
+      }
+    },
+    "/maintenance/list-status-log": {
+      "get": {
+        "operationId": "MaintenanceController_listStatusLog",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "verbose",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "event",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/LazyLoadingResult"
+                    },
+                    {
+                      "properties": {
+                        "records": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/StatusLogEntry"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["maintenance"]
+      }
+    },
+    "/user/get": {
+      "get": {
+        "operationId": "UserController_getUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get user",
+        "tags": ["user"]
+      }
+    },
+    "/debug/log": {
+      "get": {
+        "operationId": "DebugController_getLog",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DebugLogEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get debug log of device",
+        "tags": ["debug"]
+      }
+    },
+    "/debug/execute-commands": {
+      "post": {
+        "operationId": "DebugController_postExecuteCommands",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecuteCommandsCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Execute commands on device",
+        "tags": ["debug"]
+      }
+    },
+    "/debug/refresh-public-data": {
+      "post": {
+        "operationId": "DebugController_postRefreshPublicData",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshPublicDataCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Refreshes the public data",
+        "tags": ["debug"]
+      }
+    },
+    "/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Health check OK"
+          },
+          "500": {
+            "description": "Health check failed"
+          }
+        },
+        "tags": ["health"]
+      }
+    },
+    "/file-store/upload": {
+      "post": {
+        "operationId": "FileStoreController_storeFile",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["file-store"]
+      }
+    },
+    "/file-store/download/{id}": {
+      "get": {
+        "operationId": "FileStoreController_downloadFile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["file-store"]
+      }
+    },
+    "/external-api/recycled-water-by-year": {
+      "get": {
+        "operationId": "ExternalApiController_getRecycledWaterByYear",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": false,
+            "in": "query",
+            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterRecycledRecords"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": ["external-api"]
+      }
+    },
+    "/external-api/recycled-water-by-month": {
+      "get": {
+        "operationId": "ExternalApiController_getRecycledWaterByMonth",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": false,
+            "in": "query",
+            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WaterRecycledRecords"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": ["external-api"]
+      }
+    },
+    "/external-api/bypass-mode": {
+      "post": {
+        "operationId": "ExternalApiController_changeBypassMode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeBypassModeCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": ["external-api"]
+      },
+      "get": {
+        "operationId": "ExternalApiController_getBypassMode",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BypassMode"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "tags": ["external-api"]
+      }
+    },
+    "/external-api/tank-levels": {
+      "get": {
+        "description": "Returns the latest known tank levels of a Hydraloop device: tank2 (leveled) and tank3, plus tank2b for H600 devices (the B-side of the T2 pair). Each tank reports a percentage (integer 0-100, same window definition as the device dashboard: T2/T2B over the calibrated pressure window 80→590 hPa (V1_5) / 80→596 hPa (V2_0); T3 from its minimum (87 hPa) up to the dashboard-full level) and the calibrated liters (one decimal). Tanks without data are returned as `null`. For H600 devices `tank2b` is a separate entry with its own percentage and liters; it is `null` for all other device types and for H600 devices without B-side data. Non-Hydraloop devices are rejected with 400 (tank levels do not apply to that device type).",
+        "operationId": "ExternalApiController_getTankLevels",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "description": "Id of the device. Must be a device assigned to the API key.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TankLevelsLatest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "deviceId is missing or not valid, or the device is not a Hydraloop device (tank levels do not apply to that device type)."
+          },
+          "401": {
+            "description": "API key missing or invalid, or the deviceId is not assigned to the API key."
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "summary": "Latest tank levels",
+        "tags": ["external-api"]
+      }
+    },
+    "/external-api/tank-levels-by-month": {
+      "get": {
+        "description": "Returns the tank level history of a Hydraloop device for a calendar month: one point per hour (average of the readings within the hour; hours without data are omitted) for tank2, tank3 and tank2b (H600 only). `x` is the hour bucket start as UTC ISO-8601, in the same style as the recycled-water endpoints. The percentage and liters use the same definition as `tank-levels`, applied to the hourly average pressure. Notes: tank2 is leveled only when the T1/T2 tanks are leveled (typically 1-2 samples per day, so the series is sparse by design); the tank3 series is served from a continuously refreshed one-hour aggregate that lags by about a day, so the most recent hours of the current month may be missing or incomplete; in half-hour timezones the tank2/tank2b hour labels are shifted 30 minutes relative to the tank3 labels. Non-Hydraloop devices are rejected with 400.",
+        "operationId": "ExternalApiController_getTankLevelsByMonth",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "description": "Id of the device. Must be a device assigned to the API key.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "year",
+            "required": true,
+            "in": "query",
+            "description": "Year of the month (2000-3000).",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "description": "Month of the year (1-12).",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "zone",
+            "required": false,
+            "in": "query",
+            "description": "Timezone to use, defaults to UTC. Use INANA timezone notation like \"Europe/Amsterdam\" or a fixed offset like \"+01:00\" or \"UTC+1\".",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TankLevelsMonth"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "deviceId is missing or not valid, the device is not a Hydraloop device, or year/month is out of range."
+          },
+          "401": {
+            "description": "API key missing or invalid, or the deviceId is not assigned to the API key."
+          }
+        },
+        "security": [
+          {
+            "external-api-key": []
+          }
+        ],
+        "summary": "Tank levels by month",
+        "tags": ["external-api"]
+      }
+    },
+    "/random-data/insert": {
+      "get": {
+        "operationId": "RandomDataController_getInsertRandomData",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Insert random data",
+        "tags": ["random-data"]
+      },
+      "post": {
+        "operationId": "RandomDataController_setInsertRandomData",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Insert random data",
+        "tags": ["random-data"]
+      }
+    },
+    "/audit-trail/device-audit-trail-by-day": {
+      "get": {
+        "operationId": "AuditTrailController_getDeviceAuditTrailByDay",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditTrailAggregated"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Lists audit trail for device",
+        "tags": ["audit-trail"]
+      }
+    },
+    "/audit-trail/device-audit-trail": {
+      "get": {
+        "operationId": "AuditTrailController_getDeviceAuditTrail",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "loginUserId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditTrailEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Lists audit trail for device",
+        "tags": ["audit-trail"]
+      }
+    },
+    "/audit-trail/user-audit-trail-by-day": {
+      "get": {
+        "operationId": "AuditTrailController_getUserAuditTrailByDay",
+        "parameters": [
+          {
+            "name": "loginUserId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditTrailAggregated"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Lists audit trail for user",
+        "tags": ["audit-trail"]
+      }
+    },
+    "/audit-trail/user-audit-trail": {
+      "get": {
+        "operationId": "AuditTrailController_getUserAuditTrail",
+        "parameters": [
+          {
+            "name": "loginUserId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditTrailEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Lists audit trail for user",
+        "tags": ["audit-trail"]
+      }
+    },
+    "/audit-trail/resolve-names": {
+      "post": {
+        "operationId": "AuditTrailController_resolveNames",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveNamesCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResolvedName"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Resolves names for the audit trail",
+        "tags": ["audit-trail"]
+      }
+    },
+    "/console/execute": {
+      "post": {
+        "operationId": "ConsoleController_execute",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsoleExecuteResult"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Command executed"
+          }
+        },
+        "summary": "Execute commands",
+        "tags": ["console"]
+      }
+    },
+    "/cache-support/del": {
+      "post": {
+        "operationId": "CacheSupportLocalController_processDelEvent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Invalidate device cache",
+        "tags": ["CacheSupportLocal"]
+      }
+    },
+    "/external-io/input": {
+      "post": {
+        "operationId": "ExternalIOController_postAddNewInputData",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InputsData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Add input data from external source",
+        "tags": ["external-io"]
+      }
+    },
+    "/io-on-time/list": {
+      "get": {
+        "operationId": "IoOnTimeController_listIoOnTime",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ioName",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IoOnTime"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Lists the on time of an IO",
+        "tags": ["io-on-time"]
+      }
+    },
+    "/kiosk/data": {
+      "get": {
+        "operationId": "OfficeKioskController_getKioskData",
+        "parameters": [
+          {
+            "name": "zone",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get statistics kiosk data",
+        "tags": ["kiosk"]
+      }
+    },
+    "/kiosk/data-daily": {
+      "get": {
+        "operationId": "OfficeKioskController_getKioskDataInit",
+        "parameters": [
+          {
+            "name": "zone",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get statistics kiosk data",
+        "tags": ["kiosk"]
+      }
+    },
+    "/kiosk/water-recycled-last-week-per-device": {
+      "get": {
+        "operationId": "OfficeKioskController_getWaterRecycledData",
+        "parameters": [
+          {
+            "name": "zone",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get statistics kiosk data",
+        "tags": ["kiosk"]
+      }
+    },
+    "/kiosk/water-recycled-today-per-device": {
+      "get": {
+        "operationId": "OfficeKioskController_getWaterRecycledTodayData",
+        "parameters": [
+          {
+            "name": "zone",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get per-device water recycled today (for the kiosk top-3)",
+        "tags": ["kiosk"]
+      }
+    },
+    "/server-activity": {
+      "get": {
+        "operationId": "ServerActivityController_getActivity",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get local FSM and manual IO activity",
+        "tags": ["server-activity"]
+      }
+    },
+    "/server-activity/fsms/force-stop": {
+      "post": {
+        "operationId": "ServerActivityController_forceStopFsm",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Emergency force-stop a parent FSM and its children",
+        "tags": ["server-activity"]
+      }
+    },
+    "/performance-diagnostics": {
+      "get": {
+        "operationId": "LocalPerformanceDiagnosticsController_getDiagnostics",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get current local performance diagnostics and recent abnormalities",
+        "tags": ["performance-diagnostics"]
+      }
+    },
+    "/ecu-simulator/list": {
+      "get": {
+        "operationId": "EcuSimulatorController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "List ECU simulator instances, including orphaned simulator devices",
+        "tags": ["ecu-simulator"]
+      }
+    },
+    "/ecu-simulator/spawn": {
+      "post": {
+        "operationId": "EcuSimulatorController_spawn",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpawnCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Spawn a new ECU simulator instance (only an alias is needed)",
+        "tags": ["ecu-simulator"]
+      }
+    },
+    "/ecu-simulator/{id}/stop": {
+      "post": {
+        "operationId": "EcuSimulatorController_stop",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Stop an ECU simulator instance, or kill the stray process of an orphaned one",
+        "tags": ["ecu-simulator"]
+      }
+    },
+    "/ecu-simulator/{id}/speed": {
+      "post": {
+        "operationId": "EcuSimulatorController_setSpeed",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpeedCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the simulation speed of an instance",
+        "tags": ["ecu-simulator"]
+      }
+    },
+    "/ecu-simulator/{id}/scenario": {
+      "post": {
+        "operationId": "EcuSimulatorController_setScenario",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the simulation scenario of an instance",
+        "tags": ["ecu-simulator"]
+      }
+    },
+    "/ecu-simulator/{id}/restart": {
+      "post": {
+        "operationId": "EcuSimulatorController_restart",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Restart an ECU simulator instance",
+        "tags": ["ecu-simulator"]
+      }
+    },
+    "/ecu-simulator/{id}": {
+      "delete": {
+        "operationId": "EcuSimulatorController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Remove an ECU simulator instance completely (process, files, device + ECU records)",
+        "tags": ["ecu-simulator"]
+      }
+    },
+    "/ecu-simulator/{id}/logs": {
+      "get": {
+        "operationId": "EcuSimulatorController_logs",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "lines",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Tail the log of an ECU simulator instance",
+        "tags": ["ecu-simulator"]
+      }
+    },
+    "/usb-connect/log": {
+      "get": {
+        "operationId": "UsbConnectController_getLog",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "direction",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["rx", "tx"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsbConnectLogEntry"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get the stored USB Connect console history of a device (on demand, newest first)",
+        "tags": ["usb-connect"]
+      }
+    },
+    "/usb-connect/sessions": {
+      "get": {
+        "operationId": "UsbConnectController_getSessions",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UsbConnectSessionRow"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get the USB Connect sessions of a device, newest first (HDM-84)",
+        "tags": ["usb-connect"]
+      }
+    },
+    "/usb-connect/firmware-updates": {
+      "get": {
+        "operationId": "UsbConnectFirmwareController_getFirmwareUpdates",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        },
+        "summary": "List the USB firmware updates of the device (audit, newest first)",
+        "tags": ["usb-connect-firmware"]
+      }
+    }
+  },
+  "info": {
+    "title": "Hydraloop Device Manager - Local",
+    "description": "Hydraloop Device Manager Local API description",
+    "version": "8.9.6",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "https://hdm-dev.hydraloop.com/api-local/",
+      "description": "Development"
+    },
+    {
+      "url": "https://hdm-acc.hydraloop.com/api-local/",
+      "description": "Acceptation"
+    },
+    {
+      "url": "https://hdm.hydraloop.com/api-local/",
+      "description": "Production"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "GraphConfig": {
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ios": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["lines", "ios"]
+      },
+      "GraphRecords": {
+        "type": "object",
+        "properties": {}
+      },
+      "IoRecords": {
+        "type": "object",
+        "properties": {}
+      },
+      "Behavior": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string"
+          },
+          "typeId": {
+            "type": "number"
+          },
+          "typeName": {
+            "type": "string"
+          },
+          "subTypeId": {
+            "type": "number"
+          },
+          "subTypeName": {
+            "type": "string"
+          }
+        },
+        "required": ["time", "typeId", "typeName", "subTypeId", "subTypeName"]
+      },
+      "IoRecordsByType": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "$ref": "#/components/schemas/IoRecords"
+          },
+          "manual": {
+            "$ref": "#/components/schemas/IoRecords"
+          },
+          "stuckPower": {
+            "$ref": "#/components/schemas/IoRecords"
+          },
+          "behavior": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Behavior"
+            }
+          }
+        },
+        "required": ["value", "manual", "stuckPower", "behavior"]
+      },
+      "RoutineRecords": {
+        "type": "object",
+        "properties": {
+          "routines": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["routines"]
+      },
+      "JumpTo": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId", "type", "from", "name"]
+      },
+      "StatusLogEntryRecords": {
+        "type": "object",
+        "properties": {
+          "statusLogEntries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["statusLogEntries"]
+      },
+      "WaterRecycledCoordinates": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "Timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Water recycled in liters"
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "WaterIntakeOfHouseCoordinates": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "Timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Water intake of house in liters"
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "WaterRecycledRecords": {
+        "type": "object",
+        "properties": {
+          "waterRecycled": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WaterRecycledCoordinates"
+            }
+          },
+          "waterIntakeOfHouse": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WaterIntakeOfHouseCoordinates"
+            }
+          }
+        },
+        "required": ["waterRecycled", "waterIntakeOfHouse"]
+      },
+      "IncomingWaterCoordinates": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "Timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Water recycled in liters"
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "IncomingWaterRecords": {
+        "type": "object",
+        "properties": {
+          "incomingWater": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IncomingWaterCoordinates"
+            }
+          }
+        },
+        "required": ["incomingWater"]
+      },
+      "PowerUsageCoordinates": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "Timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Power usage in kWh"
+          },
+          "duration": {
+            "type": "number",
+            "description": "Duration in seconds"
+          }
+        },
+        "required": ["x", "y", "duration"]
+      },
+      "PowerUsageRecords": {
+        "type": "object",
+        "properties": {
+          "ecu": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "lin_bottom": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "lin_pressure_4": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "lin_pressure_3": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "lin_pressure_2": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "led_strip": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "accu_charge_enable": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "grey_water_bypass": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "grey_water_ab_selection_valve": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "uv_valve": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "uv_power": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "auxiliary": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "backup_water": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "back_flush": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "distribution_pump": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "distribution_pump_circ": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "circulation_pump": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "air_pump": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "air_pump_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "bubbles_block": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "bubbles_block_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "add_air_valve": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "add_air_valve_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "release_air": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "release_air_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "transfer_path": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "transfer_path_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "waste_clean_tank": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "waste_clean_tank_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "diffuser_backwash": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          },
+          "diffuser_backwash_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PowerUsageCoordinates"
+            }
+          }
+        },
+        "required": [
+          "ecu",
+          "lin_bottom",
+          "lin_pressure_4",
+          "lin_pressure_3",
+          "lin_pressure_2",
+          "led_strip",
+          "accu_charge_enable",
+          "grey_water_bypass",
+          "grey_water_ab_selection_valve",
+          "uv_valve",
+          "uv_power",
+          "auxiliary",
+          "backup_water",
+          "back_flush",
+          "distribution_pump",
+          "distribution_pump_circ",
+          "circulation_pump",
+          "air_pump",
+          "air_pump_b",
+          "bubbles_block",
+          "bubbles_block_b",
+          "add_air_valve",
+          "add_air_valve_b",
+          "release_air",
+          "release_air_b",
+          "transfer_path",
+          "transfer_path_b",
+          "waste_clean_tank",
+          "waste_clean_tank_b",
+          "diffuser_backwash",
+          "diffuser_backwash_b"
+        ]
+      },
+      "SetIoManual": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "manual": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "name", "manual"]
+      },
+      "SetIoValue": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "name", "value"]
+      },
+      "SetActiveHeartBeat": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId"]
+      },
+      "DeviceDateRange": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "end": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": ["start", "end"]
+      },
+      "DeviceLevels": {
+        "type": "object",
+        "properties": {}
+      },
+      "LogData": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "deviceType": {
+            "type": "string"
+          },
+          "coreVersion": {
+            "type": "string",
+            "description": "Last known CORE firmware version at log receipt"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": ["deviceId", "deviceType", "data"]
+      },
+      "DataWithDeviceId": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "remoteAddress": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "serverInstanceId": {
+            "type": "string"
+          },
+          "connectionType": {
+            "type": "string"
+          },
+          "port": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "remoteAddress", "time"]
+      },
+      "LazyLoadingResult": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "number"
+          }
+        },
+        "required": ["total"]
+      },
+      "ConnectivityEvent": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "example": "device"
+          },
+          "eventType": {
+            "type": "string"
+          },
+          "eventCode": {
+            "type": "number"
+          },
+          "receivedAt": {
+            "type": "string"
+          },
+          "eventTime": {
+            "type": "string"
+          },
+          "eventTimeSource": {
+            "type": "string"
+          },
+          "bootId": {
+            "type": "number"
+          },
+          "sequence": {
+            "type": "number"
+          },
+          "eventUptimeMilliseconds": {
+            "type": "number"
+          },
+          "currentBootId": {
+            "type": "number"
+          },
+          "currentUptimeMilliseconds": {
+            "type": "number"
+          },
+          "route": {
+            "type": "number"
+          },
+          "rssi": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "number"
+          },
+          "detail": {
+            "type": "number"
+          },
+          "droppedBefore": {
+            "type": "number"
+          },
+          "aggregateSequence": {
+            "type": "number"
+          },
+          "occurrenceCount": {
+            "type": "number"
+          },
+          "serverInstanceId": {
+            "type": "string"
+          },
+          "socketId": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": ["source", "eventType", "receivedAt", "eventTimeSource"]
+      },
+      "DeviceProgress": {
+        "type": "object",
+        "properties": {
+          "streamIdentifier": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "percentage": {
+            "type": "number"
+          },
+          "type": {
+            "type": "string"
+          },
+          "info": {
+            "type": "string"
+          },
+          "created": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updated": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "streamIdentifier",
+          "deviceId",
+          "percentage",
+          "type",
+          "info",
+          "created",
+          "updated"
+        ]
+      },
+      "Setting": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "group": {
+            "type": "number"
+          },
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["key", "group", "id", "name"]
+      },
+      "SettingGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "settings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Setting"
+            }
+          }
+        },
+        "required": ["id", "name", "settings"]
+      },
+      "Settings": {
+        "type": "object",
+        "properties": {
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingGroup"
+            }
+          }
+        },
+        "required": ["groups"]
+      },
+      "SettingValue": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string"
+          },
+          "group": {
+            "type": "number"
+          },
+          "id": {
+            "type": "number"
+          },
+          "value": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["time", "group", "id", "value", "name"]
+      },
+      "SettingChangeDistPumpSpeedCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "distPumpSettingType": {
+            "type": "string"
+          },
+          "distPumpSpeed": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "distPumpSettingType", "distPumpSpeed"]
+      },
+      "SettingChangePrioritySettingCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "priorityOrder": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "priorityOrder"]
+      },
+      "StateSettings": {
+        "type": "object",
+        "properties": {
+          "settings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["settings", "values"]
+      },
+      "DateTime": {
+        "type": "object",
+        "properties": {}
+      },
+      "SettingChangeSystemActiveCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deviceId", "active"]
+      },
+      "SettingChangeFactoryStateCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deviceId", "active"]
+      },
+      "SettingChangeRecycleAfterDateCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "recycleAfterDate": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId", "recycleAfterDate"]
+      },
+      "SettingChangeSimulationScenarioCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "constantIncomingWater": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deviceId", "constantIncomingWater"]
+      },
+      "SettingChangeCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "group": {
+            "type": "number"
+          },
+          "id": {
+            "type": "number"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "group", "id", "value"]
+      },
+      "SettingRefreshCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "group": {
+            "type": "number"
+          },
+          "id": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "group", "id"]
+      },
+      "RequestAppAuthenticationCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "authenticationCode": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId", "authenticationCode"]
+      },
+      "MigrateEcuDataCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "oldEcuId": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId", "oldEcuId"]
+      },
+      "SettingChangeBypassModeCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "activate": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deviceId", "activate"]
+      },
+      "SettingChangeBuzzerSettingCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "value": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deviceId", "value"]
+      },
+      "SettingChangeWashingMachineModeSettingCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "value"]
+      },
+      "SettingChangeOperationModeSettingCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": ["deviceId", "value"]
+      },
+      "NewLoggingCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "line": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId", "line", "level", "time"]
+      },
+      "LoggingEntry": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "line": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string"
+          }
+        },
+        "required": ["time", "deviceId", "line", "level"]
+      },
+      "SubmitChoiceCommand": {
+        "type": "object",
+        "properties": {}
+      },
+      "ForceUploadCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId"]
+      },
+      "RestartDeviceCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId"]
+      },
+      "ResetWifiCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId"]
+      },
+      "StartActionCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "object"
+          },
+          "resumeIfRunning": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deviceId", "action", "parameters"]
+      },
+      "ReadFirmwareVersionCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId"]
+      },
+      "WifiRestartCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId"]
+      },
+      "RequestWifiRssiCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId"]
+      },
+      "StatusLogEntry": {
+        "type": "object",
+        "properties": {
+          "fsmInstanceId": {
+            "type": "string"
+          },
+          "fsmParentInstanceId": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          },
+          "errorId": {
+            "type": "number"
+          },
+          "information": {
+            "type": "string"
+          },
+          "verbose": {
+            "type": "boolean"
+          },
+          "loginUserId": {
+            "type": "string"
+          },
+          "side": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "fsmInstanceId",
+          "fsmParentInstanceId",
+          "time",
+          "errorId",
+          "information",
+          "verbose",
+          "loginUserId",
+          "side"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "personId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "totpEnabled": {
+            "type": "boolean"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "measurementSystem": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "updated": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "fullyLoggedIn": {
+            "type": "boolean"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "hardwareVersion": {
+            "type": "string"
+          },
+          "deviceVersion": {
+            "type": "string"
+          },
+          "deviceType": {
+            "type": "string"
+          },
+          "deviceInletManifoldType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "personId",
+          "name",
+          "username",
+          "totpEnabled",
+          "organisationId",
+          "measurementSystem",
+          "permissions",
+          "updated",
+          "language",
+          "fullyLoggedIn",
+          "deviceId",
+          "hardwareVersion",
+          "deviceVersion",
+          "deviceType",
+          "deviceInletManifoldType"
+        ]
+      },
+      "DebugLogEntry": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string"
+          },
+          "information": {
+            "type": "string"
+          }
+        },
+        "required": ["time", "information"]
+      },
+      "ExecuteCommandsCommand": {
+        "type": "object",
+        "properties": {}
+      },
+      "RefreshPublicDataCommand": {
+        "type": "object",
+        "properties": {}
+      },
+      "ChangeBypassModeCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "activate": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deviceId", "activate"]
+      },
+      "BypassMode": {
+        "type": "object",
+        "properties": {
+          "bypassActive": {
+            "type": "boolean"
+          },
+          "minutesRemaining": {
+            "type": "number"
+          },
+          "remaining": {
+            "type": "string"
+          }
+        },
+        "required": ["bypassActive", "minutesRemaining", "remaining"]
+      },
+      "TankLevelLatest": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string",
+            "example": "2026-10-28T09:12:40.000Z",
+            "description": "Source-row timestamp, UTC ISO-8601."
+          },
+          "percentage": {
+            "type": "number",
+            "example": 64,
+            "description": "Integer 0-100, same window definition as the device dashboard."
+          },
+          "liters": {
+            "type": "number",
+            "example": 57.3,
+            "description": "Calibrated liters, one decimal."
+          }
+        },
+        "required": ["time", "percentage", "liters"]
+      },
+      "TankLevelsLatest": {
+        "type": "object",
+        "properties": {
+          "tank2": {
+            "nullable": true,
+            "description": "Latest leveled tank2 reading. Null when no data.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TankLevelLatest"
+              }
+            ]
+          },
+          "tank2b": {
+            "nullable": true,
+            "description": "Latest leveled tank2b reading. H600 only; null for other types and when no B-side data.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TankLevelLatest"
+              }
+            ]
+          },
+          "tank3": {
+            "nullable": true,
+            "description": "Latest tank3 reading. Null when no data.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TankLevelLatest"
+              }
+            ]
+          }
+        },
+        "required": ["tank2", "tank2b", "tank3"]
+      },
+      "TankLevelMonthPoint": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "example": "2026-10-01T09:00:00.000Z",
+            "description": "Hour bucket start, UTC ISO-8601."
+          },
+          "percentage": {
+            "type": "number",
+            "example": 63,
+            "description": "Integer 0-100, same window definition as the device dashboard."
+          },
+          "liters": {
+            "type": "number",
+            "example": 56.8,
+            "description": "Calibrated liters, one decimal."
+          }
+        },
+        "required": ["x", "percentage", "liters"]
+      },
+      "TankLevelsMonth": {
+        "type": "object",
+        "properties": {
+          "tank2": {
+            "description": "Hourly points (average of the readings within the hour); hours without data are omitted.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankLevelMonthPoint"
+            }
+          },
+          "tank2b": {
+            "description": "H600 only; empty array for other types and when no B-side data.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankLevelMonthPoint"
+            }
+          },
+          "tank3": {
+            "description": "Hourly points (average of the readings within the hour); hours without data are omitted.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankLevelMonthPoint"
+            }
+          }
+        },
+        "required": ["tank2", "tank2b", "tank3"]
+      },
+      "AuditTrailAggregated": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string"
+          },
+          "loginUserId": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "first": {
+            "type": "string"
+          },
+          "last": {
+            "type": "string"
+          },
+          "calls": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "time",
+          "loginUserId",
+          "deviceId",
+          "first",
+          "last",
+          "calls"
+        ]
+      },
+      "AuditTrailEntry": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string"
+          },
+          "loginUserId": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "section": {
+            "type": "string"
+          },
+          "part": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "object"
+          },
+          "data": {
+            "type": "object"
+          },
+          "processingTime": {
+            "type": "number"
+          },
+          "resultType": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "loginUserId",
+          "deviceId",
+          "section",
+          "part",
+          "type",
+          "parameters",
+          "data",
+          "processingTime",
+          "resultType"
+        ]
+      },
+      "ResolveNamesCommand": {
+        "type": "object",
+        "properties": {
+          "loginUserIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["loginUserIds"]
+      },
+      "ResolvedName": {
+        "type": "object",
+        "properties": {
+          "loginUserId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["loginUserId", "name"]
+      },
+      "ConsoleExecuteResult": {
+        "type": "object",
+        "properties": {}
+      },
+      "InputData": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "time": {
+            "type": "number"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "required": ["id", "time", "value"]
+      },
+      "InputsData": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InputData"
+            }
+          }
+        },
+        "required": ["deviceId", "inputs"]
+      },
+      "IoOnTime": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "number"
+          },
+          "formattedDuration": {
+            "type": "string"
+          },
+          "turnedOnCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "deviceId",
+          "name",
+          "duration",
+          "formattedDuration",
+          "turnedOnCount"
+        ]
+      },
+      "SpawnCommand": {
+        "type": "object",
+        "properties": {}
+      },
+      "SpeedCommand": {
+        "type": "object",
+        "properties": {}
+      },
+      "ScenarioCommand": {
+        "type": "object",
+        "properties": {}
+      },
+      "UsbConnectLogEntry": {
+        "type": "object",
+        "properties": {
+          "time": {
+            "type": "string"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string",
+            "enum": ["rx", "tx"]
+          },
+          "senderId": {
+            "type": "string",
+            "nullable": true
+          },
+          "senderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "line": {
+            "type": "string"
+          },
+          "fullLine": {
+            "type": "string"
+          }
+        },
+        "required": ["time", "deviceId", "direction", "line", "fullLine"]
+      },
+      "UsbConnectSessionRow": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string"
+          },
+          "endedAt": {
+            "type": "string",
+            "nullable": true
+          },
+          "endReason": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "broken",
+              "hub-disconnected",
+              "port-lost",
+              "server-restarted"
+            ]
+          },
+          "hubName": {
+            "type": "string"
+          },
+          "lineCount": {
+            "type": "number"
+          }
+        },
+        "required": ["id", "startedAt", "hubName", "lineCount"]
+      }
+    }
+  }
+}
