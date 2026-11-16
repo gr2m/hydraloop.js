@@ -9,7 +9,7 @@ export HYDRALOOP_API_KEY="your-api-key"
 Run any example from the repository root with:
 
 ```bash
-node examples/<name>.js
+node examples/external/<name>.js
 ```
 
 ## Available Examples
