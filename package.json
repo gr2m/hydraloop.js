@@ -68,7 +68,7 @@
         "semantic-release-plugin-update-version-in-files",
         {
           "files": [
-            "lib/version.js"
+            "lib/external/version.js"
           ]
         }
       ],
