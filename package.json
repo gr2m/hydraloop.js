@@ -7,6 +7,10 @@
     ".": {
       "types": "./index.d.ts",
       "import": "./index.js"
+    },
+    "./internal": {
+      "types": "./lib/internal/index.d.ts",
+      "import": "./lib/internal/index.js"
     }
   },
   "main": "index.js",
@@ -14,7 +18,8 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "lib/"
+    "lib/",
+    "readme.internal.md"
   ],
   "scripts": {
     "lint": "prettier --check .",

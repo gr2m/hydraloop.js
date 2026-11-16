@@ -1,0 +1,69 @@
+import type { AuthToken } from "./root-types.js";
+import type { RootApi } from "./root-types.js";
+import type { LocalApi } from "./local-types.js";
+
+export type * as Root from "./root-types.js";
+export type * as Local from "./local-types.js";
+export type { RootApi } from "./root-types.js";
+export type { LocalApi } from "./local-types.js";
+
+export interface HydraloopOptions {
+  /** Token from a previous login. Use `hydraloop.login()` to get a new one. */
+  token?: string;
+  rootApiUrl?: string;
+  /**
+   * Local API URL for local API requests that are not for a specific device.
+   * Defaults to the preferred local server of `GET /devices/local-servers`.
+   */
+  localApiUrl?: string;
+}
+
+export interface LoginOptions {
+  username: string;
+  password: string;
+  /**
+   * One-time password for accounts with two-factor authentication. Pass a
+   * function to only create the code when it is needed.
+   */
+  totpCode?: string | (() => string | Promise<string>);
+  rememberDevice?: boolean;
+}
+
+export interface Route {
+  method: string;
+  url: string;
+  path?: string[];
+  query?: string[];
+}
+
+export interface State {
+  token: string | undefined;
+  rootApiUrl: string;
+  localApiUrl: string | undefined;
+  deviceLocalApiUrls: Map<string, string>;
+  deviceTokens: Map<string, { token: string; expiresAt: number }>;
+}
+
+export declare const VERSION: string;
+
+export { RequestError } from "../../index.js";
+
+export declare class Hydraloop {
+  static VERSION: string;
+  constructor(options?: HydraloopOptions);
+
+  /**
+   * Logs in with username and password, followed by the two-factor
+   * authentication if the account requires it. The token is used for all
+   * following requests.
+   */
+  login(options: LoginOptions): Promise<AuthToken>;
+
+  /** Methods of the root API (`/api-root`), grouped by tag */
+  root: RootApi;
+  /**
+   * Methods of the local API (`/api-local`), grouped by tag. Requests for a
+   * device are sent to the device's local API automatically.
+   */
+  local: LocalApi;
+}
