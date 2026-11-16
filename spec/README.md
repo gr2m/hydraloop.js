@@ -10,7 +10,7 @@ HDM has two backends, each with its own spec:
 Each backend publishes two specs:
 
 - **External** — only the `/external-api/*` endpoints, which are the ones Hydraloop offers for integrations. This library is built on these.
-- **Internal** — every endpoint, including the ones the HDM web app at `https://hdm.hydraloop.com/hdm/` uses internally. Not used by this library; kept for reference.
+- **Internal** — every endpoint, including the ones the HDM web app at `https://hdm.hydraloop.com/hdm/` uses internally. The [`hydraloop/internal`](../readme.internal.md) SDK is generated from these.
 
 ## Files
 
@@ -40,11 +40,11 @@ The internal specs are incomplete in places. Many root API operations have no su
 
 ## Stability
 
-The **external API** is the one Hydraloop provides for integrations. This library only uses the external API. Hydraloop has made no explicit promise of stability or versioning for it. So far it has changed by gaining endpoints and parameters (e.g. the `zone` parameter in February 2026).
+The **external API** is the one Hydraloop provides for integrations. The main `hydraloop` export only uses the external API. Hydraloop has made no explicit promise of stability or versioning for it. So far it has changed by gaining endpoints and parameters (e.g. the `zone` parameter in February 2026).
 
 The **internal API** behind the internal specs is meant for personal use only. The API is prune to change at any moment to support Hydraloop's needs for their own applications.
 
-It authenticates with a login session (JWT bearer token), not the `X-API-KEY` used by the external API. Treat `spec/internal/` as reference material only.
+It authenticates with a login session (JWT bearer token), not the `X-API-KEY` used by the external API. The [`hydraloop/internal`](../readme.internal.md) SDK is provided for personal use and exploration, not for integrations.
 
 Hydraloop also asked that the local API base URL not be hardcoded. Each device's `localApiUrl` (from `/api-root/external-api/list-coupled-devices`) "might change depending on load balancing and or privacy laws of your country".
 
@@ -56,4 +56,4 @@ Run the following command from the repository root:
 node scripts/update-spec.js
 ```
 
-This fetches all four sources and overwrites the JSON files in this folder. The [Update OpenAPI Specs](../.github/workflows/update-spec.yml) workflow runs it daily and opens a pull request when anything other than `info.version` changes.
+This fetches all four sources and overwrites the JSON files in this folder. Afterwards, regenerate the [`hydraloop/internal`](../readme.internal.md) SDK with `npm run generate:internal`. The [Update OpenAPI Specs](../.github/workflows/update-spec.yml) workflow runs it daily and opens a pull request when anything other than `info.version` changes.

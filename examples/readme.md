@@ -7,4 +7,4 @@
 
 Start with [`external/`](external/). Those examples use this library and the API that Hydraloop provides for integrations.
 
-The [`internal/`](internal/) examples call the internal HDM API directly, without this library. That API is not meant for external use and may change at any time. See [`spec/README.md`](../spec/README.md#stability).
+The [`internal/`](internal/) examples call the internal HDM API directly, without this library. There is also an SDK for it: [`hydraloop/internal`](../readme.internal.md). That API is not meant for external use and may change at any time. See [`spec/README.md`](../spec/README.md#stability).
