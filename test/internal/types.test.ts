@@ -58,6 +58,27 @@ describe("hydraloop/internal types", () => {
     hydraloop.local.settings.changeSetting({});
   });
 
+  it("corrected response types", () => {
+    const hydraloop = new Hydraloop();
+
+    expectTypeOf(
+      hydraloop.root.ticket.hasOpenOdooTicket({ deviceId: "device" }),
+    ).resolves.toEqualTypeOf<boolean>();
+    expectTypeOf<Root.Device["alias"]>().toEqualTypeOf<string | null>();
+    expectTypeOf<
+      Root.DeviceStatus["minorIssueInfo"][number]
+    >().toEqualTypeOf<Root.DeviceIssue>();
+    expectTypeOf<Local.GraphRecords>().toEqualTypeOf<
+      Record<string, Local.GraphPoint[]>
+    >();
+    expectTypeOf<Local.GraphConfig["lines"][number]["axis"]>().toEqualTypeOf<
+      "LEFT" | "RIGHT"
+    >();
+    expectTypeOf(
+      hydraloop.local.graph.getLastKnownIoState({ deviceId: "device" }),
+    ).resolves.toEqualTypeOf<Local.IoState[]>();
+  });
+
   it("RequestError", () => {
     expectTypeOf(new RequestError("message", {} as any)).toHaveProperty(
       "response",

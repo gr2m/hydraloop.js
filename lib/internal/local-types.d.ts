@@ -7,13 +7,15 @@
 export type LazyLoadEvent = Record<string, unknown>;
 
 export interface GraphConfig {
-  lines: string[];
-  ios: string[];
+  lines: GraphLine[];
+  ios: GraphIo[];
 }
 
-export interface GraphRecords {}
+/** Data points by graph line name (see `GraphLine.name`), e.g. "tank1" */
+export type GraphRecords = Record<string, GraphPoint[]>;
 
-export interface IoRecords {}
+/** Data points by IO name (see `GraphIo.name`), e.g. "air_pump" */
+export type IoRecords = Record<string, IoPoint[]>;
 
 export interface Behavior {
   time: string;
@@ -28,10 +30,11 @@ export interface IoRecordsByType {
   manual: IoRecords;
   stuckPower: IoRecords;
   behavior: Behavior[];
+  lastGroupItems: string[];
 }
 
 export interface RoutineRecords {
-  routines: string[];
+  routines: Routine[];
 }
 
 export interface JumpTo {
@@ -42,7 +45,7 @@ export interface JumpTo {
 }
 
 export interface StatusLogEntryRecords {
-  statusLogEntries: string[];
+  statusLogEntries: StatusLogEntry[];
 }
 
 export interface WaterRecycledCoordinates {
@@ -139,7 +142,11 @@ export interface DeviceDateRange {
   end: string;
 }
 
-export interface DeviceLevels {}
+/** Calibration tables to convert tank pressure to liters */
+export interface DeviceLevels {
+  t1t2Levels: LevelTableEntry[];
+  t3Levels: LevelTableEntry[];
+}
 
 export interface LogData {
   deviceId: string;
@@ -234,8 +241,8 @@ export interface SettingChangePrioritySettingCommand {
 }
 
 export interface StateSettings {
-  settings: string[];
-  values: string[];
+  settings: StateSetting[];
+  values: SettingValue[];
 }
 
 export type DateTime = string;
@@ -317,7 +324,7 @@ export interface LoggingEntry {
   level: string;
 }
 
-export interface SubmitChoiceCommand {}
+export type SubmitChoiceCommand = {};
 
 export interface ForceUploadCommand {
   deviceId: string;
@@ -385,9 +392,9 @@ export interface DebugLogEntry {
   information: string;
 }
 
-export interface ExecuteCommandsCommand {}
+export type ExecuteCommandsCommand = {};
 
-export interface RefreshPublicDataCommand {}
+export type RefreshPublicDataCommand = {};
 
 export interface ChangeBypassModeCommand {
   deviceId: string;
@@ -467,7 +474,7 @@ export interface ResolvedName {
   name: string;
 }
 
-export interface ConsoleExecuteResult {}
+export type ConsoleExecuteResult = {};
 
 export interface InputData {
   id: number;
@@ -488,11 +495,11 @@ export interface IoOnTime {
   turnedOnCount: number;
 }
 
-export interface SpawnCommand {}
+export type SpawnCommand = {};
 
-export interface SpeedCommand {}
+export type SpeedCommand = {};
 
-export interface ScenarioCommand {}
+export type ScenarioCommand = {};
 
 export interface UsbConnectLogEntry {
   time: string;
@@ -516,6 +523,98 @@ export interface UsbConnectSessionRow {
     | null;
   hubName: string;
   lineCount: number;
+}
+
+export interface GraphLine {
+  /** Device versions the line applies to, e.g. ["ALL"] or ["V2.1", "IO20"] */
+  versions: string[];
+  id: number;
+  /** Key of the line in the graph data, e.g. "tank1" */
+  name: string;
+  dataTable: string | null;
+  color: string;
+  axis: "LEFT" | "RIGHT";
+  area: boolean;
+  debug: boolean;
+  hidden: boolean;
+  permission?: string | null;
+}
+
+export interface GraphIo {
+  versions: string[];
+  id: number;
+  /** Key of the IO in the IO data, e.g. "air_pump" */
+  name: string;
+  sensor: boolean;
+  flipped: boolean;
+  lastOfGroup: boolean;
+  caption: string;
+}
+
+/** `yMin`, `yMax` and `info` are only set for tank lines */
+export interface GraphPoint {
+  /** ISO 8601 timestamp */
+  x: string;
+  y: number;
+  yMin?: number;
+  yMax?: number;
+  info?: unknown | null;
+}
+
+export interface IoPoint {
+  /** ISO 8601 timestamp */
+  x: string;
+  y: number;
+  actorId?: string | null;
+}
+
+export interface IoState {
+  /** IO name, e.g. "air_pump" */
+  type: string;
+  time: string;
+  value: number;
+  manual: number;
+  stuckPower: boolean;
+}
+
+export interface Routine {
+  /** ISO 8601 timestamp */
+  x: string;
+  routine: number;
+  name: string;
+  state: string;
+  side: string;
+  origin: number;
+}
+
+export interface StateSetting {
+  groupId: number;
+  id: number;
+  name: string;
+}
+
+export interface LevelTableEntry {
+  /** Pressure */
+  p: number;
+  /** Liters */
+  l: number;
+}
+
+export interface HealthStatus {
+  status: string;
+  responseTimeMs?: number;
+  message?: string;
+}
+
+export interface HealthCheck {
+  timestamp: string;
+  database: HealthStatus;
+  redis: HealthStatus;
+  hdmRoot: HealthStatus;
+  hdmLocals: {
+    url: string;
+    status: HealthStatus;
+  }[];
 }
 
 export interface LocalApi {
@@ -722,61 +821,6 @@ export interface LocalApi {
       lines: string | number | boolean | Date;
     }): Promise<any>;
   };
-  externalApi: {
-    /**
-     * `GET /external-api/recycled-water-by-year`
-     */
-    getRecycledWaterByYear(options: {
-      deviceId: string | number | boolean | Date;
-      year: number;
-      /** Timezone to use, defaults to UTC. Use INANA timezone notation like "Europe/Amsterdam" or a fixed offset like "+01:00" or "UTC+1". */
-      zone?: string | number | boolean | Date;
-    }): Promise<WaterRecycledRecords>;
-    /**
-     * `GET /external-api/recycled-water-by-month`
-     */
-    getRecycledWaterByMonth(options: {
-      deviceId: string | number | boolean | Date;
-      year: number;
-      month: number;
-      /** Timezone to use, defaults to UTC. Use INANA timezone notation like "Europe/Amsterdam" or a fixed offset like "+01:00" or "UTC+1". */
-      zone?: string | number | boolean | Date;
-    }): Promise<WaterRecycledRecords>;
-    /**
-     * `POST /external-api/bypass-mode`
-     */
-    changeBypassMode(options: { body: ChangeBypassModeCommand }): Promise<any>;
-    /**
-     * `GET /external-api/bypass-mode`
-     */
-    getBypassMode(options: {
-      deviceId: string | number | boolean | Date;
-    }): Promise<BypassMode>;
-    /**
-     * Latest tank levels
-     *
-     * `GET /external-api/tank-levels`
-     */
-    getTankLevels(options: {
-      /** Id of the device. Must be a device assigned to the API key. */
-      deviceId: string | number | boolean | Date;
-    }): Promise<TankLevelsLatest>;
-    /**
-     * Tank levels by month
-     *
-     * `GET /external-api/tank-levels-by-month`
-     */
-    getTankLevelsByMonth(options: {
-      /** Id of the device. Must be a device assigned to the API key. */
-      deviceId: string | number | boolean | Date;
-      /** Year of the month (2000-3000). */
-      year: number;
-      /** Month of the year (1-12). */
-      month: number;
-      /** Timezone to use, defaults to UTC. Use INANA timezone notation like "Europe/Amsterdam" or a fixed offset like "+01:00" or "UTC+1". */
-      zone?: string | number | boolean | Date;
-    }): Promise<TankLevelsMonth>;
-  };
   externalIo: {
     /**
      * Add input data from external source
@@ -916,7 +960,7 @@ export interface LocalApi {
      */
     getLastKnownIoState(options: {
       deviceId: string | number | boolean | Date;
-    }): Promise<any>;
+    }): Promise<IoState[]>;
     /**
      * Set io manual state
      *
@@ -964,7 +1008,9 @@ export interface LocalApi {
      *
      * `GET /ping`
      */
-    ping(options?: {}): Promise<any>;
+    ping(options?: {}): Promise<{
+      pong: string;
+    }>;
     /**
      * `GET /load-files`
      */
@@ -978,7 +1024,7 @@ export interface LocalApi {
     /**
      * `GET /health`
      */
-    check(options?: {}): Promise<any>;
+    check(options?: {}): Promise<HealthCheck>;
   };
   ioOnTime: {
     /**

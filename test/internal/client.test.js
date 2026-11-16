@@ -229,17 +229,50 @@ describe("hydraloop/internal", () => {
         .intercept({ path: "/api-root/auth/logout", method: "POST" })
         .reply(201, "");
       pool
-        .intercept({ path: "/api-root/health", method: "GET" })
+        .intercept({ path: "/api-root/test", method: "GET" })
         .reply(200, "OK", { headers: { "content-type": "text/plain" } });
       pool
-        .intercept({ path: "/api-root/ping", method: "GET" })
-        .reply(200, "pong");
+        .intercept({ path: "/api-root/test", method: "GET" })
+        .reply(200, "true");
 
       const hydraloop = new Hydraloop({ token: "user-token" });
 
       expect(await hydraloop.root.auth.logout()).toBeUndefined();
-      expect(await hydraloop.root.health.check()).toBe("OK");
-      expect(await hydraloop.root.hdmRoot.ping()).toBe("pong");
+      // undocumented responses are only parsed if they are sent as JSON
+      expect(await hydraloop.root.hdmRoot.test()).toBe("OK");
+      expect(await hydraloop.root.hdmRoot.test()).toBe("true");
+    });
+
+    it("parses documented JSON responses sent as text/html", async () => {
+      const html = { headers: { "content-type": "text/html; charset=utf-8" } };
+      pool
+        .intercept({
+          path: `/api-root/ticket/has-open-odoo-ticket?deviceId=${DEVICE_ID}`,
+          method: "GET",
+        })
+        .reply(200, "false", html);
+      pool
+        .intercept({
+          path: "/api-root/ticket/unseen-changes-count",
+          method: "GET",
+        })
+        .reply(200, "0", html);
+      pool
+        .intercept({
+          path: "/api-root/ecus/connection-data?mac=mac",
+          method: "GET",
+        })
+        .reply(200, "1:node001.example.com:443", html);
+
+      const hydraloop = new Hydraloop({ token: "user-token" });
+
+      expect(
+        await hydraloop.root.ticket.hasOpenOdooTicket({ deviceId: DEVICE_ID }),
+      ).toBe(false);
+      expect(await hydraloop.root.ticket.countUnseenChanges()).toBe(0);
+      expect(await hydraloop.root.ecus.getConnectionData({ mac: "mac" })).toBe(
+        "1:node001.example.com:443",
+      );
     });
 
     it("throws a RequestError with redacted tokens", async () => {
@@ -357,41 +390,74 @@ describe("hydraloop/internal", () => {
       ).rejects.toThrow(`No local API URL for device: ${DEVICE_ID}`);
     });
 
-    it("sends other requests to the preferred local server", async () => {
+    it("sends other requests to the local API of the first device with its device token", async () => {
       pool
         .intercept({
-          path: "/api-root/devices/local-servers?preferredFirst=true",
+          path: `/api-root/devices/list?event=${encodeURIComponent('{"first":0,"rows":1}')}`,
           method: "GET",
         })
         .reply(
           200,
-          [{ id: "1" }, { id: "2", apiUrl: `${ORIGIN}/api-local-3/` }],
+          {
+            total: 1,
+            records: [{ id: DEVICE_ID, localApiUrl: `${ORIGIN}/api-local-3` }],
+          },
           JSON_HEADERS,
         );
+      interceptDeviceToken();
       for (let i = 0; i < 2; i++) {
         pool
-          .intercept({ path: "/api-local-3/ping", method: "GET" })
-          .reply(200, "pong");
+          .intercept({
+            path: "/api-local-3/graph/io-names-sensor-only",
+            method: "GET",
+            headers: { "additional-authorization": "device-token" },
+          })
+          .reply(200, ["wash"], JSON_HEADERS);
       }
 
       const hydraloop = new Hydraloop({ token: "user-token" });
 
-      // the local server is cached
-      expect(await hydraloop.local.hdmLocal.ping()).toBe("pong");
-      expect(await hydraloop.local.hdmLocal.ping()).toBe("pong");
+      // the device is cached
+      for (let i = 0; i < 2; i++) {
+        expect(
+          await hydraloop.local.graph.getIoNamesSensorOnly(),
+        ).toStrictEqual(["wash"]);
+      }
     });
 
-    it("throws if there is no local server", async () => {
+    it("sends other requests to the localApiUrl option", async () => {
       pool
         .intercept({
-          path: "/api-root/devices/local-servers?preferredFirst=true",
+          path: `/api-root/devices/list?event=${encodeURIComponent('{"first":0,"rows":1}')}`,
           method: "GET",
         })
-        .reply(200, [], JSON_HEADERS);
+        .reply(200, { total: 1, records: [{ id: DEVICE_ID }] }, JSON_HEADERS);
+      interceptDeviceToken();
+      pool
+        .intercept({ path: "/api-local-4/ping", method: "GET" })
+        .reply(200, { pong: "pong" }, JSON_HEADERS);
+
+      const hydraloop = new Hydraloop({
+        token: "user-token",
+        localApiUrl: `${ORIGIN}/api-local-4`,
+      });
+
+      expect(await hydraloop.local.hdmLocal.ping()).toStrictEqual({
+        pong: "pong",
+      });
+    });
+
+    it("throws if the user has no device", async () => {
+      pool
+        .intercept({
+          path: `/api-root/devices/list?event=${encodeURIComponent('{"first":0,"rows":1}')}`,
+          method: "GET",
+        })
+        .reply(200, { total: 0 }, JSON_HEADERS);
 
       const hydraloop = new Hydraloop({ token: "user-token" });
       await expect(hydraloop.local.hdmLocal.ping()).rejects.toThrow(
-        "No local server found",
+        "No device found",
       );
     });
   });

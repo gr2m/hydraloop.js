@@ -36,7 +36,9 @@ They are taken from production, which is what the HDM web app talks to.
 
 The web app doesn't use a generated client. Its JavaScript builds request URLs by hand, as `/api-root/<path segments>`. For the local API, the base URL is the `apiUrl` field of a "local server" record that the app loads from `/api-root/devices/local-servers`.
 
-The internal specs are incomplete in places. Many root API operations have no summary, and about half of the operations in both specs have no response schema. To fill in a missing response type, call the endpoint with a logged-in session and record what comes back.
+The internal specs are incomplete in places. Many root API operations have no summary, and about half of the operations in both specs have no response schema. Some schemas are wrong as well, e.g. many fields that can be `null` are not marked as nullable. To fill in a missing response type, call the endpoint with a logged-in session and record what comes back.
+
+Corrections found that way are kept in [`internal-patches/`](internal-patches/) as [JSON merge patches](https://www.rfc-editor.org/rfc/rfc7386). They are applied to the internal specs when generating the [`hydraloop/internal`](../readme.internal.md) SDK. The update script doesn't touch them.
 
 ## Stability
 

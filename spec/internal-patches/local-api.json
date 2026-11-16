@@ -1,0 +1,426 @@
+{
+  "paths": {
+    "/graph/last-io": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IoState"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pong": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["pong"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheck"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "GraphConfig": {
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphLine"
+            }
+          },
+          "ios": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphIo"
+            }
+          }
+        }
+      },
+      "GraphLine": {
+        "type": "object",
+        "properties": {
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Device versions the line applies to, e.g. [\"ALL\"] or [\"V2.1\", \"IO20\"]"
+          },
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string",
+            "description": "Key of the line in the graph data, e.g. \"tank1\""
+          },
+          "dataTable": {
+            "type": "string",
+            "nullable": true
+          },
+          "color": {
+            "type": "string"
+          },
+          "axis": {
+            "type": "string",
+            "enum": ["LEFT", "RIGHT"]
+          },
+          "area": {
+            "type": "boolean"
+          },
+          "debug": {
+            "type": "boolean"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "permission": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "versions",
+          "id",
+          "name",
+          "dataTable",
+          "color",
+          "axis",
+          "area",
+          "debug",
+          "hidden"
+        ]
+      },
+      "GraphIo": {
+        "type": "object",
+        "properties": {
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string",
+            "description": "Key of the IO in the IO data, e.g. \"air_pump\""
+          },
+          "sensor": {
+            "type": "boolean"
+          },
+          "flipped": {
+            "type": "boolean"
+          },
+          "lastOfGroup": {
+            "type": "boolean"
+          },
+          "caption": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "versions",
+          "id",
+          "name",
+          "sensor",
+          "flipped",
+          "lastOfGroup",
+          "caption"
+        ]
+      },
+      "GraphRecords": {
+        "description": "Data points by graph line name (see `GraphLine.name`), e.g. \"tank1\"",
+        "properties": null,
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/GraphPoint"
+          }
+        }
+      },
+      "GraphPoint": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "ISO 8601 timestamp"
+          },
+          "y": {
+            "type": "number"
+          },
+          "yMin": {
+            "type": "number"
+          },
+          "yMax": {
+            "type": "number"
+          },
+          "info": {
+            "nullable": true
+          }
+        },
+        "required": ["x", "y"],
+        "description": "`yMin`, `yMax` and `info` are only set for tank lines"
+      },
+      "IoRecordsByType": {
+        "properties": {
+          "lastGroupItems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "lastGroupItems",
+          "value",
+          "manual",
+          "stuckPower",
+          "behavior"
+        ]
+      },
+      "IoRecords": {
+        "description": "Data points by IO name (see `GraphIo.name`), e.g. \"air_pump\"",
+        "properties": null,
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/IoPoint"
+          }
+        }
+      },
+      "IoPoint": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "ISO 8601 timestamp"
+          },
+          "y": {
+            "type": "number"
+          },
+          "actorId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "IoState": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "IO name, e.g. \"air_pump\""
+          },
+          "time": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "manual": {
+            "type": "number"
+          },
+          "stuckPower": {
+            "type": "boolean"
+          }
+        },
+        "required": ["type", "time", "value", "manual", "stuckPower"]
+      },
+      "RoutineRecords": {
+        "properties": {
+          "routines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Routine"
+            }
+          }
+        }
+      },
+      "Routine": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "description": "ISO 8601 timestamp"
+          },
+          "routine": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "side": {
+            "type": "string"
+          },
+          "origin": {
+            "type": "number"
+          }
+        },
+        "required": ["x", "routine", "name", "state", "side", "origin"]
+      },
+      "StatusLogEntryRecords": {
+        "properties": {
+          "statusLogEntries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusLogEntry"
+            }
+          }
+        }
+      },
+      "StateSettings": {
+        "properties": {
+          "settings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StateSetting"
+            }
+          },
+          "values": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SettingValue"
+            }
+          }
+        }
+      },
+      "StateSetting": {
+        "type": "object",
+        "properties": {
+          "groupId": {
+            "type": "number"
+          },
+          "id": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["groupId", "id", "name"]
+      },
+      "DeviceLevels": {
+        "description": "Calibration tables to convert tank pressure to liters",
+        "properties": {
+          "t1t2Levels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LevelTableEntry"
+            }
+          },
+          "t3Levels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LevelTableEntry"
+            }
+          }
+        },
+        "required": ["t1t2Levels", "t3Levels"]
+      },
+      "LevelTableEntry": {
+        "type": "object",
+        "properties": {
+          "p": {
+            "type": "number",
+            "description": "Pressure"
+          },
+          "l": {
+            "type": "number",
+            "description": "Liters"
+          }
+        },
+        "required": ["p", "l"]
+      },
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "responseTimeMs": {
+            "type": "number"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["status"]
+      },
+      "HealthCheck": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "database": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "redis": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "hdmRoot": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "hdmLocals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              },
+              "required": ["url", "status"]
+            }
+          }
+        },
+        "required": ["timestamp", "database", "redis", "hdmRoot", "hdmLocals"]
+      }
+    }
+  }
+}

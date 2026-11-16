@@ -1,0 +1,1141 @@
+{
+  "paths": {
+    "/environment": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "display": {
+                      "type": "boolean"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["display", "name"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "pong": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["pong"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthCheck"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/version": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["version"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/search-persons": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Person"
+                  },
+                  "allOf": null
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/release-notes/list": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReleaseNote"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices/statuses": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices/countries": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices/kits": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices/device-types": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ecus/connection-data": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "Connection data of the ECU, e.g. \"1:node001-nl.hydraloop.com:443|1:hdm.hydraloop.com:443\"",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/history": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TicketHistoryEntry"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/statuses": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/ListOption"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "closed": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": ["closed"]
+                          }
+                        },
+                        "required": ["data"]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/priorities": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/subject-types": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/causes": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/ListOption"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "description": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["description"]
+                          }
+                        },
+                        "required": ["data"]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/solutions": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "allOf": [
+                      {
+                        "$ref": "#/components/schemas/ListOption"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "data": {
+                            "type": "object",
+                            "properties": {
+                              "contextInformationRequired": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": ["contextInformationRequired"]
+                          }
+                        },
+                        "required": ["data"]
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/creators": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/assignees": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/supervisors": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/device-organisations": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ListOption"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ticket/notification-entities": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "email": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["name", "email"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/device-part/io-spare-parts": {
+      "get": {
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IoSparePart"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "Password hash, only returned by `GET /settings/current-user`"
+          }
+        },
+        "required": [
+          "id",
+          "personId",
+          "name",
+          "username",
+          "totpEnabled",
+          "organisationId",
+          "measurementSystem",
+          "permissions",
+          "updated",
+          "language"
+        ]
+      },
+      "LoginUser": {
+        "required": ["id", "enabled", "username", "totpEnabled", "roles"]
+      },
+      "Role": {
+        "required": ["id", "name", "main", "description"]
+      },
+      "Person": {
+        "properties": {
+          "odooPersonId": {
+            "type": "number",
+            "nullable": true
+          },
+          "odooUserId": {
+            "type": "number",
+            "nullable": true
+          },
+          "allBoundId": {
+            "nullable": true
+          },
+          "phoneNumber1": {
+            "nullable": true
+          },
+          "phoneNumber2": {
+            "nullable": true
+          },
+          "pipedrivePersonId": {
+            "nullable": true
+          },
+          "termsAndConditionsAccepted": {
+            "nullable": true
+          }
+        }
+      },
+      "Organisation": {
+        "properties": {
+          "pipedriveOrganisationId": {
+            "type": "number",
+            "nullable": true
+          },
+          "accountManagerId": {
+            "nullable": true
+          },
+          "defaultAssigneeId": {
+            "nullable": true
+          },
+          "defaultSupervisorId": {
+            "nullable": true
+          },
+          "latitude": {
+            "nullable": true
+          },
+          "longitude": {
+            "nullable": true
+          },
+          "odooOrganisationId": {
+            "nullable": true
+          },
+          "parent": {
+            "nullable": true
+          },
+          "parentId": {
+            "nullable": true
+          },
+          "parentName": {
+            "nullable": true
+          },
+          "phoneNumber2": {
+            "nullable": true
+          },
+          "primaryContactPerson": {
+            "nullable": true
+          },
+          "accountManager": {
+            "nullable": true
+          }
+        }
+      },
+      "DeviceStatus": {
+        "properties": {
+          "noticeInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceIssue"
+            }
+          },
+          "minorIssueInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceIssue"
+            }
+          },
+          "majorIssueInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceIssue"
+            }
+          },
+          "blockingInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceIssue"
+            }
+          },
+          "attentionRequiredInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceIssue"
+            }
+          }
+        }
+      },
+      "DeviceIssue": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "ticketId": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string"
+          },
+          "lastDetected": {
+            "type": "string"
+          },
+          "info": {
+            "type": "string",
+            "description": "Translation key, e.g. \"deviceSignals.releaseAirStuckClosed\""
+          },
+          "issue": {
+            "type": "string",
+            "description": "e.g. \"release_air_stuck_closed\""
+          },
+          "publicIdentification": {
+            "type": "string",
+            "description": "e.g. \"HL0035\""
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "id",
+          "ticketId",
+          "created",
+          "lastDetected",
+          "info",
+          "issue",
+          "publicIdentification",
+          "data"
+        ]
+      },
+      "Ticket": {
+        "properties": {
+          "numberOfRelatedTickets": {
+            "type": "string",
+            "description": "Number of related tickets, as a numeric string"
+          },
+          "assigneePersonId": {
+            "nullable": true
+          },
+          "causeId": {
+            "nullable": true
+          },
+          "causeKey": {
+            "nullable": true
+          },
+          "closed": {
+            "nullable": true
+          },
+          "contextInformation": {
+            "nullable": true
+          },
+          "creatorEmail": {
+            "nullable": true
+          },
+          "creatorPersonId": {
+            "nullable": true
+          },
+          "deviceSignalCreated": {
+            "nullable": true
+          },
+          "deviceSignalId": {
+            "nullable": true
+          },
+          "deviceSignalIssue": {
+            "nullable": true
+          },
+          "deviceSignalSide": {
+            "nullable": true
+          },
+          "formId": {
+            "nullable": true
+          },
+          "issueDiagnosticFsm": {
+            "nullable": true
+          },
+          "issuePublicIdentification": {
+            "nullable": true
+          },
+          "odooFieldServiceId": {
+            "nullable": true
+          },
+          "solutionId": {
+            "nullable": true
+          },
+          "solutionKey": {
+            "nullable": true
+          },
+          "updatedEmail": {
+            "nullable": true
+          },
+          "viewed": {
+            "nullable": true
+          }
+        }
+      },
+      "Professional": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "person": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "receiveTicketEmail": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "start": {
+            "type": "string"
+          },
+          "until": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "person",
+          "deviceId",
+          "type",
+          "receiveTicketEmail",
+          "description",
+          "start",
+          "until"
+        ]
+      },
+      "ListOption": {
+        "type": "object",
+        "description": "An option of a select list",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "translated": {
+            "type": "boolean",
+            "description": "Whether `label` is a translation key"
+          }
+        },
+        "required": ["id", "label", "translated"]
+      },
+      "TicketHistoryEntry": {
+        "type": "object",
+        "properties": {
+          "updated": {
+            "type": "string"
+          },
+          "changerId": {
+            "type": "string"
+          },
+          "changerName": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "previousValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "nextValue": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "updated",
+          "changerId",
+          "changerName",
+          "field",
+          "previousValue",
+          "nextValue"
+        ]
+      },
+      "ReleaseNote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string",
+            "nullable": true
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "date", "type", "description", "link", "version"]
+      },
+      "IoSparePart": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "tag": {
+            "type": "string"
+          },
+          "partNumber": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["id", "tag", "partNumber", "name", "versions"]
+      },
+      "HealthStatus": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "responseTimeMs": {
+            "type": "number"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["status"]
+      },
+      "HealthCheck": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "database": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "redis": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "hdmRoot": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "hdmLocals": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string"
+                },
+                "status": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              },
+              "required": ["url", "status"]
+            }
+          }
+        },
+        "required": ["timestamp", "database", "redis", "hdmRoot", "hdmLocals"]
+      },
+      "Device": {
+        "properties": {
+          "address2": {
+            "nullable": true
+          },
+          "alias": {
+            "nullable": true
+          },
+          "cascadeGroupId": {
+            "nullable": true
+          },
+          "cascadeGroupName": {
+            "nullable": true
+          },
+          "cascadeGroupNumber": {
+            "nullable": true
+          },
+          "connectedToilets": {
+            "nullable": true
+          },
+          "dealer": {
+            "nullable": true
+          },
+          "deviceVersionAsBuild": {
+            "nullable": true
+          },
+          "invoice": {
+            "nullable": true
+          },
+          "lastMaintenanceDate": {
+            "nullable": true
+          },
+          "lastMaintenanceType": {
+            "nullable": true
+          },
+          "maintenancePlannedDate": {
+            "nullable": true
+          },
+          "neighbourGroupId": {
+            "nullable": true
+          },
+          "neighbourGroupName": {
+            "nullable": true
+          },
+          "nextMaintenanceDate": {
+            "nullable": true
+          },
+          "nickname": {
+            "nullable": true
+          },
+          "notes": {
+            "nullable": true
+          },
+          "productionOrder": {
+            "nullable": true
+          },
+          "purchaseOrder": {
+            "nullable": true
+          },
+          "vpnAddress": {
+            "nullable": true
+          },
+          "vpnAddressUpdated": {
+            "nullable": true
+          },
+          "wifiVersion": {
+            "nullable": true
+          },
+          "kits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DeviceKit"
+            }
+          },
+          "organisations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Organisation"
+            }
+          },
+          "boardVersions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BoardVersion"
+            }
+          }
+        },
+        "description": "`owner`, `organisation`, `boardVersions`, `neighborDevices` and `timezones` are only set by `GET /devices/get`",
+        "required": [
+          "id",
+          "ecuId",
+          "organisationId",
+          "organisationName",
+          "serial",
+          "serialAlias",
+          "ecuSerial",
+          "alias",
+          "deviceVersion",
+          "deviceVersionAsBuild",
+          "deviceName",
+          "mac",
+          "ethernetMac",
+          "hardwareVersion",
+          "bootVersion",
+          "deviceTypeId",
+          "baseType",
+          "type",
+          "subType",
+          "voltage",
+          "color",
+          "status",
+          "address",
+          "address1",
+          "address2",
+          "postalCode",
+          "city",
+          "region",
+          "countryId",
+          "country",
+          "longitude",
+          "latitude",
+          "inletManifoldType",
+          "toilet",
+          "connectedToilets",
+          "washingMachine",
+          "auxiliary",
+          "auxiliaryOptionAvailable",
+          "hasTransferUpgradeKit",
+          "liftPumpBefore",
+          "liftPumpAfter",
+          "targetBranch",
+          "dealer",
+          "purchaseOrder",
+          "productionOrder",
+          "invoice",
+          "notes",
+          "lastOnline",
+          "currentBranch",
+          "firmwareVersion",
+          "firmwareCoreVersion",
+          "wifiVersion",
+          "manual",
+          "online",
+          "factoryTestCompletedDate",
+          "verificationDate",
+          "commissionDate",
+          "endOfWarranty",
+          "neighbourGroupId",
+          "neighbourGroupName",
+          "cascadeGroupId",
+          "cascadeGroupName",
+          "cascadeGroupConnectedT3",
+          "cascadeGroupExternalDistPump",
+          "cascadeGroupNumber",
+          "maintenancePeriod",
+          "nextMaintenanceDate",
+          "maintenancePlannedDate",
+          "lastMaintenanceDate",
+          "lastMaintenanceType",
+          "nickname",
+          "ownerId",
+          "ownerName",
+          "organisations",
+          "settings",
+          "deviceStatus",
+          "localApiUrl",
+          "localServerId",
+          "kits",
+          "kitNumbers",
+          "vpnAddress",
+          "vpnAddressUpdated"
+        ]
+      },
+      "DeviceHardware": {
+        "properties": {
+          "partNumber": {
+            "nullable": true
+          }
+        }
+      },
+      "DeviceKit": {
+        "type": "object",
+        "properties": {
+          "installationType": {
+            "type": "string"
+          },
+          "partNumber": {
+            "type": "string"
+          }
+        },
+        "required": ["installationType", "partNumber"]
+      },
+      "BoardVersion": {
+        "type": "object",
+        "properties": {
+          "boardId": {
+            "type": "number"
+          },
+          "boardName": {
+            "type": "string"
+          },
+          "hardwareVersion": {
+            "type": "string"
+          },
+          "hardwareMillivolt": {
+            "type": "number"
+          },
+          "firmware": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "boardId",
+          "boardName",
+          "hardwareVersion",
+          "hardwareMillivolt",
+          "firmware"
+        ]
+      }
+    }
+  }
+}

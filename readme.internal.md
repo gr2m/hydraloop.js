@@ -7,7 +7,7 @@
 >
 > For integrations, use the [external API SDK](readme.md) (`hydraloop`) instead.
 
-The SDK is generated from the OpenAPI specs in [`spec/internal/`](spec/internal/). It covers every operation of both HDM backends.
+The SDK is generated from the OpenAPI specs in [`spec/internal/`](spec/internal/), with corrections from [`spec/internal-patches/`](spec/internal-patches/). It covers every operation of both HDM backends, except for the `/external-api/*` endpoints. These don't accept a login token, and the main [`hydraloop`](readme.md) export already covers them.
 
 ## Usage
 
@@ -47,11 +47,11 @@ npm install hydraloop
 
 #### `new Hydraloop(options)`
 
-| Option        | Type     | Required | Description                                                                                                                                           |
-| ------------- | -------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `token`       | `string` | No       | Token from a previous login. Without it, call [`hydraloop.login()`](#hydralooploginoptions) first                                                     |
-| `rootApiUrl`  | `string` | No       | Override the root API URL (default: `https://hdm.hydraloop.com/api-root`)                                                                             |
-| `localApiUrl` | `string` | No       | Local API URL for [requests that are not for a device](#local-api). Default: the preferred local server of `hydraloop.root.devices.getLocalServers()` |
+| Option        | Type     | Required | Description                                                                                                         |
+| ------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
+| `token`       | `string` | No       | Token from a previous login. Without it, call [`hydraloop.login()`](#hydralooploginoptions) first                   |
+| `rootApiUrl`  | `string` | No       | Override the root API URL (default: `https://hdm.hydraloop.com/api-root`)                                           |
+| `localApiUrl` | `string` | No       | Local API URL for [requests that are not for a device](#local-api). Default: the local API URL of your first device |
 
 ### Authentication
 
@@ -71,6 +71,10 @@ Logs in with username and password, followed by the two-factor authentication if
 **Returns:** `Promise<Root.AuthToken>` with the `token`, its `expiresIn` (seconds) and the `user`.
 
 To skip the login next time, store `token` and pass it to the constructor until it expires.
+
+### Permissions
+
+What you can access depends on the permissions of your HDM account (see `user.permissions` of the login response). Most endpoints are meant for Hydraloop staff and respond with `401` and `"Insufficient permissions"` for regular users. With a regular account, you can use the endpoints for your devices, such as the graph data, the device list and details, and your tickets.
 
 ### Methods
 
@@ -103,7 +107,7 @@ Each device's data lives on a local server, the URL of which "might change depen
 
 - Requests for a device (with a `deviceId` parameter, or a `deviceId` in `body`) are sent to the device's `localApiUrl`. The SDK looks it up with `hydraloop.root.devices.getDeviceShallow({ id })` and caches it.
 - The local API requires a device-scoped token for these requests, in addition to the user token. The SDK gets it with `hydraloop.root.auth.tokenForDevice({ deviceId })` and caches it until shortly before it expires.
-- All other local API requests are sent to the `localApiUrl` option, or by default to the first local server returned by `hydraloop.root.devices.getLocalServers({ preferredFirst: true })`.
+- All other local API requests are sent to the `localApiUrl` option, or by default to the local API of your first device. Some of these endpoints require a device token as well (e.g. `hydraloop.local.graph.getIoNamesSensorOnly()`), so the SDK sends the one of your first device.
 
 ### Types
 
@@ -120,7 +124,7 @@ const data: Local.GraphRecords = await hydraloop.local.graph.getData({
 
 Also exported are `HydraloopOptions`, `LoginOptions`, `RootApi` and `LocalApi` (the types of `hydraloop.root` and `hydraloop.local`).
 
-About half of the operations have no response schema in the specs. Their methods resolve with `any`.
+About half of the operations have no response schema in the specs. Their methods resolve with `any`. The response types of the endpoints that regular users can access were checked against actual responses and corrected where needed, see [`spec/internal-patches/`](spec/internal-patches/).
 
 ## Error Handling
 
@@ -142,7 +146,11 @@ The `authorization` and `additional-authorization` headers are redacted in `erro
 
 ## Development
 
-The endpoint methods (`lib/internal/root/`, `lib/internal/local/`), their types (`lib/internal/*-types.d.ts`) and the [list of all methods](#all-methods) below are generated from [`spec/internal/`](spec/internal/). Don't edit them by hand. To regenerate them, run:
+The endpoint methods (`lib/internal/root/`, `lib/internal/local/`), their types (`lib/internal/*-types.d.ts`) and the [list of all methods](#all-methods) below are generated from [`spec/internal/`](spec/internal/). Don't edit them by hand.
+
+The specs are incomplete or wrong in places, e.g. many fields that can be `null` are not marked as nullable. Corrections are kept as [JSON merge patches](https://www.rfc-editor.org/rfc/rfc7386) in [`spec/internal-patches/`](spec/internal-patches/), which are applied to the specs before generating. To add a correction, edit the patch file of the API.
+
+To regenerate, run:
 
 ```
 npm run generate:internal
@@ -528,15 +536,6 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>root.externalApi</code> (1)</summary>
-
-| Method                 | Request                                  | Summary |
-| ---------------------- | ---------------------------------------- | ------- |
-| `listCoupledDevices()` | `GET /external-api/list-coupled-devices` |         |
-
-</details>
-
-<details>
 <summary><code>root.fileStore</code> (2)</summary>
 
 | Method           | Request                         | Summary |
@@ -901,20 +900,6 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 | `restart()`     | `POST /ecu-simulator/{id}/restart`  | Restart an ECU simulator instance                                                  |
 | `remove()`      | `DELETE /ecu-simulator/{id}`        | Remove an ECU simulator instance completely (process, files, device + ECU records) |
 | `logs()`        | `GET /ecu-simulator/{id}/logs`      | Tail the log of an ECU simulator instance                                          |
-
-</details>
-
-<details>
-<summary><code>local.externalApi</code> (6)</summary>
-
-| Method                      | Request                                     | Summary              |
-| --------------------------- | ------------------------------------------- | -------------------- |
-| `getRecycledWaterByYear()`  | `GET /external-api/recycled-water-by-year`  |                      |
-| `getRecycledWaterByMonth()` | `GET /external-api/recycled-water-by-month` |                      |
-| `changeBypassMode()`        | `POST /external-api/bypass-mode`            |                      |
-| `getBypassMode()`           | `GET /external-api/bypass-mode`             |                      |
-| `getTankLevels()`           | `GET /external-api/tank-levels`             | Latest tank levels   |
-| `getTankLevelsByMonth()`    | `GET /external-api/tank-levels-by-month`    | Tank levels by month |
 
 </details>
 

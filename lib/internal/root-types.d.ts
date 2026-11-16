@@ -22,12 +22,14 @@ export interface User {
   permissions: string[];
   updated: string;
   language: string;
-  fullyLoggedIn: boolean;
-  deviceId: string;
-  hardwareVersion: string;
-  deviceVersion: string;
-  deviceType: string;
-  deviceInletManifoldType: string;
+  fullyLoggedIn?: boolean;
+  deviceId?: string;
+  hardwareVersion?: string;
+  deviceVersion?: string;
+  deviceType?: string;
+  deviceInletManifoldType?: string;
+  /** Password hash, only returned by `GET /settings/current-user` */
+  password?: string;
 }
 
 export interface AuthToken {
@@ -56,7 +58,7 @@ export interface TotpCode {
   rememberDevice: boolean;
 }
 
-export interface StreamableFile {}
+export type StreamableFile = {};
 
 export interface Permission {
   id: string;
@@ -68,15 +70,15 @@ export interface Role {
   name: string;
   main: boolean;
   description: string;
-  roles: Role[];
-  permissions: Permission[];
+  roles?: Role[];
+  permissions?: Permission[];
 }
 
 export interface LoginUser {
   id: string;
   enabled: boolean;
   username: string;
-  password: string;
+  password?: string;
   totpEnabled: boolean;
   roles: Role[];
 }
@@ -87,11 +89,11 @@ export interface Person {
   surname: string;
   displayName: string;
   email: string;
-  phoneNumber1: string;
-  phoneNumber2: string;
-  pipedrivePersonId: string;
-  odooPersonId: string;
-  odooUserId: string;
+  phoneNumber1: string | null;
+  phoneNumber2: string | null;
+  pipedrivePersonId: string | null;
+  odooPersonId: number | null;
+  odooUserId: number | null;
   organisationId: string;
   organisationName: string;
   userId: string;
@@ -99,61 +101,62 @@ export interface Person {
   username: string;
   totpEnabled: boolean;
   roles: string[];
-  allBoundId: string;
+  allBoundId: string | null;
   enabled: boolean;
-  termsAndConditionsAccepted: string;
+  termsAndConditionsAccepted: string | null;
   user: LoginUser;
 }
 
 export interface Organisation {
   id: string;
   name: string;
-  parentId: string;
-  parentName: string;
+  parentId: string | null;
+  parentName: string | null;
   address1: string;
   address2: string;
   address3: string;
   phoneNumber1: string;
-  phoneNumber2: string;
+  phoneNumber2: string | null;
   email: string;
-  pipedriveOrganisationId: string;
-  odooOrganisationId: string;
-  primaryContactPerson: string;
-  longitude: number;
-  latitude: number;
+  pipedriveOrganisationId: number | null;
+  odooOrganisationId: string | null;
+  primaryContactPerson: string | null;
+  longitude: number | null;
+  latitude: number | null;
   ownDivision: boolean;
   receiveTicketEmail: boolean;
-  accountManagerId: string;
+  accountManagerId: string | null;
   accountManagerName: string;
-  defaultAssigneeId: string;
+  defaultAssigneeId: string | null;
   defaultAssigneeName: string;
-  defaultSupervisorId: string;
+  defaultSupervisorId: string | null;
   defaultSupervisorName: string;
   numberOfPersons: number;
   numberOfDevices: number;
-  accountManager: Person;
-  parent: Organisation;
+  accountManager: Person | null;
+  parent: Organisation | null;
 }
 
 export interface DeviceStatus {
   deviceId: string;
   online: boolean;
   hasNotice: boolean;
-  noticeInfo: string[];
+  noticeInfo: DeviceIssue[];
   hasMinorIssue: boolean;
-  minorIssueInfo: string[];
+  minorIssueInfo: DeviceIssue[];
   hasMajorIssue: boolean;
-  majorIssueInfo: string[];
+  majorIssueInfo: DeviceIssue[];
   hasBlockingIssue: boolean;
-  blockingInfo: string[];
+  blockingInfo: DeviceIssue[];
   state: string;
   storedState: string;
   fieldTest: boolean;
   deviceForSpecialUseCases: boolean;
   hasAttentionRequired: boolean;
-  attentionRequiredInfo: string[];
+  attentionRequiredInfo: DeviceIssue[];
 }
 
+/** `owner`, `organisation`, `boardVersions`, `neighborDevices` and `timezones` are only set by `GET /devices/get` */
 export interface Device {
   id: string;
   ecuId: string;
@@ -162,9 +165,9 @@ export interface Device {
   serial: string;
   serialAlias: string;
   ecuSerial: string;
-  alias: string;
+  alias: string | null;
   deviceVersion: string;
-  deviceVersionAsBuild: string;
+  deviceVersionAsBuild: string | null;
   deviceName: string;
   mac: string;
   ethernetMac: string;
@@ -179,7 +182,7 @@ export interface Device {
   status: string;
   address: string;
   address1: string;
-  address2: string;
+  address2: string | null;
   postalCode: string;
   city: string;
   region: string;
@@ -189,7 +192,7 @@ export interface Device {
   latitude: number;
   inletManifoldType: string;
   toilet: boolean;
-  connectedToilets: number;
+  connectedToilets: number | null;
   washingMachine: boolean;
   auxiliary: boolean;
   auxiliaryOptionAvailable: boolean;
@@ -197,51 +200,51 @@ export interface Device {
   liftPumpBefore: boolean;
   liftPumpAfter: boolean;
   targetBranch: string;
-  dealer: string;
-  purchaseOrder: string;
-  productionOrder: string;
-  invoice: string;
-  notes: string;
+  dealer: string | null;
+  purchaseOrder: string | null;
+  productionOrder: string | null;
+  invoice: string | null;
+  notes: string | null;
   lastOnline: string;
   currentBranch: string;
   firmwareVersion: string;
   firmwareCoreVersion: string | null;
-  wifiVersion: string;
+  wifiVersion: string | null;
   manual: boolean;
   online: boolean;
   factoryTestCompletedDate: string;
   verificationDate: string;
   commissionDate: string;
   endOfWarranty: string;
-  neighbourGroupId: string;
-  neighbourGroupName: string;
-  cascadeGroupId: string;
-  cascadeGroupName: string;
+  neighbourGroupId: string | null;
+  neighbourGroupName: string | null;
+  cascadeGroupId: string | null;
+  cascadeGroupName: string | null;
   cascadeGroupConnectedT3: boolean;
   cascadeGroupExternalDistPump: boolean;
-  cascadeGroupNumber: number;
+  cascadeGroupNumber: number | null;
   maintenancePeriod: number;
-  nextMaintenanceDate: string;
-  maintenancePlannedDate: string;
-  lastMaintenanceDate: string;
-  lastMaintenanceType: string;
-  nickname: string;
+  nextMaintenanceDate: string | null;
+  maintenancePlannedDate: string | null;
+  lastMaintenanceDate: string | null;
+  lastMaintenanceType: string | null;
+  nickname: string | null;
   ownerId: string;
   ownerName: string;
-  owner: Person;
+  owner?: Person;
   neighborDevices?: Device[];
   timezones?: string[];
-  organisation: Organisation;
-  organisations: string[];
-  boardVersions: string[];
+  organisation?: Organisation;
+  organisations: Organisation[];
+  boardVersions?: BoardVersion[];
   settings: Record<string, unknown>;
   deviceStatus: DeviceStatus;
   localApiUrl: string;
   localServerId: string;
-  kits: string[];
+  kits: DeviceKit[];
   kitNumbers: string[];
-  vpnAddress: string;
-  vpnAddressUpdated: string;
+  vpnAddress: string | null;
+  vpnAddressUpdated: string | null;
 }
 
 export interface DeviceHardware {
@@ -249,7 +252,7 @@ export interface DeviceHardware {
   type: string;
   name: string;
   description: string;
-  partNumber: string;
+  partNumber: string | null;
 }
 
 export interface DeviceAccess {
@@ -372,15 +375,15 @@ export interface CascadeGroup {
   devices: Device[];
 }
 
-export interface StoreInletManifoldTypeCommand {}
+export type StoreInletManifoldTypeCommand = {};
 
-export interface StoreDeviceTypeCommand {}
+export type StoreDeviceTypeCommand = {};
 
-export interface ChangeSerialCommand {}
+export type ChangeSerialCommand = {};
 
-export interface ChangeUvSerialCommand {}
+export type ChangeUvSerialCommand = {};
 
-export interface RegisterAirPumpReplacementCommand {}
+export type RegisterAirPumpReplacementCommand = {};
 
 export interface RegisterPartReplacementCommand {
   deviceId: string;
@@ -398,31 +401,31 @@ export interface SeedPartHistoryCommand {
   date: string;
 }
 
-export interface WithSubTypeCommand {}
+export type WithSubTypeCommand = {};
 
-export interface StoreWhatIsConnectedCommand {}
+export type StoreWhatIsConnectedCommand = {};
 
-export interface StoreWhatIsTheGpsLocationCommand {}
+export type StoreWhatIsTheGpsLocationCommand = {};
 
-export interface StoreNewProfessionalCommand {}
+export type StoreNewProfessionalCommand = {};
 
-export interface UpdateProfessionalCommand {}
+export type UpdateProfessionalCommand = {};
 
-export interface LinkOwnerCommand {}
+export type LinkOwnerCommand = {};
 
-export interface StoreNewOwnerCommand {}
+export type StoreNewOwnerCommand = {};
 
-export interface UpdateOwnerCommand {}
+export type UpdateOwnerCommand = {};
 
-export interface ChangeDeviceVersion {}
+export type ChangeDeviceVersion = {};
 
-export interface StoreVoltageCommand {}
+export type StoreVoltageCommand = {};
 
-export interface ChangeDeviceBoardVersions {}
+export type ChangeDeviceBoardVersions = {};
 
-export interface ChangeDeviceVersionOnOverflowT4SensorSystem {}
+export type ChangeDeviceVersionOnOverflowT4SensorSystem = {};
 
-export interface ChangeDeviceVersionOnPtuVersion {}
+export type ChangeDeviceVersionOnPtuVersion = {};
 
 export interface StoreLocalServerCmd {
   deviceId: string;
@@ -438,7 +441,7 @@ export interface ResetDeviceFromPersonalInformationResult {
   deviceId: string;
 }
 
-export interface SimulatorCleanupCommand {}
+export type SimulatorCleanupCommand = {};
 
 export interface Ecu {
   id: string;
@@ -452,11 +455,11 @@ export interface Ecu {
   notes: string;
 }
 
-export interface ChangeEcuVersion {}
+export type ChangeEcuVersion = {};
 
-export interface ChangeWifiFirmwareVersion {}
+export type ChangeWifiFirmwareVersion = {};
 
-export interface ChangeEthernetMac {}
+export type ChangeEthernetMac = {};
 
 export interface UnresolvedEcuCommand {
   macAddress: string;
@@ -607,55 +610,56 @@ export interface Ticket {
   subjectTypeKey: string;
   title: string;
   description: string;
-  creatorPersonId: string;
+  creatorPersonId: string | null;
   creatorPersonName: string;
-  creatorEmail: string;
-  assigneePersonId: string;
+  creatorEmail: string | null;
+  assigneePersonId: string | null;
   assigneePersonName: string;
   supervisorPersonId: string;
   supervisorPersonName: string;
-  numberOfRelatedTickets: number;
+  /** Number of related tickets, as a numeric string */
+  numberOfRelatedTickets: string;
   relatedTickets: string[];
-  causeId: string;
-  causeKey: string;
+  causeId: string | null;
+  causeKey: string | null;
   isCauseTranslated: boolean;
-  solutionId: string;
-  solutionKey: string;
-  contextInformation: string;
+  solutionId: string | null;
+  solutionKey: string | null;
+  contextInformation: string | null;
   due: string;
-  formId: string;
+  formId: string | null;
   isDue: boolean;
   created: string;
   updated: string;
-  viewed: string;
-  closed: string;
+  viewed: string | null;
+  closed: string | null;
   seen: boolean;
   following: boolean;
   mine: boolean;
   updatedPersonId: string;
-  updatedEmail: string;
+  updatedEmail: string | null;
   files: string[];
-  deviceSignalId: string;
-  deviceSignalIssue: string;
-  deviceSignalCreated: string;
-  issuePublicIdentification: string;
-  issueDiagnosticFsm: string;
-  deviceSignalSide: string;
-  odooFieldServiceId: number;
+  deviceSignalId: string | null;
+  deviceSignalIssue: string | null;
+  deviceSignalCreated: string | null;
+  issuePublicIdentification: string | null;
+  issueDiagnosticFsm: string | null;
+  deviceSignalSide: string | null;
+  odooFieldServiceId: number | null;
   isIssueBlocked: boolean;
 }
 
-export interface RemoveTicketCommand {}
+export type RemoveTicketCommand = {};
 
-export interface ViewedTicketCommand {}
+export type ViewedTicketCommand = {};
 
-export interface CreateOdooFieldServiceRecordCommand {}
+export type CreateOdooFieldServiceRecordCommand = {};
 
-export interface AddRemoveFollowerCommand {}
+export type AddRemoveFollowerCommand = {};
 
-export interface FollowTicketCommand {}
+export type FollowTicketCommand = {};
 
-export interface DontKnowCauseCommand {}
+export type DontKnowCauseCommand = {};
 
 export interface TreatTicketAsIncidentCommand {
   _recordId: string;
@@ -680,7 +684,7 @@ export interface TicketComment {
   files: string[];
 }
 
-export interface RemoveTicketCommentCommand {}
+export type RemoveTicketCommentCommand = {};
 
 export interface TicketCause {
   id: string;
@@ -698,7 +702,7 @@ export interface SetSignalsInactiveCommand {
   side: Record<string, unknown>;
 }
 
-export interface Issue {}
+export type Issue = {};
 
 export interface CreateSignalCommand {
   deviceId: string;
@@ -906,7 +910,7 @@ export interface DeviceSparePartPrice {
   startDate: string;
 }
 
-export interface ConsoleExecuteResult {}
+export type ConsoleExecuteResult = {};
 
 export interface SendAuthenticationCodeCommand {
   deviceSerial: string;
@@ -984,8 +988,94 @@ export interface FormstackForm {
   created: string;
 }
 
-/** Referenced, but not defined in the spec */
-export type Professional = Record<string, any>;
+export interface DeviceIssue {
+  id: string;
+  ticketId: string;
+  created: string;
+  lastDetected: string;
+  /** Translation key, e.g. "deviceSignals.releaseAirStuckClosed" */
+  info: string;
+  /** e.g. "release_air_stuck_closed" */
+  issue: string;
+  /** e.g. "HL0035" */
+  publicIdentification: string;
+  data: Record<string, unknown>;
+}
+
+export interface Professional {
+  id: string;
+  person: Person;
+  deviceId: string;
+  type: string;
+  receiveTicketEmail: boolean;
+  description: string | null;
+  start: string;
+  until: string;
+}
+
+/** An option of a select list */
+export interface ListOption {
+  id: string;
+  label: string;
+  /** Whether `label` is a translation key */
+  translated: boolean;
+}
+
+export interface TicketHistoryEntry {
+  updated: string;
+  changerId: string;
+  changerName: string;
+  field: string;
+  previousValue: string | null;
+  nextValue: string | null;
+}
+
+export interface ReleaseNote {
+  id: string;
+  date: string;
+  type: string;
+  description: string;
+  link: string | null;
+  version: string;
+}
+
+export interface IoSparePart {
+  id: string;
+  tag: string;
+  partNumber: string;
+  name: string;
+  versions: string[];
+}
+
+export interface HealthStatus {
+  status: string;
+  responseTimeMs?: number;
+  message?: string;
+}
+
+export interface HealthCheck {
+  timestamp: string;
+  database: HealthStatus;
+  redis: HealthStatus;
+  hdmRoot: HealthStatus;
+  hdmLocals: {
+    url: string;
+    status: HealthStatus;
+  }[];
+}
+
+export interface DeviceKit {
+  installationType: string;
+  partNumber: string;
+}
+
+export interface BoardVersion {
+  boardId: number;
+  boardName: string;
+  hardwareVersion: string;
+  hardwareMillivolt: number;
+  firmware: string;
+}
 
 /** Referenced, but not defined in the spec */
 export type RememberedDevice = Record<string, any>;
@@ -1479,7 +1569,7 @@ export interface RootApi {
      */
     getIoSpareParts(options: {
       deviceId: string | number | boolean | Date;
-    }): Promise<any>;
+    }): Promise<IoSparePart[]>;
     /**
      * `GET /device-part/get`
      */
@@ -2061,19 +2151,19 @@ export interface RootApi {
     /**
      * `GET /devices/statuses`
      */
-    listStatuses(options?: {}): Promise<unknown[]>;
+    listStatuses(options?: {}): Promise<string[]>;
     /**
      * `GET /devices/countries`
      */
-    listCountries(options?: {}): Promise<unknown[]>;
+    listCountries(options?: {}): Promise<ListOption[]>;
     /**
      * `GET /devices/kits`
      */
-    listKits(options?: {}): Promise<unknown[]>;
+    listKits(options?: {}): Promise<ListOption[]>;
     /**
      * `GET /devices/device-types`
      */
-    listDeviceTypes(options?: {}): Promise<unknown[]>;
+    listDeviceTypes(options?: {}): Promise<ListOption[]>;
     /**
      * Remove a simulator device with its ECU records (refuses non-simulator devices)
      *
@@ -2153,17 +2243,11 @@ export interface RootApi {
      */
     getConnectionData(options: {
       mac: string | number | boolean | Date;
-    }): Promise<any>;
+    }): Promise<string>;
     /**
      * `POST /ecus/store-unresolved-ecu`
      */
     storeUnresolvedEcu(options: { body: UnresolvedEcuCommand }): Promise<any>;
-  };
-  externalApi: {
-    /**
-     * `GET /external-api/list-coupled-devices`
-     */
-    listCoupledDevices(options?: {}): Promise<Device[]>;
   };
   fileStore: {
     /**
@@ -2244,19 +2328,24 @@ export interface RootApi {
      *
      * `GET /environment`
      */
-    getEnvironment(options?: {}): Promise<any>;
+    getEnvironment(options?: {}): Promise<{
+      display: boolean;
+      name: string;
+    }>;
     /**
      * Ping endpoint for health checks
      *
      * `GET /ping`
      */
-    ping(options?: {}): Promise<any>;
+    ping(options?: {}): Promise<{
+      pong: string;
+    }>;
   };
   health: {
     /**
      * `GET /health`
      */
-    check(options?: {}): Promise<any>;
+    check(options?: {}): Promise<HealthCheck>;
   };
   kiosk: {
     /**
@@ -2326,7 +2415,7 @@ export interface RootApi {
     /**
      * `GET /release-notes/list`
      */
-    getVersion(options?: {}): Promise<string>;
+    getVersion(options?: {}): Promise<ReleaseNote[]>;
   };
   serverPerformance: {
     /**
@@ -2362,7 +2451,9 @@ export interface RootApi {
     /**
      * `GET /settings/version`
      */
-    getVersion(options?: {}): Promise<string>;
+    getVersion(options?: {}): Promise<{
+      version: string;
+    }>;
     /**
      * `GET /settings/list-organisations`
      */
@@ -2417,11 +2508,7 @@ export interface RootApi {
       hasPermissions: string[];
       aroundDevice: string | number | boolean | Date;
       includeOwners: string | number | boolean | Date;
-    }): Promise<
-      LazyLoadingResult & {
-        records?: Person[];
-      }
-    >;
+    }): Promise<Person[]>;
     /**
      * `GET /settings/export-persons`
      */
@@ -2744,7 +2831,7 @@ export interface RootApi {
      */
     getHistory(options: {
       ticketId: string | number | boolean | Date;
-    }): Promise<unknown[]>;
+    }): Promise<TicketHistoryEntry[]>;
     /**
      * `GET /ticket/export`
      */
@@ -2895,17 +2982,23 @@ export interface RootApi {
       allowed: string | number | boolean | Date;
       due: string | number | boolean | Date;
       showAll: string | number | boolean | Date;
-    }): Promise<unknown[]>;
+    }): Promise<
+      (ListOption & {
+        data: {
+          closed: boolean;
+        };
+      })[]
+    >;
     /**
      * `GET /ticket/priorities`
      */
-    listPriorities(options?: {}): Promise<unknown[]>;
+    listPriorities(options?: {}): Promise<ListOption[]>;
     /**
      * `GET /ticket/subject-types`
      */
     listSubjectTypes(options: {
       showAll: string | number | boolean | Date;
-    }): Promise<unknown[]>;
+    }): Promise<ListOption[]>;
     /**
      * `GET /ticket/causes`
      */
@@ -2913,14 +3006,26 @@ export interface RootApi {
       showAll: string | number | boolean | Date;
       ticketId: string | number | boolean | Date;
       solutionId: string | number | boolean | Date;
-    }): Promise<unknown[]>;
+    }): Promise<
+      (ListOption & {
+        data: {
+          description: string;
+        };
+      })[]
+    >;
     /**
      * `GET /ticket/solutions`
      */
     listSolutions(options: {
       showAll: string | number | boolean | Date;
       ticketId: string | number | boolean | Date;
-    }): Promise<unknown[]>;
+    }): Promise<
+      (ListOption & {
+        data: {
+          contextInformationRequired: boolean;
+        };
+      })[]
+    >;
     /**
      * `GET /ticket/solution-priorities/contexts`
      */
@@ -2939,19 +3044,19 @@ export interface RootApi {
     /**
      * `GET /ticket/creators`
      */
-    listCreators(options?: {}): Promise<unknown[]>;
+    listCreators(options?: {}): Promise<ListOption[]>;
     /**
      * `GET /ticket/assignees`
      */
-    listAssignees(options?: {}): Promise<unknown[]>;
+    listAssignees(options?: {}): Promise<ListOption[]>;
     /**
      * `GET /ticket/supervisors`
      */
-    listSupervisors(options?: {}): Promise<unknown[]>;
+    listSupervisors(options?: {}): Promise<ListOption[]>;
     /**
      * `GET /ticket/device-organisations`
      */
-    listDeviceOrganisations(options?: {}): Promise<unknown[]>;
+    listDeviceOrganisations(options?: {}): Promise<ListOption[]>;
     /**
      * `GET /ticket/ticket-file/{ticketId}/{fileId}`
      */
@@ -2967,7 +3072,12 @@ export interface RootApi {
       notifyFollowers: string | number | boolean | Date;
       notifyCreator: string | number | boolean | Date;
       notifyOwner: string | number | boolean | Date;
-    }): Promise<any>;
+    }): Promise<
+      {
+        name: string;
+        email: string;
+      }[]
+    >;
   };
   timeLog: {
     /**

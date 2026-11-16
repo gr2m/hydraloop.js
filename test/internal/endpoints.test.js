@@ -96,6 +96,17 @@ describe("generated endpoint methods", () => {
         { headers: { "content-type": "application/json" } },
       )
       .persist();
+    pool
+      .intercept({
+        path: `/api-root/devices/list?event=${encodeURIComponent('{"first":0,"rows":1}')}`,
+        method: "GET",
+      })
+      .reply(
+        200,
+        { total: 1, records: [{ id: DEVICE_ID }] },
+        { headers: { "content-type": "application/json" } },
+      )
+      .persist();
   });
 
   afterAll(async () => {
@@ -114,6 +125,8 @@ describe("generated endpoint methods", () => {
       for (const [path, pathItem] of Object.entries(spec.paths)) {
         for (const [method, operation] of Object.entries(pathItem)) {
           if (!METHODS.includes(method)) continue;
+          // not included in hydraloop/internal, see scripts/generate-internal.js
+          if (operation.tags[0] === "external-api") continue;
 
           const namespace = camelCase(operation.tags[0]);
           const name = operation.operationId.split("_").slice(1).join("_");
