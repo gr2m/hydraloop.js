@@ -13,7 +13,7 @@ export interface HydraloopOptions {
   rootApiUrl?: string;
   /**
    * Local API URL for local API requests that are not for a specific device.
-   * Defaults to the preferred local server of `GET /devices/local-servers`.
+   * Defaults to the local API URL of your first device.
    */
   localApiUrl?: string;
 }
@@ -34,12 +34,15 @@ export interface Route {
   url: string;
   path?: string[];
   query?: string[];
+  /** Whether the response is documented as JSON */
+  json?: boolean;
 }
 
 export interface State {
   token: string | undefined;
   rootApiUrl: string;
   localApiUrl: string | undefined;
+  defaultDeviceId: string | undefined;
   deviceLocalApiUrls: Map<string, string>;
   deviceTokens: Map<string, { token: string; expiresAt: number }>;
 }
