@@ -9,7 +9,7 @@ https://info.hydraloop.com/docs/how-to-use-the-hydraloop-api/
 
 ## Usage
 
-Find more examples in [examples/external/](examples/external/).
+Find more examples in [examples/](examples/).
 
 ```js
 import { Hydraloop } from "hydraloop";
