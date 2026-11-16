@@ -23,16 +23,16 @@ const SOURCES = [
     filename: "external/root-api.json",
     format: "swagger-ui-init",
   },
-  // Full API used by the Hydraloop Device Manager web app. Served as plain
+  // Internal API used by the Hydraloop Device Manager web app. Served as plain
   // JSON next to the Swagger UI at /explorer/.
   {
     url: "https://hdm.hydraloop.com/api-local/explorer-json",
-    filename: "full/local-api.json",
+    filename: "internal/local-api.json",
     format: "json",
   },
   {
     url: "https://hdm.hydraloop.com/api-root/explorer-json",
-    filename: "full/root-api.json",
+    filename: "internal/root-api.json",
     format: "json",
   },
 ];

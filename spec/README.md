@@ -10,7 +10,7 @@ HDM has two backends, each with its own spec:
 Each backend publishes two specs:
 
 - **External** — only the `/external-api/*` endpoints, which are the ones Hydraloop offers for integrations. This library is built on these.
-- **Full** — every endpoint, including the ones the HDM web app at `https://hdm.hydraloop.com/hdm/` uses internally. Not used by this library; kept for reference.
+- **Internal** — every endpoint, including the ones the HDM web app at `https://hdm.hydraloop.com/hdm/` uses internally. Not used by this library; kept for reference.
 
 ## Files
 
@@ -18,33 +18,33 @@ Each backend publishes two specs:
 | ------------------------- | -------------------------------- | --------------------------------------------------------------------- |
 | `external/local-api.json` | HDM - External Local API         | `https://hdm.hydraloop.com/api-local/external-api/swagger-ui-init.js` |
 | `external/root-api.json`  | HDM - External Root API          | `https://hdm.hydraloop.com/api-root/external-api/swagger-ui-init.js`  |
-| `full/local-api.json`     | Hydraloop Device Manager - Local | `https://hdm.hydraloop.com/api-local/explorer-json`                   |
-| `full/root-api.json`      | Hydraloop Device Manager - Root  | `https://hdm.hydraloop.com/api-root/explorer-json`                    |
+| `internal/local-api.json` | Hydraloop Device Manager - Local | `https://hdm.hydraloop.com/api-local/explorer-json`                   |
+| `internal/root-api.json`  | Hydraloop Device Manager - Root  | `https://hdm.hydraloop.com/api-root/explorer-json`                    |
 
 ### External specs
 
-Swagger UI for these runs at `/api-root/external-api/` and `/api-local/external-api/`. The update script fetches the Swagger UI initialisation script (`swagger-ui-init.js`) and extracts the spec, which is embedded in it as the `swaggerDoc` object. The same spec is also served as plain JSON at `external-api-json`, the same NestJS pattern as the full specs below.
+Swagger UI for these runs at `/api-root/external-api/` and `/api-local/external-api/`. The update script fetches the Swagger UI initialisation script (`swagger-ui-init.js`) and extracts the spec, which is embedded in it as the `swaggerDoc` object. The same spec is also served as plain JSON at `external-api-json`, the same NestJS pattern as the internal specs below.
 
-### Full specs
+### Internal specs
 
 These are served by the NestJS Swagger module next to the API explorer:
 
-- `GET /api-root/` and `GET /api-local/` redirect to `explorer/`, the Swagger UI for the full API.
+- `GET /api-root/` and `GET /api-local/` redirect to `explorer/`, the Swagger UI for the internal API.
 - The spec itself is served at `explorer-json` (and as YAML at `explorer-yaml`). This is the NestJS default of `<swagger path>-json`.
 
 They are taken from production, which is what the HDM web app talks to.
 
 The web app doesn't use a generated client. Its JavaScript builds request URLs by hand, as `/api-root/<path segments>`. For the local API, the base URL is the `apiUrl` field of a "local server" record that the app loads from `/api-root/devices/local-servers`.
 
-The full specs are incomplete in places. Many root API operations have no summary, and about half of the operations in both specs have no response schema. To fill in a missing response type, call the endpoint with a logged-in session and record what comes back.
+The internal specs are incomplete in places. Many root API operations have no summary, and about half of the operations in both specs have no response schema. To fill in a missing response type, call the endpoint with a logged-in session and record what comes back.
 
 ## Stability
 
 The **external API** is the one Hydraloop provides for integrations. This library only uses the external API. Hydraloop has made no explicit promise of stability or versioning for it. So far it has changed by gaining endpoints and parameters (e.g. the `zone` parameter in February 2026).
 
-The **internal API** behind the full specs is meant for personal use only. The API is prune to change at any moment to support Hydraloop's needs for their own applications.
+The **internal API** behind the internal specs is meant for personal use only. The API is prune to change at any moment to support Hydraloop's needs for their own applications.
 
-It authenticates with a login session (JWT bearer token), not the `X-API-KEY` used by the external API. Treat `spec/full/` as reference material only.
+It authenticates with a login session (JWT bearer token), not the `X-API-KEY` used by the external API. Treat `spec/internal/` as reference material only.
 
 Hydraloop also asked that the local API base URL not be hardcoded. Each device's `localApiUrl` (from `/api-root/external-api/list-coupled-devices`) "might change depending on load balancing and or privacy laws of your country".
 
