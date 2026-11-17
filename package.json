@@ -28,7 +28,7 @@
     "test:coverage": "vitest run --coverage --coverage.reporter=html && open coverage/index.html",
     "test:tsc": "tsc",
     "test:types": "vitest --typecheck.only run",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "generate:internal": "node scripts/generate-internal.js && prettier --write lib/internal readme.internal.md"
   },
   "keywords": [
