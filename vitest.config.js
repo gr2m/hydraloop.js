@@ -13,7 +13,7 @@ export default defineConfig({
       },
     },
     typecheck: {
-      include: ["test/types.test.ts"],
+      include: ["test/types.test.ts", "test/internal/types.test.ts"],
     },
   },
 });

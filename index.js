@@ -1,16 +1,16 @@
 // @ts-check
 
-import { VERSION } from "./lib/version.js";
-import { listDevices } from "./lib/list-devices.js";
-import { getRecycledWaterByYear } from "./lib/get-recycled-water-by-year.js";
-import { getRecycledWaterByMonth } from "./lib/get-recycled-water-by-month.js";
-import { getTankLevels } from "./lib/get-tank-levels.js";
-import { getTankLevelsByMonth } from "./lib/get-tank-levels-by-month.js";
-import { getBypassMode } from "./lib/get-bypass-mode.js";
-import { setBypassMode } from "./lib/set-bypass-mode.js";
+import { VERSION } from "./lib/external/version.js";
+import { listDevices } from "./lib/external/list-devices.js";
+import { getRecycledWaterByYear } from "./lib/external/get-recycled-water-by-year.js";
+import { getRecycledWaterByMonth } from "./lib/external/get-recycled-water-by-month.js";
+import { getTankLevels } from "./lib/external/get-tank-levels.js";
+import { getTankLevelsByMonth } from "./lib/external/get-tank-levels-by-month.js";
+import { getBypassMode } from "./lib/external/get-bypass-mode.js";
+import { setBypassMode } from "./lib/external/set-bypass-mode.js";
 
-export { VERSION } from "./lib/version.js";
-export { RequestError } from "./lib/request-error.js";
+export { VERSION } from "./lib/external/version.js";
+export { RequestError } from "./lib/external/request-error.js";
 
 const ROOT_API_URL = "https://hdm.hydraloop.com/api-root";
 

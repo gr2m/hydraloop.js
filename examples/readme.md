@@ -1,31 +1,13 @@
 # Examples
 
-All examples require a Hydraloop API key set as an environment variable:
+| Folder                   | API                                        | Authentication                           |
+| ------------------------ | ------------------------------------------ | ---------------------------------------- |
+| [`external/`](external/) | External API, which this library uses      | API key (`HYDRALOOP_API_KEY`)            |
+| [`internal/`](internal/) | Internal API used by the HDM web app       | HDM login with two-factor authentication |
+| [`app/`](app/)           | Internal API, through `hydraloop/internal` | HDM login with two-factor authentication |
 
-```bash
-export HYDRALOOP_API_KEY="your-api-key"
-```
+Start with [`external/`](external/). Those examples use this library and the API that Hydraloop provides for integrations.
 
-Run any example from the repository root with:
+The [`internal/`](internal/) examples call the internal HDM API directly, without this library. There is also an SDK for it: [`hydraloop/internal`](../readme.internal.md). That API is not meant for external use and may change at any time. See [`spec/README.md`](../spec/README.md#stability).
 
-```bash
-node examples/<name>.js
-```
-
-## Available Examples
-
-### `readme.js`
-
-Basic usage matching the README: lists your devices, fetches yearly recycled water data, and checks bypass mode status.
-
-### `full-test.js`
-
-Exercises every API method with formatted output. Useful for verifying your API key works and exploring the full response shapes.
-
-### `water-efficiency.js`
-
-Generates a water efficiency report with year-to-date totals, monthly breakdown, current month detail, and an assessment of your system's recycling performance.
-
-### `tank-levels.js`
-
-Prints the latest tank levels and a per-day summary (min / average / max) of the hourly tank levels for the current month.
+The [`app/`](app/) folder is a Next.js dashboard for the H600 that uses the [`hydraloop/internal`](../readme.internal.md) SDK to show the live and historic status of the device.

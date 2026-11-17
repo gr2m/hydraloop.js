@@ -7,6 +7,10 @@
     ".": {
       "types": "./index.d.ts",
       "import": "./index.js"
+    },
+    "./internal": {
+      "types": "./lib/internal/index.d.ts",
+      "import": "./lib/internal/index.js"
     }
   },
   "main": "index.js",
@@ -14,7 +18,8 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "lib/"
+    "lib/",
+    "readme.internal.md"
   ],
   "scripts": {
     "lint": "prettier --check .",
@@ -23,7 +28,8 @@
     "test:coverage": "vitest run --coverage --coverage.reporter=html && open coverage/index.html",
     "test:tsc": "tsc",
     "test:types": "vitest --typecheck.only run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate:internal": "node scripts/generate-internal.js && prettier --write lib/internal readme.internal.md"
   },
   "keywords": [
     "hydraloop",
@@ -68,7 +74,7 @@
         "semantic-release-plugin-update-version-in-files",
         {
           "files": [
-            "lib/version.js"
+            "lib/external/version.js"
           ]
         }
       ],

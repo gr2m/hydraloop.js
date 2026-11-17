@@ -8,5 +8,6 @@
     "allowJs": true,
     "checkJs": true
   },
-  "include": ["index.js", "index.d.ts", "lib/*.js", "examples/*.js"]
+  "include": ["index.js", "index.d.ts", "lib/**/*.js", "examples/**/*.js"],
+  "exclude": ["examples/app"]
 }
