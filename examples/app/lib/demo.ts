@@ -181,8 +181,8 @@ function run(now: number) {
     } else {
       set(IO.bypass, t, false);
     }
-    // Switched twice a day, independent of incoming water
-    set(IO.abSelector, t, minuteOfDay % 720 !== 285);
+    // Selects the receiving train
+    set(IO.abSelector, t, route === "B");
     set(IO.backFlush, t, minuteOfDay % 720 === 285);
 
     // ── Trains ──

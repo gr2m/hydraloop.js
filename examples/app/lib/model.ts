@@ -39,7 +39,10 @@ export const TANK_LABELS: Record<TankId, string> = {
 export const IO = {
   /** Sends incoming greywater to the sewer while on */
   bypass: "grey_water_bypass",
-  /** Switched twice a day with `back_flush`, not by incoming water */
+  /**
+   * Selects the train that receives greywater (0: A, 1: B). Switched when a
+   * train starts filth removal, and for a minute during the bypass test
+   */
   abSelector: "grey_water_ab_selection_valve",
   uvValve: "uv_valve",
   uvPower: "uv_power",
@@ -724,15 +727,35 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
 // ── Room for greywater ─────────────────────────────────────────────────────
 
 // Derived from 30 days of an H600's data, not documented by Hydraloop:
-// - Greywater only enters a train in STANDBY (or during INCOMING_WATER).
-// - A train starts FILTH_REMOVAL when it holds about 270–330 L (T1 + T2),
-//   and doesn't accept water for the ~4.5 h it lasts.
+// - Greywater only enters the train selected by the A/B valve, and only in
+//   STANDBY (or during INCOMING_WATER).
+// - After each incoming water, SKIM_LEVEL_DETERMINATION checks the train
+//   with T2 vented. Once T2 holds about 134 L, the train starts
+//   FILTH_REMOVAL, the A/B valve switches to the other train, and the train
+//   doesn't accept water for the ~4.5 h it lasts. In T1 + T2, that is about
+//   290 L for train A and 280 L for train B, ±15 L.
 // - The bypass opens when neither train can accept water.
 // T1 + T2 is only valid while T2 is vented (see t2Pressurized), which
 // happens about once an hour.
 
 /** Total of T1 + T2 at which a train is full and starts FILTH_REMOVAL */
-export const TRAIN_FULL_LITERS = 290;
+export const TRAIN_FULL_LITERS: Record<Side, number> = { A: 290, B: 280 };
+
+/** How far off TRAIN_FULL_LITERS was for single filth removals */
+export const TRAIN_FULL_SPREAD = 15;
+
+/**
+ * The train that the A/B valve sends greywater to. The valve is also
+ * switched for a minute while the bypass is tested, which is skipped.
+ */
+export function fillingTrain(ds: Dataset, t: number): Side | undefined {
+  const points = ds.io[IO.abSelector];
+  if (!points?.length) return undefined;
+  let i = indexAt(points, t);
+  while (i > 0 && (stepAt(ds.io[IO.bypass], points[i].t)?.v ?? 0) > 0) i--;
+  if (i === -1) return undefined;
+  return points[i].v > 0 ? "B" : "A";
+}
 
 /** Vent openings shorter than this don't settle the levels */
 const MIN_VENT = 60_000;
@@ -782,6 +805,8 @@ export type Room = {
   /** Only one train is known, so `liters` is a lower bound */
   partial: boolean;
   bypass: boolean;
+  /** The train that receives greywater, and starts filth removal next */
+  filling: Side | undefined;
   trains: Record<Side, TrainRoom>;
 };
 
@@ -828,11 +853,11 @@ export function roomAt(ds: Dataset, t: number): Room {
     }
     return {
       side,
-      liters: Math.max(0, TRAIN_FULL_LITERS - last.v),
+      liters: Math.max(0, TRAIN_FULL_LITERS[side] - last.v),
       total: last.v,
       measuredAt: last.t,
       accepting: true,
-      reason: last.v >= TRAIN_FULL_LITERS ? "Full" : "Accepting water",
+      reason: last.v >= TRAIN_FULL_LITERS[side] ? "Full" : "Accepting water",
     };
   };
 
@@ -846,7 +871,7 @@ export function roomAt(ds: Dataset, t: number): Room {
     : known.length === 0
       ? undefined
       : known.reduce((sum, l) => sum + l, 0);
-  return { liters, partial, bypass, trains };
+  return { liters, partial, bypass, filling: fillingTrain(ds, t), trains };
 }
 
 /** Room for greywater over the dataset's range, at `steps` points */

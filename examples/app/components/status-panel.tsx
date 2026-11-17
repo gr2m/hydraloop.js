@@ -3,6 +3,7 @@ import { Fragment } from "react";
 import {
   formatDuration,
   TRAIN_FULL_LITERS,
+  TRAIN_FULL_SPREAD,
   formatLiters,
   type Confidence,
   type DeviceState,
@@ -120,6 +121,48 @@ function TrainStatus({ side, state }: { side: Side; state: DeviceState }) {
   );
 }
 
+function NextFilthRemoval({ state }: { state: DeviceState }) {
+  const { filling, bypass } = state.room;
+  const train = filling && state.room.trains[filling];
+  const liters = train?.accepting ? train.liters : undefined;
+  return (
+    <section className="status-block room" aria-labelledby="next-heading">
+      <div className="status-head">
+        <h3 id="next-heading">Greywater until filth removal</h3>
+        <ConfidenceTag confidence="inferred" />
+      </div>
+      <p className="room-value">
+        {!train
+          ? "Unknown"
+          : bypass || !train.accepting
+            ? "Not accepting water"
+            : liters === undefined
+              ? "Unknown"
+              : `≈ ${Math.round(liters)} L`}
+      </p>
+      <dl className="status-facts">
+        <dt>Receiving</dt>
+        <dd>{filling ? `Train ${filling} (A/B valve)` : "No data"}</dd>
+        {liters !== undefined && (
+          <>
+            <dt>Range</dt>
+            <dd>
+              {Math.max(0, Math.round(liters - TRAIN_FULL_SPREAD))}–
+              {Math.round(liters + TRAIN_FULL_SPREAD)} L
+            </dd>
+          </>
+        )}
+      </dl>
+      <p className="status-evidence">
+        After greywater stops, the train starts filth removal within about 10
+        minutes once T2 holds about 134 L, at about {TRAIN_FULL_LITERS.A} L (A)
+        or {TRAIN_FULL_LITERS.B} L (B) in T1 + T2. About 6 hours later it has
+        transferred about 100 L to T3.
+      </p>
+    </section>
+  );
+}
+
 function RoomSummary({ state }: { state: DeviceState }) {
   const { room } = state;
   return (
@@ -163,9 +206,9 @@ function RoomSummary({ state }: { state: DeviceState }) {
         })}
       </dl>
       <p className="status-evidence">
-        A train counts as full at about {TRAIN_FULL_LITERS} L (T1 + T2, measured
-        while vented). It then starts filth removal and takes no water until it
-        is done.
+        A train counts as full at about {TRAIN_FULL_LITERS.A} L (A) or{" "}
+        {TRAIN_FULL_LITERS.B} L (B), in T1 + T2 measured while vented. It then
+        starts filth removal and takes no water until it is done.
       </p>
     </section>
   );
@@ -180,6 +223,7 @@ export function StatusPanel({ state }: { state: DeviceState }) {
   ].filter(Boolean);
   return (
     <div className="status-panel">
+      <NextFilthRemoval state={state} />
       <RoomSummary state={state} />
       <TrainStatus side="A" state={state} />
       <TrainStatus side="B" state={state} />
