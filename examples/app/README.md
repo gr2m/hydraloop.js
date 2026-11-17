@@ -7,7 +7,20 @@ A Next.js app that shows the live and historic status of a Hydraloop H600, using
 
 ## Views
 
-**Live** (`/`) refreshes every 10 seconds and shows:
+**Overview** (`/`) answers the main questions at a glance and links to the details. It refreshes every 10 seconds:
+
+- **Until the next cleaning**: how much more greywater the receiving train takes before it starts filth removal (see [Next filth removal](#next-filth-removal)).
+- **Until greywater goes to the drain**: the room for greywater in both trains (see [Room for greywater](#room-for-greywater)).
+- **Recycled water ready**: T3 above the ~28 L it reads when empty ([`T3_EMPTY_LITERS`](lib/model.ts)).
+- **Being cleaned**: about 100 L per train in `FILTH_REMOVAL` or `TRANSFER`, and when it will be in T3 (see [Water being cleaned](#water-being-cleaned)).
+
+And for the last 30 days (see [30-day statistics](#30-day-statistics)):
+
+- **Recycled**: liters moved into T3, as reported by HDM.
+- **Greywater lost, both trains busy**: how long the bypass sent greywater to the drain because neither train accepted water, with every bypass episode and its cause.
+- **Fresh water instead of recycled**: an estimate of the backup water the outlets used.
+
+**Live** (`/live`) refreshes every 10 seconds and shows:
 
 - A flow diagram of both treatment trains (T1 and T2 for A and B), UV-C, T3 storage, T4 backup and the outlets. Tanks show their fill level in liters. Pipes are colored and animated only while a valve or pump signal shows water moving through them. Hover any valve, pump or tank for its raw value.
 - The state of each train (the HDM routine and its sub-state), of storage and of the outlets, and when each train last received water and transferred to T3. Each state says how it was determined: **HDM routine**, **Valve signal**, or **Inferred**.
@@ -60,6 +73,18 @@ The live view also shows how much more greywater the receiving train takes befor
 
 The estimate is `TRAIN_FULL_LITERS − T1 − T2` of the receiving train, with T1 + T2 from its last venting. It counts the water the train takes, measured by its own sensors, not the water that left the shower. None of this is documented by Hydraloop.
 
+### Water being cleaned
+
+In 30 days of an H600's data, every `FILTH_REMOVAL` that ran to its end took about 4.5 h. Then `TRANSFER` moved 85–120 L (about 100 L) into T3 in about 1.4 h. So the overview expects about 100 L in T3 about 6 h after filth removal starts. During `TRANSFER`, it subtracts what T3 gained since the transfer started. A train in `SKIM_LEVEL_DETERMINATION` / `FIND_HIGHEST_WATER_POINT` counts as starting filth removal now.
+
+### 30-day statistics
+
+[`/api/stats`](app/api/stats/route.ts) loads the last 30 days and computes the figures on the server ([`lib/stats.ts`](lib/stats.ts)). The result is cached for 10 minutes.
+
+- **Recycled** is the sum of `local.graph.getWaterRecycledData({ unit: "day" })`, in the browser's time zone. HDM reports about 100 L on each day with a transfer, so it matches the transfers into T3. `unit` only accepts `day` or `month`.
+- **Bypass**: `getIo()` returns about 5 days before `until`, whatever `from` is, so the valves are loaded in windows of 5 days. Bypass openings shorter than 2 minutes are the scheduled test and are skipped. Each episode gets a cause: switched on in the app (`bypassByAppBypassValve`), a train emptied to the drain (waste valve or a `fullT1T2Waste…` behavior), both trains busy (neither in `STANDBY`, `INCOMING_WATER` or `TRANSFER`), or other. The H600 can't measure the water that goes through the bypass, so only the time is shown.
+- **Fresh water**: while `backup_water` is on, the distribution pump supplies the outlets from T4, which is filled with fresh water. On recycled water, T3 dropped by about 0.06 L per second of pumping to the outlets ([`PUMP_LITERS_PER_SECOND`](lib/stats.ts)). The estimate is the pump time on backup water times that rate. Circulation and the `distribution…` check behaviors don't count. In 30 days of an H600's data, the outlets ran on backup water 65% of the time, and used about 3,150 L. HDM reported 1,269 L recycled in the same 30 days.
+
 ### Behaviors
 
 Besides the valve values, `getIo()` returns firmware _behaviors_ with an `engaged` and a `disengaged` event, e.g. `fullT1T2WasteSoapBombA` while train A is emptied to the drain because of too much soap, `fullT3WasteCleaning`, `t4OverflowBackflush` or `bypassByAppBypassValve`. A trailing `A` or `B` names the train. The app shows them as events, in a timeline lane per train, and in the status of the train while engaged.
@@ -99,8 +124,11 @@ To skip the login form, set `HYDRALOOP_TOKEN` to a token from a previous login, 
 | -------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | [`lib/hdm.ts`](lib/hdm.ts)                                                             | Loads and normalizes data with the SDK (server only) |
 | [`lib/model.ts`](lib/model.ts)                                                         | State at a point in time, phases, events, transfers  |
+| [`lib/stats.ts`](lib/stats.ts)                                                         | 30-day statistics                                    |
 | [`lib/demo.ts`](lib/demo.ts)                                                           | Simulated data                                       |
 | [`app/api/live`](app/api/live/route.ts), [`app/api/history`](app/api/history/route.ts) | JSON for the live and history views                  |
+| [`app/api/stats`](app/api/stats/route.ts)                                              | JSON for the 30-day statistics                       |
+| [`components/overview.tsx`](components/overview.tsx)                                   | The overview                                         |
 | [`components/flow-diagram.tsx`](components/flow-diagram.tsx)                           | The flow diagram                                     |
 | [`components/timeline.tsx`](components/timeline.tsx)                                   | The history tracks                                   |
 
@@ -116,3 +144,4 @@ The SDK methods used:
 - `local.graph.getData()`: tank levels (`tank1`, `tank2`, `tank1_b`, `tank2_b`, `tank3`)
 - `local.graph.getIo()`, `local.graph.getLastKnownIoState()`: valves and pumps
 - `local.graph.getRoutineData()`: HDM routines per side
+- `local.graph.getWaterRecycledData()`: liters recycled per day
