@@ -18,6 +18,7 @@ import {
 
 import { EventTable } from "./event-table";
 import { DiagramLegend, FlowDiagram, FlowSummary } from "./flow-diagram";
+import { SessionKeepAlive } from "./session-keep-alive";
 import { SiteHeader } from "./site-header";
 import { StatusPanel } from "./status-panel";
 import { Time } from "./time";
@@ -157,8 +158,8 @@ export function HistoryExplorer() {
 
   const completed = transferList.filter((t) => !t.open && !t.clipped);
   const medianDuration = median(completed.map((t) => t.end - t.start));
-  const medianDrop = median(
-    completed.flatMap((t) => (t.trainDrop === undefined ? [] : [t.trainDrop])),
+  const medianIntoT3 = median(
+    completed.flatMap((t) => (t.t3Change === undefined ? [] : [t.t3Change])),
   );
 
   return (
@@ -168,6 +169,7 @@ export function HistoryExplorer() {
       ) : (
         <header className="site-header" aria-busy="true" />
       )}
+      <SessionKeepAlive />
       <main id="main" className="page">
         <div className="page-title">
           <h1>How the H600 behaved</h1>
@@ -260,8 +262,8 @@ export function HistoryExplorer() {
                     `A ${transferList.filter((t) => t.side === "A").length}, B ${transferList.filter((t) => t.side === "B").length}`}
                   {medianDuration !== undefined &&
                     `. Median ${formatDuration(medianDuration)}`}
-                  {medianDrop !== undefined &&
-                    `, ${Math.round(medianDrop)} L from T1+T2`}
+                  {medianIntoT3 !== undefined &&
+                    `, ${Math.round(medianIntoT3)} L into T3`}
                 </dd>
               </div>
               <div>
@@ -329,9 +331,10 @@ export function HistoryExplorer() {
             <section className="section" aria-labelledby="transfers-heading">
               <h2 id="transfers-heading">Transfers to T3</h2>
               <p className="section-lede">
-                From the transfer valve opening to it closing. The level changes
-                include anything else that happened at the same time, such as
-                toilet flushes drawing from T3.
+                From the transfer valve opening to it closing. The volume is the
+                change of T3, so toilet flushes drawing from T3 at the same time
+                make it smaller. T1+T2 is not used, as T2 reads high while it
+                holds air pressure.
               </p>
               {transferList.length === 0 ? (
                 <p className="empty">No transfers in this period.</p>
@@ -346,10 +349,7 @@ export function HistoryExplorer() {
                         Duration
                       </th>
                       <th scope="col" className="numeric">
-                        T1+T2 change
-                      </th>
-                      <th scope="col" className="numeric">
-                        T3 change
+                        Into T3
                       </th>
                     </tr>
                   </thead>
@@ -371,13 +371,6 @@ export function HistoryExplorer() {
                           {formatDuration(t.end - t.start)}
                           {t.open && <span className="muted"> so far</span>}
                         </td>
-                        <td className="numeric">
-                          {signed(
-                            t.trainDrop === undefined
-                              ? undefined
-                              : -t.trainDrop,
-                          )}
-                        </td>
                         <td className="numeric">{signed(t.t3Change)}</td>
                       </tr>
                     ))}
@@ -391,8 +384,12 @@ export function HistoryExplorer() {
                 <h2 id="cleaning-heading">Filth removal</h2>
                 <p className="section-lede">
                   The <span className="mono">FILTH_REMOVAL</span> routine as
-                  reported by HDM, and how long the waste valve of its train was
-                  open during it.
+                  reported by HDM. A normal run holds T1 at the top for about
+                  4.5 hours, so filth and foam spill over the skim overflow to
+                  the drain. That overflow has no valve signal, so it&apos;s
+                  inferred. The waste valve usually stays closed; when it opens
+                  right after the routine, T1 is emptied to the drain. Select a
+                  run to see the moment water leaves the train.
                 </p>
                 <table>
                   <caption className="sr-only">Filth removal runs</caption>
@@ -404,6 +401,9 @@ export function HistoryExplorer() {
                         Duration
                       </th>
                       <th scope="col" className="numeric">
+                        Skimming
+                      </th>
+                      <th scope="col" className="numeric">
                         Waste valve open
                       </th>
                     </tr>
@@ -413,7 +413,7 @@ export function HistoryExplorer() {
                       <tr
                         key={`${c.side}-${c.start}`}
                         className="is-selectable"
-                        onClick={() => select(c.start)}
+                        onClick={() => select(c.focus)}
                       >
                         <td>{c.side}</td>
                         <td>
@@ -422,6 +422,9 @@ export function HistoryExplorer() {
                         <td className="numeric">
                           {formatDuration(c.end - c.start)}
                           {c.open && <span className="muted"> so far</span>}
+                        </td>
+                        <td className="numeric">
+                          {c.skimming ? formatDuration(c.skimming) : "–"}
                         </td>
                         <td className="numeric">
                           {c.waste ? formatDuration(c.waste) : "–"}

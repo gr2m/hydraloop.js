@@ -105,9 +105,88 @@ export type Dataset = {
   captions: Record<string, string>;
   /** Routine changes, sorted by time. Includes the last one before `from`. */
   routines: RoutineEvent[];
+  /** Firmware behaviors (e.g. `fullT1T2WasteSoapBombA`) overlapping the range */
+  behaviors: Behavior[];
   /** Data that could not be loaded */
   warnings: string[];
 };
+
+/**
+ * A firmware behavior from the `behavior` list of `getIo()`, from its
+ * `engaged` to its `disengaged` event. Behaviors explain why the controller
+ * acts, e.g. `fullT1T2WasteSoapBombA` while it empties train A to the drain.
+ */
+export type Behavior = {
+  name: string;
+  typeId: number;
+  side: RoutineSide;
+  label: string;
+  start: number;
+  end: number;
+  /** Not disengaged by the end of the range */
+  open: boolean;
+};
+
+/** `fullT1T2WasteSoapBombA` → `Full T1 T2 waste soap bomb` */
+export function behaviorLabel(name: string) {
+  const words = name
+    .replace(/([a-z])([AB])$/, "$1")
+    .replace(/^t(\d)/, "T$1")
+    .replace(/([a-z])([A-Z0-9])/g, "$1 $2")
+    .replace(/([0-9])([A-Z])/g, "$1 $2")
+    .split(" ")
+    .map((w) => (/^T\d$/.test(w) ? w : w.toLowerCase()));
+  const text = words.join(" ");
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+export function behaviorSide(name: string): RoutineSide {
+  const match = /[a-z]([AB])$/.exec(name);
+  return match ? (match[1] as Side) : "SYSTEM";
+}
+
+/** Pairs `engaged` and `disengaged` events into behaviors */
+export function behaviorIntervals(
+  events: { t: number; name: string; typeId: number; engaged: boolean }[],
+  from: number,
+  until: number,
+): Behavior[] {
+  const result: Behavior[] = [];
+  const engaged = new Map<string, { t: number; typeId: number }>();
+  for (const e of [...events].sort((a, b) => a.t - b.t)) {
+    if (e.t > until) break;
+    if (e.engaged) {
+      if (!engaged.has(e.name)) engaged.set(e.name, e);
+      continue;
+    }
+    const start = engaged.get(e.name);
+    engaged.delete(e.name);
+    if (!start || e.t < from) continue;
+    result.push(behavior(e.name, start.typeId, start.t, e.t, false));
+  }
+  for (const [name, start] of engaged) {
+    result.push(behavior(name, start.typeId, start.t, until, true));
+  }
+  return result.sort((a, b) => a.start - b.start);
+}
+
+function behavior(
+  name: string,
+  typeId: number,
+  start: number,
+  end: number,
+  open: boolean,
+): Behavior {
+  return {
+    name,
+    typeId,
+    side: behaviorSide(name),
+    label: behaviorLabel(name),
+    start,
+    end,
+    open,
+  };
+}
 
 // ── Conversion and labels ──────────────────────────────────────────────────
 
@@ -260,6 +339,53 @@ const PHASE_LABELS: Record<TrainPhase, string> = {
   unknown: "Unknown",
 };
 
+// ── T2 pressure ────────────────────────────────────────────────────────────
+
+// T2 is a closed tank. The air pump pressurizes it to push water up into T1,
+// and `release_air` vents it, which lets the water fall back. Its level
+// sensor measures pressure, so while T2 holds air pressure, the reading is
+// higher than the water in it: when the air is released, T1 drops by tens of
+// liters but T2 barely rises. Derived from an H600's data, not documented.
+
+const AIR_IN = ["air_pump", "add_air_valve"];
+
+/** Vent closed, and air pumped in since it closed */
+export function t2Pressurized(ds: Dataset, side: Side, t: number) {
+  const vent = ds.io[sideIo("release_air", side)];
+  const v = stepAt(vent, t);
+  if (!vent || !v) return undefined;
+  if (v.v > 0) return false;
+  const closedAt = onSince(vent, t) ?? v.t;
+  return AIR_IN.some((name) => {
+    const points = ds.io[sideIo(name, side)];
+    if (!points) return false;
+    if ((stepAt(points, closedAt)?.v ?? 0) > 0) return true;
+    return points.some((p) => p.t > closedAt && p.t <= t && p.v > 0);
+  });
+}
+
+/** Intervals during which T2 was pressurized, within the dataset's range */
+export function t2PressurizedIntervals(ds: Dataset, side: Side): Interval[] {
+  const names = ["release_air", ...AIR_IN].map((n) => sideIo(n, side));
+  if (!ds.io[names[0]]) return [];
+  const changes = names
+    .flatMap((name) => (ds.io[name] ?? []).map((p) => ({ ...p, name })))
+    .sort((a, b) => a.t - b.t);
+  const values: Record<string, number> = {};
+  let charged = false;
+  const points: Point[] = [];
+  for (const c of changes) {
+    values[c.name] = c.v;
+    if (values[names[0]] > 0) charged = false;
+    else if (AIR_IN.some((n) => values[sideIo(n, side)] > 0)) charged = true;
+    const pressurized = values[names[0]] === 0 && charged ? 1 : 0;
+    if (points[points.length - 1]?.v !== pressurized) {
+      points.push({ t: c.t, v: pressurized });
+    }
+  }
+  return onIntervals(points, ds.from, ds.until);
+}
+
 // ── State at a point in time ───────────────────────────────────────────────
 
 export type IoValue = { on: boolean; value: number; since: number | undefined };
@@ -270,6 +396,11 @@ export type TankLevel = {
   pct: number | undefined;
   /** Liters per minute over the previous 10 minutes */
   trend: number | undefined;
+  /**
+   * T2 only: the tank holds air pressure, which adds to the reading. The
+   * liters are then not the actual volume.
+   */
+  pressurized?: boolean;
 };
 
 export type TrainState = {
@@ -286,6 +417,13 @@ export type TrainState = {
   lastTransfer: number | undefined;
   /** Water flows from T2 into T1, inferred from a falling T2 level */
   t2ToT1: boolean;
+  /** Firmware behaviors of this train that are engaged */
+  behaviors: Behavior[];
+  /**
+   * Filth and foam spill over the skim overflow of T1 to the drain, inferred
+   * from the `FILTH_REMOVAL` routine (the overflow has no valve signal)
+   */
+  skimming: boolean;
 };
 
 export type T3State = {
@@ -329,9 +467,16 @@ export type DeviceState = {
   t3: T3State;
   t4: T4State;
   supply: SupplyState;
+  /** Engaged firmware behaviors that don't belong to a train */
+  systemBehaviors: Behavior[];
+  /** Estimated room for greywater before it is bypassed */
+  room: Room;
 };
 
 const TREND_WINDOW = 10 * 60_000;
+
+/** `FILTH_REMOVAL` sub-states while T1 is held at the skim overflow */
+const SKIM_STATES = new Set(["REMOVE_FILTH_ON_HEIGHT", "SKIM_LAST_WATER"]);
 
 /** The current routine of a side and when it started (first sub-state) */
 function routineAt(ds: Dataset, side: RoutineSide, t: number) {
@@ -371,6 +516,8 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
           : (liters - before) / (TREND_WINDOW / 60_000),
     };
   }
+  tanks.t2a.pressurized = t2Pressurized(ds, "A", t);
+  tanks.t2b.pressurized = t2Pressurized(ds, "B", t);
 
   const io: Record<string, IoValue | undefined> = {};
   for (const [name, points] of Object.entries(ds.io)) {
@@ -380,6 +527,9 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
   const on = (name: string) => io[name]?.on;
 
   const routine: Partial<Record<RoutineSide, RoutineEvent>> = {};
+  const active = (ds.behaviors ?? []).filter(
+    (b) => b.start <= t && (b.open ? t <= b.end : t < b.end),
+  );
 
   const train = (side: Side): TrainState => {
     const { current, start, lastIncoming, lastTransfer } = routineAt(
@@ -404,7 +554,23 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
       Boolean(waste?.on || transfer?.on) &&
       t2Trend !== undefined &&
       t2Trend <= -0.5;
-    const base = { side, lastIncoming, lastTransfer, evidence, t2ToT1 };
+    // During `FILTH_REMOVAL`, the air pump runs continuously and holds T1 at
+    // the top of its range, so filth spills over the skim overflow
+    const skimming =
+      current?.name === "FILTH_REMOVAL" &&
+      SKIM_STATES.has(current.state) &&
+      air?.on !== false;
+    if (skimming) evidence.push("Skimming over the overflow (inferred)");
+    const behaviors = active.filter((b) => b.side === side);
+    const base = {
+      side,
+      lastIncoming,
+      lastTransfer,
+      evidence,
+      t2ToT1,
+      skimming,
+      behaviors,
+    };
 
     const routineText = current
       ? [humanize(current.name), current.state && humanize(current.state)]
@@ -419,7 +585,13 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
         ...base,
         phase: draining ? "cleaning" : "transferring",
         label: draining ? "Draining to waste" : PHASE_LABELS.transferring,
-        detail: routineText && `HDM routine: ${routineText}`,
+        detail: [
+          behaviors.length > 0 &&
+            `HDM behavior: ${behaviors.map((b) => b.label).join(", ")}`,
+          routineText && `HDM routine: ${routineText}`,
+        ]
+          .filter(Boolean)
+          .join(". "),
         confidence: "valve",
         since: (draining ? waste : transfer)?.since,
       };
@@ -529,7 +701,155 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
     ),
   };
 
-  return { t, tanks, io, routine, inlet, trains, t3, t4, supply };
+  const systemBehaviors = active.filter((b) => b.side === "SYSTEM");
+
+  return {
+    t,
+    tanks,
+    io,
+    routine,
+    inlet,
+    trains,
+    t3,
+    t4,
+    supply,
+    systemBehaviors,
+    room: roomAt(ds, t),
+  };
+}
+
+// ── Room for greywater ─────────────────────────────────────────────────────
+
+// Derived from 30 days of an H600's data, not documented by Hydraloop:
+// - Greywater only enters a train in STANDBY (or during INCOMING_WATER).
+// - A train starts FILTH_REMOVAL when it holds about 270–330 L (T1 + T2),
+//   and doesn't accept water for the ~4.5 h it lasts.
+// - The bypass opens when neither train can accept water.
+// T1 + T2 is only valid while T2 is vented (see t2Pressurized), which
+// happens about once an hour.
+
+/** Total of T1 + T2 at which a train is full and starts FILTH_REMOVAL */
+export const TRAIN_FULL_LITERS = 290;
+
+/** Vent openings shorter than this don't settle the levels */
+const MIN_VENT = 60_000;
+
+/** T1 + T2 in liters, measured while T2 was vented, one point per venting */
+export function ventedTotals(ds: Dataset, side: Side): Point[] {
+  const t1 = ds.tanks[side === "A" ? "t1a" : "t1b"];
+  const t2 = ds.tanks[side === "A" ? "t2a" : "t2b"];
+  const vents = onIntervals(
+    ds.io[sideIo("release_air", side)],
+    -Infinity,
+    ds.until,
+  ).filter((i) => i.end - i.start >= MIN_VENT);
+  const result: Point[] = [];
+  for (const vent of vents) {
+    // The second half of the vent, after the water settled
+    const from = (vent.start + vent.end) / 2;
+    const totals: number[] = [];
+    for (let i = Math.max(0, indexAt(t1, from)); i < t1.length; i++) {
+      const p = t1[i];
+      if (p.t > vent.end) break;
+      if (p.t < from) continue;
+      const other = valueAt(t2, p.t);
+      if (other !== undefined) totals.push(p.v + other);
+    }
+    if (totals.length === 0) continue;
+    totals.sort((a, b) => a - b);
+    result.push({ t: vent.end, v: totals[totals.length >> 1] });
+  }
+  return result;
+}
+
+export type TrainRoom = {
+  side: Side;
+  /** Liters the train can still take, 0 while it doesn't accept water */
+  liters: number | undefined;
+  /** T1 + T2 at the last venting */
+  total: number | undefined;
+  measuredAt: number | undefined;
+  accepting: boolean | undefined;
+  reason: string;
+};
+
+export type Room = {
+  /** Liters the H600 can take before greywater is bypassed */
+  liters: number | undefined;
+  bypass: boolean;
+  trains: Record<Side, TrainRoom>;
+};
+
+const roomCache = new WeakMap<Dataset, Record<Side, Point[]>>();
+
+export function roomAt(ds: Dataset, t: number): Room {
+  let totals = roomCache.get(ds);
+  if (!totals) {
+    totals = { A: ventedTotals(ds, "A"), B: ventedTotals(ds, "B") };
+    roomCache.set(ds, totals);
+  }
+  const bypass = (stepAt(ds.io[IO.bypass], t)?.v ?? 0) > 0;
+
+  const train = (side: Side): TrainRoom => {
+    const last = stepAt(totals[side], t);
+    const routine = routineAt(ds, side, t).current;
+    const waste =
+      (stepAt(ds.io[sideIo("waste_clean_tank", side)], t)?.v ?? 0) > 0;
+    const busy = waste
+      ? "Waste valve open"
+      : routine &&
+          !["STANDBY", "INCOMING_WATER", "TRANSFER"].includes(routine.name)
+        ? humanize(routine.name)
+        : undefined;
+    if (busy) {
+      return {
+        side,
+        liters: 0,
+        total: last?.v,
+        measuredAt: last?.t,
+        accepting: false,
+        reason: `${busy}, not accepting water`,
+      };
+    }
+    if (!last) {
+      return {
+        side,
+        liters: undefined,
+        total: undefined,
+        measuredAt: undefined,
+        accepting: routine ? true : undefined,
+        reason: "No venting with level data yet",
+      };
+    }
+    return {
+      side,
+      liters: Math.max(0, TRAIN_FULL_LITERS - last.v),
+      total: last.v,
+      measuredAt: last.t,
+      accepting: true,
+      reason: last.v >= TRAIN_FULL_LITERS ? "Full" : "Accepting water",
+    };
+  };
+
+  const trains = { A: train("A"), B: train("B") };
+  const liters =
+    trains.A.liters === undefined || trains.B.liters === undefined
+      ? undefined
+      : bypass
+        ? 0
+        : trains.A.liters + trains.B.liters;
+  return { liters, bypass, trains };
+}
+
+/** Room for greywater over the dataset's range, at `steps` points */
+export function roomSeries(ds: Dataset, steps: number): Point[] {
+  const result: Point[] = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = ds.from + ((ds.until - ds.from) * i) / steps;
+    const room = roomAt(ds, t);
+    if (room.liters !== undefined) result.push({ t, v: room.liters });
+  }
+  return result;
 }
 
 /** Time of the latest tank reading */
@@ -627,7 +947,7 @@ export type DeviceEvent = {
   side: RoutineSide;
   label: string;
   detail: string;
-  source: "routine" | "io";
+  source: "routine" | "behavior" | "io";
   /** Key events are shown by default, others only on request */
   key: boolean;
 };
@@ -696,6 +1016,21 @@ export function deviceEvents(ds: Dataset): DeviceEvent[] {
       key: changed,
     });
   }
+  for (const b of ds.behaviors ?? []) {
+    const edges: [number, boolean][] = [[b.start, true]];
+    if (!b.open) edges.push([b.end, false]);
+    for (const [t, engaged] of edges) {
+      if (t < ds.from || t > ds.until) continue;
+      events.push({
+        t,
+        side: b.side,
+        label: `${b.label} ${engaged ? "started" : "ended"}`,
+        detail: `behavior ${b.name} ${engaged ? "engaged" : "disengaged"}`,
+        source: "behavior",
+        key: true,
+      });
+    }
+  }
   for (const [name, points] of Object.entries(ds.io)) {
     for (let i = 1; i < points.length; i++) {
       const before = points[i - 1].v > 0;
@@ -718,9 +1053,10 @@ export function deviceEvents(ds: Dataset): DeviceEvent[] {
 
 export type Transfer = Interval & {
   side: Side;
-  /** Drop of T1+T2 in liters between start and end */
-  trainDrop: number | undefined;
-  /** Change of T3 in liters between start and end */
+  /**
+   * Change of T3 in liters between start and end. T1+T2 can't be used, as
+   * T2 reads high while pressurized.
+   */
   t3Change: number | undefined;
 };
 
@@ -732,22 +1068,11 @@ export function transfers(ds: Dataset): Transfer[] {
         // The valve is also opened briefly while cleaning the transfer tube
         .filter((i) => i.open || i.end - i.start >= 2 * 60_000)
         .map((interval) => {
-          const level = (t: number) => {
-            const t1 = valueAt(ds.tanks[side === "A" ? "t1a" : "t1b"], t);
-            const t2 = valueAt(ds.tanks[side === "A" ? "t2a" : "t2b"], t);
-            return t1 === undefined || t2 === undefined ? undefined : t1 + t2;
-          };
-          const before = level(interval.start);
-          const after = level(interval.end);
           const t3Before = valueAt(ds.tanks.t3, interval.start);
           const t3After = valueAt(ds.tanks.t3, interval.end);
           return {
             ...interval,
             side,
-            trainDrop:
-              before === undefined || after === undefined
-                ? undefined
-                : before - after,
             t3Change:
               t3Before === undefined || t3After === undefined
                 ? undefined
@@ -763,12 +1088,24 @@ export function cleanings(ds: Dataset) {
   return routineSegments(ds)
     .filter((s) => s.phase === "cleaning" && s.side !== "SYSTEM")
     .map((s) => {
-      const waste = onIntervals(
+      // The waste valve opens right when the routine ends, if at all
+      const wasteIntervals = onIntervals(
         ds.io[sideIo("waste_clean_tank", s.side as Side)],
         s.start,
-        s.end,
-      ).reduce((sum, i) => sum + i.end - i.start, 0);
-      return { ...s, side: s.side as Side, waste };
+        Math.min(ds.until, s.end + 15 * 60_000),
+      );
+      const waste = wasteIntervals.reduce((sum, i) => sum + i.end - i.start, 0);
+      const skimStart = s.states.find((x) => SKIM_STATES.has(x.state))?.t;
+      return {
+        ...s,
+        side: s.side as Side,
+        waste,
+        skimming: skimStart === undefined ? 0 : s.end - skimStart,
+        /** A moment when water leaves the train, to show in the diagram */
+        focus:
+          wasteIntervals[0]?.start ??
+          (skimStart === undefined ? s.start : skimStart + 60_000),
+      };
     })
     .sort((a, b) => b.start - a.start);
 }

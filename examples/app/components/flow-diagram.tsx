@@ -30,6 +30,7 @@ function Pipe({
   unknown = false,
   bridge = false,
   arrow,
+  title,
 }: {
   d: string;
   kind: Kind;
@@ -39,11 +40,14 @@ function Pipe({
   bridge?: boolean;
   /** Draw an outlet arrow at this point, pointing in this direction */
   arrow?: { x: number; y: number; dir: "down" | "right" | "left" };
+  /** Tooltip, for pipes without a valve or pump */
+  title?: string;
 }) {
   const state =
     unknown || active === undefined ? "unknown" : active ? "active" : "idle";
   return (
     <g className={`pipe kind-${kind} is-${state}`}>
+      {title && <title>{title}</title>}
       {bridge && <path d={d} className="pipe-bridge" />}
       <path d={d} className="pipe-base" />
       {state === "active" && <path d={d} className="pipe-flow" />}
@@ -298,13 +302,16 @@ function Tank({
   const arrow =
     trend === undefined || Math.abs(trend) < 0.3 ? "" : trend > 0 ? "↑" : "↓";
   const fillHeight = h * pct;
-  const title = known
-    ? `${label} ${sub ?? ""}: ${Math.round(level!.liters!)} of ${Math.round(level!.max)} L (${Math.round(pct * 100)}%)${
-        trend !== undefined
-          ? `, ${trend >= 0 ? "+" : ""}${trend.toFixed(1)} L/min`
-          : ""
-      }`
-    : `${label}: no level data`;
+  const pressurized = level?.pressurized === true;
+  const title = !known
+    ? `${label}: no level data`
+    : pressurized
+      ? `${label} ${sub ?? ""}: reads ${Math.round(level!.liters!)} L, but the tank holds air pressure, which adds to the reading. The water is at most that.`
+      : `${label} ${sub ?? ""}: ${Math.round(level!.liters!)} of ${Math.round(level!.max)} L (${Math.round(pct * 100)}%)${
+          trend !== undefined
+            ? `, ${trend >= 0 ? "+" : ""}${trend.toFixed(1)} L/min`
+            : ""
+        }`;
   return (
     <g
       className={`tank kind-${kind}`}
@@ -336,7 +343,7 @@ function Tank({
             x2={x + w - 1}
             y1={y + h - fillHeight}
             y2={y + h - fillHeight}
-            className="tank-surface"
+            className={pressurized ? "tank-surface is-dashed" : "tank-surface"}
           />
         </>
       )}
@@ -364,13 +371,18 @@ function Tank({
           <text
             x={x + 12}
             y={y + h - (h > 100 ? 30 : 26)}
-            className="tank-value"
+            className={pressurized ? "tank-value is-pressurized" : "tank-value"}
           >
+            {pressurized && "≤ "}
             {Math.round(level!.liters!)} L{" "}
-            {arrow && <tspan className="tank-trend">{arrow}</tspan>}
+            {arrow && !pressurized && (
+              <tspan className="tank-trend">{arrow}</tspan>
+            )}
           </text>
           <text x={x + 12} y={y + h - 12} className="tank-meta">
-            {Math.round(pct * 100)}% of {Math.round(level!.max)} L
+            {pressurized
+              ? "Pressurized"
+              : `${Math.round(pct * 100)}% of ${Math.round(level!.max)} L`}
           </text>
         </>
       )}
@@ -484,6 +496,7 @@ export function FlowDiagram({
     const bubbles = io[sideIo("bubbles_block", side)];
     const receiving = inlet.receiving.includes(side);
     const drainX = a ? 30 : 970;
+    const skimming = state.trains[side].skimming;
     return (
       <g key={side}>
         <text
@@ -547,11 +560,34 @@ export function FlowDiagram({
           aeration={air?.on}
         />
 
-        {/* Waste to drain (filth removal) */}
+        {/* Skim overflow at the top of T1, down the drain line. It has no
+            valve, so it is shown from the FILTH_REMOVAL routine. */}
         <Pipe
-          d={`M${t1c} 360 V410 H${drainX} V470`}
+          d={a ? `M85 205 H${drainX} V410` : `M915 205 H${drainX} V410`}
+          kind="waste"
+          active={skimming}
+          title={`Skim overflow of T1 ${side}${skimming ? ": filth spilling over to the drain (inferred from the FILTH_REMOVAL routine)" : ""}`}
+        />
+        <text
+          x={a ? 57 : 943}
+          y={300}
+          textAnchor="middle"
+          className="diagram-label"
+        >
+          Skim
+        </text>
+
+        {/* Waste valve into the drain line */}
+        <Pipe
+          d={`M${t1c} 360 V410 H${drainX}`}
           kind="waste"
           active={waste?.on}
+        />
+        {/* Shared by the skim overflow and the waste valve */}
+        <Pipe
+          d={`M${drainX} 410 V470`}
+          kind="waste"
+          active={skimming || waste?.on}
           arrow={{ x: drainX, y: 470, dir: "down" }}
         />
         <Valve
@@ -888,6 +924,9 @@ export function activeFlows(state: DeviceState) {
   if (inlet.bypass) flows.push("Greywater → sewer (bypass)");
   for (const side of ["A", "B"] as Side[]) {
     if (trains[side].t2ToT1) flows.push(`T2 ${side} → T1 ${side}`);
+    if (trains[side].skimming) {
+      flows.push(`T1 ${side} → skim overflow → drain (inferred)`);
+    }
     if (io[sideIo("waste_clean_tank", side)]?.on) {
       flows.push(`T1 ${side} → drain`);
     }

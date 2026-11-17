@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { login } from "@/lib/hdm";
-import { DEMO_COOKIE, TOKEN_COOKIE } from "@/lib/session";
+import { DEMO_COOKIE, TOKEN_COOKIE, tokenCookieOptions } from "@/lib/token";
 
 export type LoginState = { error?: string };
 
@@ -34,13 +34,7 @@ export async function signIn(
 
   const store = await cookies();
   store.delete(DEMO_COOKIE);
-  store.set(TOKEN_COOKIE, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: Math.max(60, expiresIn - 60),
-  });
+  store.set(TOKEN_COOKIE, token, tokenCookieOptions(token, expiresIn));
   redirect("/");
 }
 

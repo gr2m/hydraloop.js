@@ -1,5 +1,8 @@
+import { Fragment } from "react";
+
 import {
   formatDuration,
+  TRAIN_FULL_LITERS,
   formatLiters,
   type Confidence,
   type DeviceState,
@@ -43,14 +46,24 @@ function LevelRow({ label, level }: { label: string; level: TankLevel }) {
           <span className="level-fill" style={{ width: `${pct * 100}%` }} />
         )}
       </span>
-      <span className="level-value">
+      <span
+        className="level-value"
+        title={
+          level.pressurized
+            ? "The tank holds air pressure, which adds to the reading. The water is at most this."
+            : undefined
+        }
+      >
+        {level.pressurized && level.liters !== undefined && "≤ "}
         {formatLiters(level.liters)}
         <span className="muted"> / {Math.round(level.max)} L</span>
       </span>
       <span className="level-trend">
-        {trend === undefined || Math.abs(trend) < 0.3
-          ? ""
-          : `${trend > 0 ? "+" : "−"}${Math.abs(trend).toFixed(1)} L/min`}
+        {level.pressurized
+          ? "Pressurized"
+          : trend === undefined || Math.abs(trend) < 0.3
+            ? ""
+            : `${trend > 0 ? "+" : "−"}${Math.abs(trend).toFixed(1)} L/min`}
       </span>
     </div>
   );
@@ -86,11 +99,72 @@ function TrainStatus({ side, state }: { side: Side; state: DeviceState }) {
       <LevelRow label="T1" level={state.tanks[a ? "t1a" : "t1b"]} />
       <LevelRow label="T2" level={state.tanks[a ? "t2a" : "t2b"]} />
       <dl className="status-facts">
+        {train.behaviors.length > 0 && (
+          <>
+            <dt>HDM behavior</dt>
+            <dd>
+              {train.behaviors.map((b) => (
+                <span key={b.name} className="behavior" title={b.name}>
+                  {b.label}
+                </span>
+              ))}
+            </dd>
+          </>
+        )}
         <dt>Incoming water</dt>
         <dd>{ago(state.t, train.lastIncoming)}</dd>
         <dt>Transfer</dt>
         <dd>{ago(state.t, train.lastTransfer)}</dd>
       </dl>
+    </section>
+  );
+}
+
+function RoomSummary({ state }: { state: DeviceState }) {
+  const { room } = state;
+  return (
+    <section className="status-block room" aria-labelledby="room-heading">
+      <div className="status-head">
+        <h3 id="room-heading">Room for greywater</h3>
+        <ConfidenceTag confidence="inferred" />
+      </div>
+      <p className="room-value">
+        {room.liters === undefined
+          ? "Unknown"
+          : room.bypass
+            ? "0 L, bypass open"
+            : `≈ ${Math.round(room.liters)} L`}
+      </p>
+      <dl className="status-facts">
+        {(["A", "B"] as Side[]).map((side) => {
+          const train = room.trains[side];
+          return (
+            <Fragment key={side}>
+              <dt>Train {side}</dt>
+              <dd>
+                {train.liters === undefined
+                  ? train.reason
+                  : train.accepting
+                    ? `≈ ${Math.round(train.liters)} L`
+                    : `0 L, ${train.reason.charAt(0).toLowerCase()}${train.reason.slice(1)}`}
+                {train.total !== undefined &&
+                  train.measuredAt !== undefined && (
+                    <span className="muted">
+                      {" "}
+                      · {Math.round(train.total)} L in the train{" "}
+                      {formatDuration(state.t - train.measuredAt)} ago
+                    </span>
+                  )}
+              </dd>
+            </Fragment>
+          );
+        })}
+      </dl>
+      <p className="status-evidence">
+        A train counts as full at about {TRAIN_FULL_LITERS} L (T1 + T2, measured
+        while vented). It then starts filth removal and takes no water until it
+        is done.
+      </p>
     </section>
   );
 }
@@ -104,6 +178,7 @@ export function StatusPanel({ state }: { state: DeviceState }) {
   ].filter(Boolean);
   return (
     <div className="status-panel">
+      <RoomSummary state={state} />
       <TrainStatus side="A" state={state} />
       <TrainStatus side="B" state={state} />
 
@@ -146,6 +221,18 @@ export function StatusPanel({ state }: { state: DeviceState }) {
                 ? "Open, greywater goes to the sewer"
                 : "Closed"}
           </dd>
+          {state.systemBehaviors.length > 0 && (
+            <>
+              <dt>HDM behavior</dt>
+              <dd>
+                {state.systemBehaviors.map((b) => (
+                  <span key={b.name} className="behavior" title={b.name}>
+                    {b.label}
+                  </span>
+                ))}
+              </dd>
+            </>
+          )}
         </dl>
       </section>
     </div>

@@ -3,7 +3,7 @@ import "server-only";
 // Simulated H600 data for trying the dashboard without an HDM account. It
 // follows the operating cycle described in Hydraloop's documentation (intake,
 // about five hours of treatment, gravity transfer through UV into T3, weekly
-// self-cleaning, periodic T3 circulation). The timings are illustrative, not
+// filth removal, periodic T3 circulation). The timings are illustrative, not
 // measured.
 
 import type { LoadOptions } from "./hdm";
@@ -22,7 +22,7 @@ const DAY = 24 * 60 * MINUTE;
 const T12_MAX = 185;
 const T3_MAX = 280;
 const T1_MIN = 30;
-const T2_MIN = 100;
+const T2_MIN = 40;
 
 type Phase = "idle" | "receiving" | "treating" | "transferring" | "cleaning";
 
@@ -75,15 +75,15 @@ function run(now: number) {
       const begin = local + (hour + rand() * 0.4) * 3600_000;
       showers.push({ start: begin, end: begin + (6 + rand() * 7) * MINUTE });
     }
-    for (let i = 0; i < 22; i++) {
+    for (let i = 0; i < 32; i++) {
       flushes.push(local + (7 + rand() * 16) * 3600_000);
     }
   }
   const flushSet = new Set(flushes.map((t) => Math.floor(t / MINUTE)));
 
   const trains: Record<Side, Train> = {
-    A: { phase: "idle", t1: 40, t2: 110, phaseStart: start, lastInflow: 0 },
-    B: { phase: "idle", t1: 38, t2: 108, phaseStart: start, lastInflow: 0 },
+    A: { phase: "idle", t1: 40, t2: 60, phaseStart: start, lastInflow: 0 },
+    B: { phase: "idle", t1: 38, t2: 55, phaseStart: start, lastInflow: 0 },
   };
   let t3 = 180;
   let route: Side = "A";
@@ -170,7 +170,7 @@ function run(now: number) {
       if (available(route)) {
         const train = trains[route];
         if (train.phase !== "receiving") enter(route, "receiving", t);
-        const flow = 7 + noise() * 2;
+        const flow = 4 + noise() * 2;
         train.t1 += flow * 0.6;
         train.t2 += flow * 0.4;
         train.lastInflow = t;
@@ -199,12 +199,12 @@ function run(now: number) {
         if (train.t1 + train.t2 <= T1_MIN + T2_MIN + 2 || t3 >= T3_MAX - 5) {
           enter(side, "idle", t);
         }
-      } else if (train.phase === "cleaning" && elapsed > 35 * MINUTE) {
+      } else if (train.phase === "cleaning" && elapsed > 270 * MINUTE) {
         enter(side, "idle", t);
       } else if (train.phase === "idle") {
-        // Weekly self-cleaning on Sunday night, B after A
+        // Weekly filth removal on Sunday, B after A
         const weekday = local.getUTCDay();
-        const cleanAt = side === "A" ? 3 * 60 : 3 * 60 + 50;
+        const cleanAt = side === "A" ? 3 * 60 : 8 * 60;
         if (weekday === 0 && minuteOfDay === cleanAt)
           enter(side, "cleaning", t);
       }
@@ -222,20 +222,19 @@ function run(now: number) {
       const phase = train.phase;
       const cycle = Math.floor((t - train.phaseStart) / MINUTE);
       set(`transfer_path${sfx}`, t, phase === "transferring");
-      set(`waste_clean_tank${sfx}`, t, phase === "cleaning" && cycle < 20);
-      set(
-        `diffuser_backwash${sfx}`,
-        t,
-        phase === "cleaning" && cycle >= 20 && cycle < 26,
-      );
+      // Filth removal skims over the overflow, the waste valve stays closed
+      set(`waste_clean_tank${sfx}`, t, false);
+      set(`diffuser_backwash${sfx}`, t, false);
       set(
         `air_pump${sfx}`,
         t,
-        phase === "treating"
-          ? cycle % 15 < 11
-          : phase === "transferring"
-            ? false
-            : minuteOfDay % 30 < 3,
+        phase === "cleaning"
+          ? true
+          : phase === "treating"
+            ? cycle % 15 < 11
+            : phase === "transferring"
+              ? false
+              : minuteOfDay % 30 < 3,
       );
       set(
         `bubbles_block${sfx}`,
@@ -247,7 +246,12 @@ function run(now: number) {
         t,
         phase === "transferring" && train.t1 < T1_MIN + 4,
       );
-      set(`release_air${sfx}`, t, phase === "receiving");
+      // T2 is vented while water comes in, and about once an hour in standby
+      set(
+        `release_air${sfx}`,
+        t,
+        phase === "receiving" || (phase === "idle" && minuteOfDay % 60 < 4),
+      );
 
       if (phase === "transferring") {
         const rate = 1.4 + noise() * 0.4;
@@ -261,12 +265,14 @@ function run(now: number) {
           train.t1 += move;
         }
         t3 += rate;
-      } else if (phase === "cleaning" && cycle < 20) {
-        train.t1 = Math.max(12, train.t1 - 6);
-      } else if (phase === "cleaning" && cycle >= 20 && cycle < 26) {
-        const move = Math.max(0, Math.min(4, train.t2 - T2_MIN));
-        train.t2 -= move;
-        train.t1 += move;
+      } else if (phase === "cleaning") {
+        // T2 pressure holds T1 at the top, filth spills over the overflow
+        const lift = Math.max(
+          0,
+          Math.min(6, T12_MAX - train.t1, train.t2 - T2_MIN),
+        );
+        train.t1 += lift;
+        train.t2 -= lift + 0.1;
       }
       if (phase === "treating") {
         // Pressure in T2 lifts water into T1 for skimming, and it falls back
@@ -335,6 +341,7 @@ function run(now: number) {
     io,
     captions: {},
     routines,
+    behaviors: [],
     warnings: [],
   };
   cache = { minute, data };

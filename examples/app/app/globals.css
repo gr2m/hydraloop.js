@@ -552,6 +552,16 @@ tr.is-selectable:hover td {
   font-weight: 500;
   color: var(--muted);
 }
+.room-value {
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 4px;
+}
+.room .status-evidence {
+  margin: 12px 0 0;
+}
 .status-phase {
   font-size: 20px;
   font-weight: 600;
@@ -612,6 +622,9 @@ tr.is-selectable:hover td {
 }
 .status-facts dt {
   color: var(--muted);
+}
+.behavior + .behavior::before {
+  content: ", ";
 }
 .status-facts dd {
   margin: 0;
@@ -781,6 +794,9 @@ tr.is-selectable:hover td {
   fill: var(--fg);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
+}
+.tank-value.is-pressurized {
+  fill: var(--muted);
 }
 .tank-trend {
   font-weight: 400;
@@ -1000,6 +1016,13 @@ tr.is-selectable:hover td {
 }
 .series.is-secondary .series-label {
   fill-opacity: 0.7;
+}
+.room-chart {
+  --k: var(--fg);
+}
+.room-bypass {
+  fill: var(--water-grey);
+  fill-opacity: 0.25;
 }
 .chart-area {
   fill: var(--k);

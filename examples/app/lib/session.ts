@@ -5,9 +5,7 @@ import { cookies } from "next/headers";
 import { simulate } from "./demo";
 import { loadDataset, type LoadOptions } from "./hdm";
 import type { Dataset } from "./model";
-
-export const TOKEN_COOKIE = "hdm_token";
-export const DEMO_COOKIE = "hdm_demo";
+import { DEMO_COOKIE, TOKEN_COOKIE } from "./token";
 
 export type Session = { kind: "demo" } | { kind: "hdm"; token: string };
 

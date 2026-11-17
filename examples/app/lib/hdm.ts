@@ -3,6 +3,7 @@ import "server-only";
 import { Hydraloop, type Local, type Root } from "hydraloop/internal";
 
 import {
+  behaviorIntervals,
   routineSide,
   pressureToLiters,
   TANK_IDS,
@@ -236,6 +237,16 @@ export async function loadDataset(
     io: ioPoints,
     captions,
     routines: routineEvents,
+    behaviors: behaviorIntervals(
+      (ioData?.behavior ?? []).map((b) => ({
+        t: Date.parse(b.time),
+        name: b.typeName,
+        typeId: b.typeId,
+        engaged: b.subTypeName === "engaged",
+      })),
+      from,
+      until,
+    ),
     warnings,
   };
 }

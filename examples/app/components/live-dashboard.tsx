@@ -8,6 +8,7 @@ import { deviceEvents, latestSample, stateAt, type Dataset } from "@/lib/model";
 import { EventTable } from "./event-table";
 import { DiagramLegend, FlowDiagram, FlowSummary } from "./flow-diagram";
 import { SignalTable } from "./signal-table";
+import { SessionKeepAlive } from "./session-keep-alive";
 import { SiteHeader } from "./site-header";
 import { StatusPanel } from "./status-panel";
 import { Time } from "./time";
@@ -67,6 +68,7 @@ export function LiveDashboard({ initial }: { initial: Dataset }) {
   return (
     <>
       <SiteHeader device={dataset.device} demo={dataset.demo} />
+      <SessionKeepAlive />
       <main id="main" className="page">
         <div className="page-title">
           <h1>What the H600 is doing now</h1>
@@ -92,7 +94,7 @@ export function LiveDashboard({ initial }: { initial: Dataset }) {
             {stale && (
               <p>
                 {latest === undefined
-                  ? "No tank readings in the last hour."
+                  ? "No tank readings in the last 3 hours."
                   : "The latest tank reading is more than 3 minutes old. The device may be offline or its data delayed."}
               </p>
             )}
@@ -122,8 +124,8 @@ export function LiveDashboard({ initial }: { initial: Dataset }) {
         </div>
 
         <section className="section" aria-labelledby="events-heading">
-          <h2 id="events-heading">Last hour</h2>
-          <EventTable events={events} caption="Events in the last hour" />
+          <h2 id="events-heading">Last 3 hours</h2>
+          <EventTable events={events} caption="Events in the last 3 hours" />
         </section>
 
         <section className="section" aria-labelledby="signals-heading">

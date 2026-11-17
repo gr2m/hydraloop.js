@@ -22,7 +22,7 @@ async function Live() {
   let dataset;
   try {
     dataset = await load(session, {
-      from: until - 3600_000,
+      from: until - 3 * 3600_000,
       until,
       live: true,
     });

@@ -14,9 +14,12 @@ import {
   humanize,
   IO,
   onIntervals,
+  roomSeries,
   routineSegments,
   sideIo,
+  t2PressurizedIntervals,
   TANK_LABELS,
+  TRAIN_FULL_LITERS,
   valueAt,
   type Dataset,
   type Point,
@@ -64,18 +67,23 @@ type Row =
       y: number;
       h: number;
     }
+  | { type: "room"; key: string; y: number; h: number }
   | { type: "heading"; key: string; label: string; y: number }
   | { type: "lane"; lane: Lane; y: number };
+
+/** Points further apart than this are a gap in the data, not connected */
+const MAX_GAP = 30 * 60_000;
 
 function linePath(
   points: Point[],
   x: (t: number) => number,
   y: (v: number) => number,
+  maxGap = MAX_GAP,
 ) {
   let d = "";
   let prev: Point | undefined;
   for (const p of points) {
-    const gap = !prev || p.t - prev.t > 30 * 60_000;
+    const gap = !prev || p.t - prev.t > maxGap;
     d += `${gap ? "M" : "L"}${x(p.t).toFixed(1)} ${y(p.v).toFixed(1)}`;
     prev = p;
   }
@@ -87,6 +95,7 @@ function areaPath(
   x: (t: number) => number,
   y: (v: number) => number,
   base: number,
+  maxGap = MAX_GAP,
 ) {
   if (!points.length) return "";
   let d = "";
@@ -100,7 +109,7 @@ function areaPath(
     run = [];
   };
   for (const p of points) {
-    if (run.length && p.t - run[run.length - 1].t > 30 * 60_000) flush();
+    if (run.length && p.t - run[run.length - 1].t > maxGap) flush();
     run.push(p);
   }
   flush();
@@ -128,6 +137,24 @@ function buildLanes(ds: Dataset, showAll: boolean) {
     })),
   });
 
+  // One lane per side, as there are many kinds of behaviors
+  const behaviorLanes: Lane[] = (["A", "B", "SYSTEM"] as RoutineSide[])
+    .map((side) => ({
+      key: `behavior-${side}`,
+      label: SIDE_LABEL[side],
+      kind: "behavior",
+      segments: (ds.behaviors ?? [])
+        .filter((b) => b.side === side)
+        .map((b) => ({
+          start: Math.max(b.start, from),
+          end: b.end,
+          text: b.label,
+          kind: b.name.startsWith("full") ? "cleaning" : "other",
+          title: `${b.label} (${b.name}): ${formatTime(b.start, "datetime")} – ${b.open ? "now" : formatTime(b.end, "datetime")}`,
+        })),
+    }))
+    .filter((lane) => lane.segments.length > 0);
+
   const routineLanes: Lane[] = (["A", "B", "SYSTEM"] as RoutineSide[])
     .map((side) => ({
       key: `routine-${side}`,
@@ -152,6 +179,19 @@ function buildLanes(ds: Dataset, showAll: boolean) {
     );
 
   const label = (name: string) => caption(ds.captions, name);
+  // T2 reads high while it holds air pressure
+  const pressureLane = (side: "A" | "B"): Lane => ({
+    key: `t2-pressure-${side}`,
+    label: `T2 ${side} pressurized`,
+    kind: "air",
+    noDataUntil: ds.io[sideIo("release_air", side)]?.length
+      ? Math.max(from, Math.min(until, ds.io[sideIo("release_air", side)][0].t))
+      : until,
+    segments: t2PressurizedIntervals(ds, side).map((i) => ({
+      ...i,
+      title: `T2 ${side} pressurized, its level reads high: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`,
+    })),
+  });
   const keyLanes: Lane[] = [
     ioLane(IO.bypass, label(IO.bypass), "grey"),
     ioLane(sideIo("transfer_path", "A"), "Transfer A", "clean"),
@@ -160,6 +200,8 @@ function buildLanes(ds: Dataset, showAll: boolean) {
     ioLane(sideIo("waste_clean_tank", "B"), "Waste B", "waste"),
     ioLane(sideIo("air_pump", "A"), "Air pump A", "air"),
     ioLane(sideIo("air_pump", "B"), "Air pump B", "air"),
+    pressureLane("A"),
+    pressureLane("B"),
     ioLane(IO.uvPower, label(IO.uvPower), "uv"),
     ioLane(IO.circulation, "Circulation", "clean"),
     ioLane(IO.distributionPump, "Distribution", "clean"),
@@ -167,7 +209,7 @@ function buildLanes(ds: Dataset, showAll: boolean) {
     ioLane(IO.backupWater, label(IO.backupWater), "mains"),
     ioLane(IO.t4Min, label(IO.t4Min), "mains"),
     ioLane(IO.wasteStorageTank, label(IO.wasteStorageTank), "waste"),
-  ].filter((lane) => lane.key in ds.io);
+  ].filter((lane) => lane.key in ds.io || lane.key.startsWith("t2-pressure"));
   const shown = new Set(keyLanes.map((l) => l.key));
   const otherLanes = Object.keys(ds.io)
     .filter((name) => !shown.has(name))
@@ -176,6 +218,7 @@ function buildLanes(ds: Dataset, showAll: boolean) {
 
   return {
     routineLanes,
+    behaviorLanes,
     keyLanes,
     otherLanes: showAll ? otherLanes : [],
     otherCount: otherLanes.length,
@@ -212,10 +255,16 @@ export function Timeline({
   const x = (t: number) => LABEL_W + ((t - from) / (until - from)) * plotW;
   const tAt = (px: number) => from + ((px - LABEL_W) / plotW) * (until - from);
 
-  const { routineLanes, keyLanes, otherLanes, otherCount } = useMemo(
-    () => buildLanes(dataset, showAll),
-    [dataset, showAll],
+  const steps = Math.max(100, Math.round(plotW / 2));
+  // The room series is sampled at even steps, so a gap is a missing sample
+  const roomGap = ((dataset.until - dataset.from) / steps) * 1.5;
+  const room = useMemo(() => roomSeries(dataset, steps), [dataset, steps]);
+  const bypass = useMemo(
+    () => onIntervals(dataset.io[IO.bypass], dataset.from, dataset.until),
+    [dataset],
   );
+  const { routineLanes, behaviorLanes, keyLanes, otherLanes, otherCount } =
+    useMemo(() => buildLanes(dataset, showAll), [dataset, showAll]);
 
   // Vertical layout
   const rows: Row[] = [];
@@ -227,6 +276,8 @@ export function Timeline({
     dataset.tankMax.t2b,
     1,
   );
+  rows.push({ type: "room", key: "room", y, h: CHART_H });
+  y += CHART_H + 18;
   for (const [key, label, tanks, kind, max] of [
     ["train-a", "Train A", ["t1a", "t2a"], "grey", trainMax],
     ["train-b", "Train B", ["t1b", "t2b"], "grey", trainMax],
@@ -256,6 +307,7 @@ export function Timeline({
     y += GROUP_GAP - LANE_GAP;
   };
   addGroup("routines", "HDM routines", routineLanes);
+  addGroup("behaviors", "HDM behaviors", behaviorLanes);
   addGroup("io", "Valves and pumps", keyLanes);
   addGroup("other", "Other signals", otherLanes);
   const height = y + AXIS_H - GROUP_GAP + 8;
@@ -372,6 +424,91 @@ export function Timeline({
               <text key={row.key} x={0} y={row.y + 11} className="group-label">
                 {row.label}
               </text>
+            );
+          }
+          if (row.type === "room") {
+            const max = TRAIN_FULL_LITERS * 2;
+            const yScale = (v: number) =>
+              row.y + row.h - (Math.min(v, max) / max) * row.h;
+            const current =
+              cursor !== undefined ? valueAt(room, cursor) : undefined;
+            return (
+              <g key={row.key} className="chart room-chart">
+                <text x={0} y={row.y + 12} className="row-label is-strong">
+                  Room for
+                </text>
+                <text x={0} y={row.y + 27} className="row-label is-strong">
+                  greywater
+                </text>
+                <text x={0} y={row.y + 43} className="row-label">
+                  liters, estimate
+                </text>
+                {bypass.map((i) => (
+                  <rect
+                    key={i.start}
+                    x={x(i.start)}
+                    y={row.y}
+                    width={Math.max(1.5, x(i.end) - x(i.start))}
+                    height={row.h}
+                    className="room-bypass"
+                  >
+                    <title>{`Bypass open: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`}</title>
+                  </rect>
+                ))}
+                <line
+                  x1={LABEL_W}
+                  x2={LABEL_W + plotW}
+                  y1={row.y + row.h}
+                  y2={row.y + row.h}
+                  className="baseline"
+                />
+                <line
+                  x1={LABEL_W}
+                  x2={LABEL_W + plotW}
+                  y1={row.y}
+                  y2={row.y}
+                  className="grid-line"
+                />
+                <text
+                  x={LABEL_W - 6}
+                  y={row.y + 4}
+                  textAnchor="end"
+                  className="axis-label"
+                >
+                  {max}
+                </text>
+                <text
+                  x={LABEL_W - 6}
+                  y={row.y + row.h}
+                  textAnchor="end"
+                  className="axis-label"
+                >
+                  0
+                </text>
+                <path
+                  d={areaPath(room, x, yScale, row.y + row.h, roomGap)}
+                  className="chart-area"
+                />
+                <path
+                  d={linePath(room, x, yScale, roomGap)}
+                  className="chart-line"
+                />
+                {current !== undefined && (
+                  <g className="cursor-value">
+                    <circle cx={x(cursor!)} cy={yScale(current)} r={3.5} />
+                  </g>
+                )}
+                {room.length === 0 && (
+                  <text
+                    x={LABEL_W + plotW / 2}
+                    y={row.y + row.h / 2}
+                    textAnchor="middle"
+                    className="axis-label"
+                  >
+                    No venting with level data in this range
+                  </text>
+                )}
+              </g>
             );
           }
           if (row.type === "chart") {
