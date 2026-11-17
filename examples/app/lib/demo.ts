@@ -9,12 +9,14 @@ import "server-only";
 import type { LoadOptions } from "./hdm";
 import {
   IO,
+  transfers,
   type Dataset,
   type Point,
   type RoutineEvent,
   type Side,
   type TankId,
 } from "./model";
+import { computeStats, type Stats } from "./stats";
 
 const MINUTE = 60_000;
 const DAY = 24 * 60 * MINUTE;
@@ -61,7 +63,8 @@ function run(now: number) {
   const minute = Math.floor(now / MINUTE);
   if (cache?.minute === minute) return cache.data;
 
-  const start = Math.floor(now / DAY) * DAY - 8 * DAY;
+  // Long enough for the 30-day statistics
+  const start = Math.floor(now / DAY) * DAY - 31 * DAY;
   const tz = new Date(now).getTimezoneOffset() * MINUTE;
 
   // Showers and toilet flushes per day, seeded by the day so they stay stable
@@ -379,5 +382,31 @@ export function simulate({ from, until }: LoadOptions): Dataset {
       const next = all.slice(i + 1).find((n) => n.side === r.side);
       return !next || next.t >= from;
     }),
+  };
+}
+
+/** Statistics of the simulation. Recycled water is the change of T3 during transfers. */
+export function simulateStats({ range }: { range: number }): Stats {
+  const until = Date.now();
+  const ds = simulate({ from: until - range, until });
+  const tz = new Date(until).getTimezoneOffset() * MINUTE;
+  const perDay = new Map<number, number>();
+  for (const transfer of transfers(ds)) {
+    if (!transfer.t3Change || transfer.t3Change < 0) continue;
+    const day = Math.floor((transfer.start - tz) / DAY) * DAY + tz;
+    perDay.set(day, (perDay.get(day) ?? 0) + transfer.t3Change);
+  }
+  const days = [...perDay]
+    .map(([t, v]) => ({ t, v: Math.round(v) }))
+    .sort((a, b) => a.t - b.t);
+  return {
+    ...computeStats(ds, {
+      liters: days.reduce((sum, p) => sum + p.v, 0),
+      days,
+      source: "transfers",
+    }),
+    demo: true,
+    fetchedAt: until,
+    warnings: [],
   };
 }

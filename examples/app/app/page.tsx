@@ -2,19 +2,19 @@ import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-import { LiveDashboard } from "@/components/live-dashboard";
+import { Overview } from "@/components/overview";
 import { LIVE_RANGE } from "@/lib/model";
 import { getSession, isUnauthorized, load } from "@/lib/session";
 
-export default function LivePage() {
+export default function OverviewPage() {
   return (
     <Suspense fallback={<p className="page empty">Loading the H600…</p>}>
-      <Live />
+      <Current />
     </Suspense>
   );
 }
 
-async function Live() {
+async function Current() {
   const session = await getSession();
   if (!session) redirect("/login");
 
@@ -31,5 +31,5 @@ async function Live() {
     if (isUnauthorized(error)) redirect("/login?expired=1");
     throw error;
   }
-  return <LiveDashboard initial={dataset} />;
+  return <Overview initial={dataset} />;
 }

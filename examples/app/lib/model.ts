@@ -485,7 +485,11 @@ const TREND_WINDOW = 10 * 60_000;
 const SKIM_STATES = new Set(["REMOVE_FILTH_ON_HEIGHT", "SKIM_LAST_WATER"]);
 
 /** The current routine of a side and when it started (first sub-state) */
-function routineAt(ds: Dataset, side: RoutineSide, t: number) {
+export function routineAt(
+  ds: Pick<Dataset, "routines">,
+  side: RoutineSide,
+  t: number,
+) {
   let current: RoutineEvent | undefined;
   let start: number | undefined;
   let lastIncoming: number | undefined;
@@ -741,6 +745,13 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
 /** Total of T1 + T2 at which a train is full and starts FILTH_REMOVAL */
 export const TRAIN_FULL_LITERS: Record<Side, number> = { A: 290, B: 280 };
 
+/** Routines in which a train accepts greywater */
+export const ACCEPTING_ROUTINES = new Set([
+  "STANDBY",
+  "INCOMING_WATER",
+  "TRANSFER",
+]);
+
 /** How far off TRAIN_FULL_LITERS was for single filth removals */
 export const TRAIN_FULL_SPREAD = 15;
 
@@ -827,8 +838,7 @@ export function roomAt(ds: Dataset, t: number): Room {
       (stepAt(ds.io[sideIo("waste_clean_tank", side)], t)?.v ?? 0) > 0;
     const busy = waste
       ? "Waste valve open"
-      : routine &&
-          !["STANDBY", "INCOMING_WATER", "TRANSFER"].includes(routine.name)
+      : routine && !ACCEPTING_ROUTINES.has(routine.name)
         ? humanize(routine.name)
         : undefined;
     if (busy) {
@@ -884,6 +894,74 @@ export function roomSeries(ds: Dataset, steps: number): Point[] {
       result.push({ t, v: room.liters });
   }
   return result;
+}
+
+// ── Water being cleaned ────────────────────────────────────────────────────
+
+// In 30 days of an H600's data, every FILTH_REMOVAL that ran to its end took
+// about 4.5 h, then TRANSFER moved 85–120 L (about 100 L) into T3 in about
+// 1.4 h. So T3 got the water about 6 h after filth removal started. A train
+// in SKIM_LEVEL_DETERMINATION / FIND_HIGHEST_WATER_POINT starts filth removal
+// about 5 minutes later.
+
+export const FILTH_REMOVAL_DURATION = 4.5 * 3600_000;
+export const TRANSFER_DURATION = 1.4 * 3600_000;
+/** What a transfer after filth removal adds to T3 */
+export const TRANSFER_LITERS = 100;
+export const TRANSFER_SPREAD = 20;
+
+/**
+ * T3 reads about this when it is empty. The outlets then switch to backup
+ * water, so only what is above it is available.
+ */
+export const T3_EMPTY_LITERS = 28;
+
+export type Cleaning = {
+  side: Side;
+  stage: "starting" | "cleaning" | "transferring";
+  /** Liters still to come into T3 */
+  liters: number;
+  /** When the transfer into T3 starts */
+  transferAt: number;
+  /** When the transfer into T3 is done */
+  readyAt: number;
+};
+
+/** Water in a train that is being cleaned and will be transferred to T3 */
+export function cleaningAt(ds: Dataset, t: number): Cleaning[] {
+  const result: Cleaning[] = [];
+  for (const side of ["A", "B"] as Side[]) {
+    const { current, start } = routineAt(ds, side, t);
+    if (!current || start === undefined) continue;
+    if (
+      current.name === "FILTH_REMOVAL" ||
+      (current.name === "SKIM_LEVEL_DETERMINATION" &&
+        current.state === "FIND_HIGHEST_WATER_POINT")
+    ) {
+      const begin = current.name === "FILTH_REMOVAL" ? start : t;
+      const transferAt = Math.max(t, begin + FILTH_REMOVAL_DURATION);
+      result.push({
+        side,
+        stage: current.name === "FILTH_REMOVAL" ? "cleaning" : "starting",
+        liters: TRANSFER_LITERS,
+        transferAt,
+        readyAt: transferAt + TRANSFER_DURATION,
+      });
+    } else if (current.name === "TRANSFER") {
+      const before = valueAt(ds.tanks.t3, start);
+      const now = valueAt(ds.tanks.t3, t);
+      const moved =
+        before === undefined || now === undefined ? 0 : now - before;
+      result.push({
+        side,
+        stage: "transferring",
+        liters: Math.max(0, TRANSFER_LITERS - moved),
+        transferAt: start,
+        readyAt: Math.max(t, start + TRANSFER_DURATION),
+      });
+    }
+  }
+  return result.sort((a, b) => a.readyAt - b.readyAt);
 }
 
 /** Time of the latest tank reading */

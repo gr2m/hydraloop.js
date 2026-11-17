@@ -38,6 +38,12 @@ export function SiteHeader({
       </div>
       <nav className="site-nav" aria-label="Views">
         <Link href="/" aria-current={pathname === "/" ? "page" : undefined}>
+          Overview
+        </Link>
+        <Link
+          href="/live"
+          aria-current={pathname === "/live" ? "page" : undefined}
+        >
           Live
         </Link>
         <Link

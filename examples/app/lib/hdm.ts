@@ -15,6 +15,7 @@ import {
   type RoutineEvent,
   type TankId,
 } from "./model";
+import { computeStats, type Stats } from "./stats";
 
 // Clients are cached per token. The SDK caches the device's local API URL and
 // the device token, so we don't request them again on every poll.
@@ -249,6 +250,138 @@ export async function loadDataset(
     ),
     warnings,
   };
+}
+
+const statsCache = new Map<string, { at: number; stats: Promise<Stats> }>();
+const STATS_TTL = 10 * 60_000;
+
+/**
+ * Statistics of the last `range` milliseconds. `getIo()` returns about 5 days
+ * before `until`, whatever `from` is, so valves are loaded window by window.
+ */
+export function loadStats(
+  token: string,
+  { range, zone }: { range: number; zone: string },
+): Promise<Stats> {
+  const key = `${token} ${zone} ${range}`;
+  const hit = statsCache.get(key);
+  if (hit && Date.now() - hit.at < STATS_TTL) return hit.stats;
+  if (statsCache.size > 20) statsCache.clear();
+  const stats = computeStatsFromHdm(token, range, zone);
+  statsCache.set(key, { at: Date.now(), stats });
+  stats.catch(() => statsCache.delete(key));
+  return stats;
+}
+
+async function computeStatsFromHdm(
+  token: string,
+  range: number,
+  zone: string,
+): Promise<Stats> {
+  const entry = cached(token);
+  const { hydraloop } = entry;
+  const device = await remember(entry, "device", () => firstDevice(hydraloop));
+  const deviceId = device.id;
+  const until = Date.now();
+  const from = until - range;
+
+  const loadIo = async () => {
+    const value: Record<string, Map<number, number>> = {};
+    const behavior = new Map<
+      string,
+      { t: number; name: string; typeId: number; engaged: boolean }
+    >();
+    let end = until;
+    // At most 12 windows, in case HDM returns more or less than expected
+    for (let i = 0; i < 12 && end > from; i++) {
+      const io = await hydraloop.local.graph.getIo({
+        deviceId,
+        from: new Date(Math.max(from, end - 24 * 3600_000)),
+        until: new Date(end),
+      });
+      let earliest = end;
+      for (const [name, points] of Object.entries(io.value ?? {})) {
+        const map = (value[name] ??= new Map());
+        for (const p of points) {
+          const t = Date.parse(p.x);
+          if (!Number.isFinite(t)) continue;
+          map.set(t, p.y);
+          earliest = Math.min(earliest, t);
+        }
+      }
+      for (const b of io.behavior ?? []) {
+        const t = Date.parse(b.time);
+        if (!Number.isFinite(t)) continue;
+        behavior.set(`${t} ${b.typeName} ${b.subTypeName}`, {
+          t,
+          name: b.typeName,
+          typeId: b.typeId,
+          engaged: b.subTypeName === "engaged",
+        });
+      }
+      if (earliest >= end) break;
+      end = earliest;
+    }
+    const points: Record<string, Point[]> = {};
+    for (const [name, map] of Object.entries(value)) {
+      points[name] = [...map]
+        .map(([t, v]) => ({ t, v }))
+        .sort((a, b) => a.t - b.t);
+    }
+    return { points, behaviors: [...behavior.values()] };
+  };
+
+  const [io, routines, recycled] = await Promise.allSettled([
+    loadIo(),
+    hydraloop.local.graph.getRoutineData({
+      deviceId,
+      // Look further back to know the routine that runs at `from`
+      from: new Date(from - 24 * 3600_000),
+      until: new Date(until),
+    }),
+    hydraloop.local.graph.getWaterRecycledData({
+      deviceId,
+      unit: "day",
+      from: new Date(from).toISOString(),
+      until: new Date(until).toISOString(),
+      zone,
+    }),
+  ]);
+
+  const warnings: string[] = [];
+  const ioData = settled(io, "Valves and pumps", warnings);
+  const routineData = settled(routines, "Routines", warnings);
+  const recycledData = settled(recycled, "Recycled water", warnings);
+
+  const days = toPoints(recycledData?.waterRecycled).filter(
+    (p) => p.t >= from - 24 * 3600_000,
+  );
+  const stats = computeStats(
+    {
+      from,
+      until,
+      io: ioData?.points ?? {},
+      routines: (routineData?.routines ?? [])
+        .map((r) => ({
+          t: Date.parse(r.x),
+          side: routineSide(r.side),
+          routine: r.routine,
+          name: r.name ?? "",
+          state: r.state ?? "",
+        }))
+        .filter((r) => Number.isFinite(r.t))
+        .sort((a, b) => a.t - b.t),
+      behaviors: behaviorIntervals(ioData?.behaviors ?? [], from, until),
+    },
+    recycledData
+      ? {
+          liters: days.reduce((sum, p) => sum + p.v, 0),
+          days,
+          source: "hdm",
+        }
+      : undefined,
+  );
+  return { ...stats, demo: false, fetchedAt: Date.now(), warnings };
 }
 
 export async function login(options: {
