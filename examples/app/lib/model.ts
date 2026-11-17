@@ -9,6 +9,9 @@ export type Side = "A" | "B";
 export type RoutineSide = Side | "SYSTEM";
 export type TankId = "t1a" | "t2a" | "t1b" | "t2b" | "t3";
 
+/** How far back the live view loads data, long enough to include a venting of both trains */
+export const LIVE_RANGE = 8 * 3600_000;
+
 export const TANK_IDS: TankId[] = ["t1a", "t2a", "t1b", "t2b", "t3"];
 
 /** Graph line names of `hydraloop.local.graph.getData()` per tank */
@@ -776,6 +779,8 @@ export type TrainRoom = {
 export type Room = {
   /** Liters the H600 can take before greywater is bypassed */
   liters: number | undefined;
+  /** Only one train is known, so `liters` is a lower bound */
+  partial: boolean;
   bypass: boolean;
   trains: Record<Side, TrainRoom>;
 };
@@ -832,13 +837,16 @@ export function roomAt(ds: Dataset, t: number): Room {
   };
 
   const trains = { A: train("A"), B: train("B") };
-  const liters =
-    trains.A.liters === undefined || trains.B.liters === undefined
+  const known = [trains.A.liters, trains.B.liters].filter(
+    (l) => l !== undefined,
+  );
+  const partial = !bypass && known.length === 1;
+  const liters = bypass
+    ? 0
+    : known.length === 0
       ? undefined
-      : bypass
-        ? 0
-        : trains.A.liters + trains.B.liters;
-  return { liters, bypass, trains };
+      : known.reduce((sum, l) => sum + l, 0);
+  return { liters, partial, bypass, trains };
 }
 
 /** Room for greywater over the dataset's range, at `steps` points */
@@ -847,7 +855,8 @@ export function roomSeries(ds: Dataset, steps: number): Point[] {
   for (let i = 0; i <= steps; i++) {
     const t = ds.from + ((ds.until - ds.from) * i) / steps;
     const room = roomAt(ds, t);
-    if (room.liters !== undefined) result.push({ t, v: room.liters });
+    if (room.liters !== undefined && !room.partial)
+      result.push({ t, v: room.liters });
   }
   return result;
 }

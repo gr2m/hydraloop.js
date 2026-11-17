@@ -47,7 +47,7 @@ The live and history views estimate how much more greywater the H600 can take be
 - Greywater only enters a train in `STANDBY` (or `INCOMING_WATER`).
 - A train starts `FILTH_REMOVAL` when it holds about 270–330 L (T1 + T2), and takes no water for the ~4.5 h it lasts.
 
-So the estimate is the sum over the trains that accept water of `290 L − T1 − T2` ([`TRAIN_FULL_LITERS`](lib/model.ts)). T1 + T2 is taken from the last time T2 was vented (about once an hour), as its reading is too high while pressurized. A train in `FILTH_REMOVAL` or with its waste valve open counts as 0, and so does the whole H600 while the bypass is open. The history chart shades the times the bypass was open, to compare. The live view loads the last 3 hours, so that it includes a venting.
+So the estimate is the sum over the trains that accept water of `290 L − T1 − T2` ([`TRAIN_FULL_LITERS`](lib/model.ts)). T1 + T2 is taken from the last time T2 was vented (about once an hour), as its reading is too high while pressurized. A train in `FILTH_REMOVAL` or with its waste valve open counts as 0, and so does the whole H600 while the bypass is open. The history chart shades the times the bypass was open, to compare. The live view loads the last 8 hours, so that it includes a venting of both trains. If only one train has a venting, the estimate is shown as a lower bound (`≥ X L`) from that train alone.
 
 ### Behaviors
 

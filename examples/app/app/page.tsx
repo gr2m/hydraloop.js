@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 import { LiveDashboard } from "@/components/live-dashboard";
+import { LIVE_RANGE } from "@/lib/model";
 import { getSession, isUnauthorized, load } from "@/lib/session";
 
 export default function LivePage() {
@@ -22,7 +23,7 @@ async function Live() {
   let dataset;
   try {
     dataset = await load(session, {
-      from: until - 3 * 3600_000,
+      from: until - LIVE_RANGE,
       until,
       live: true,
     });

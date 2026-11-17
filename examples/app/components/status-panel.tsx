@@ -133,7 +133,9 @@ function RoomSummary({ state }: { state: DeviceState }) {
           ? "Unknown"
           : room.bypass
             ? "0 L, bypass open"
-            : `≈ ${Math.round(room.liters)} L`}
+            : room.partial
+              ? `≥ ${Math.round(room.liters)} L`
+              : `≈ ${Math.round(room.liters)} L`}
       </p>
       <dl className="status-facts">
         {(["A", "B"] as Side[]).map((side) => {

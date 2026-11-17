@@ -94,7 +94,7 @@ export function LiveDashboard({ initial }: { initial: Dataset }) {
             {stale && (
               <p>
                 {latest === undefined
-                  ? "No tank readings in the last 3 hours."
+                  ? "No tank readings in the last 8 hours."
                   : "The latest tank reading is more than 3 minutes old. The device may be offline or its data delayed."}
               </p>
             )}
@@ -124,8 +124,8 @@ export function LiveDashboard({ initial }: { initial: Dataset }) {
         </div>
 
         <section className="section" aria-labelledby="events-heading">
-          <h2 id="events-heading">Last 3 hours</h2>
-          <EventTable events={events} caption="Events in the last 3 hours" />
+          <h2 id="events-heading">Last 8 hours</h2>
+          <EventTable events={events} caption="Events in the last 8 hours" />
         </section>
 
         <section className="section" aria-labelledby="signals-heading">

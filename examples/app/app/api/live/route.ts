@@ -1,13 +1,14 @@
+import { LIVE_RANGE } from "@/lib/model";
 import { getSession, isUnauthorized, load } from "@/lib/session";
 
-/** The last 3 hours of data (enough for a venting), plus the current valve state */
+/** The last 8 hours of data (enough for a venting of both trains), plus the current valve state */
 export async function GET() {
   const session = await getSession();
   if (!session) return new Response("Not signed in", { status: 401 });
   const until = Date.now();
   try {
     const dataset = await load(session, {
-      from: until - 3 * 3600_000,
+      from: until - LIVE_RANGE,
       until,
       live: true,
     });
