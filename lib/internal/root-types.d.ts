@@ -320,6 +320,11 @@ export interface DeviceChangeBranchCommand {
   branch: string;
 }
 
+export interface SetTargetBranchCommand {
+  deviceId: string;
+  branch: string;
+}
+
 export interface ServiceLogEntry {
   id: string;
   userId: string;
@@ -473,6 +478,10 @@ export interface DeviceUpdaterConfig {
   value: string;
   created: string;
   updated: string;
+}
+
+export interface DeletePersonCommand {
+  personId: string;
 }
 
 export interface ResetPasswordCommand {
@@ -778,6 +787,14 @@ export interface DeviceData {
 
 export interface LazyLoadingResult {
   total: number;
+}
+
+export interface DeviceDataAttributes {
+  deviceId: string;
+  currentBranch?: string;
+  version?: string;
+  versionCore?: string;
+  manual?: boolean;
 }
 
 export interface DataWithDeviceId {
@@ -1365,6 +1382,12 @@ export interface RootApi {
      */
     storeFile(options: { body: DeviceData }): Promise<LazyLoadingResult>;
     /**
+     * `POST /device-data/update-attributes`
+     */
+    storeDeviceAttributes(options: {
+      body: DeviceDataAttributes;
+    }): Promise<LazyLoadingResult>;
+    /**
      * `POST /device-data/activity`
      */
     storeDeviceActivity(options: {
@@ -1739,6 +1762,12 @@ export interface RootApi {
       serial: string | number | boolean | Date;
     }): Promise<Device>;
     /**
+     * `GET /devices/get-by-mac`
+     */
+    getDeviceShallowByMac(options: {
+      mac: string | number | boolean | Date;
+    }): Promise<Device>;
+    /**
      * `GET /devices/get-device-hardware`
      */
     getDeviceHardware(options: {
@@ -1750,7 +1779,6 @@ export interface RootApi {
     findDeviceHardwarePartHistory(options: {
       id: string | number | boolean | Date;
       tag: string | number | boolean | Date;
-      backfill: string | number | boolean | Date;
     }): Promise<any>;
     /**
      * `GET /devices/check-access`
@@ -1860,6 +1888,10 @@ export interface RootApi {
      * `POST /devices/change-branch`
      */
     changeBranch(options: { body: DeviceChangeBranchCommand }): Promise<any>;
+    /**
+     * `POST /devices/set-target-branch`
+     */
+    setTargetBranch(options: { body: SetTargetBranchCommand }): Promise<any>;
     /**
      * `POST /devices/service-log-entry`
      */
@@ -2186,6 +2218,24 @@ export interface RootApi {
      * `POST /dynamic-list/remove-filters`
      */
     removeFilters(options: { body: RemoveFiltersCommand }): Promise<any>;
+  };
+  dynamicGraphSettings: {
+    /**
+     * `GET /dynamic-graph-settings`
+     */
+    list(options?: {}): Promise<any>;
+    /**
+     * `POST /dynamic-graph-settings`
+     */
+    create(options?: { body?: any }): Promise<any>;
+    /**
+     * `GET /dynamic-graph-settings/sync-status`
+     */
+    syncStatus(options?: {}): Promise<any>;
+    /**
+     * `POST /dynamic-graph-settings/{id}`
+     */
+    update(options: { id: string | number; body?: any }): Promise<any>;
   };
   ecus: {
     /**
@@ -2533,6 +2583,14 @@ export interface RootApi {
      * `POST /settings/merge-person`
      */
     mergePerson(options?: { body?: any }): Promise<DeviceUpdaterConfig>;
+    /**
+     * `POST /settings/delete-person-user`
+     */
+    deletePersonUser(options: { body: DeletePersonCommand }): Promise<any>;
+    /**
+     * `POST /settings/delete-person`
+     */
+    deletePerson(options: { body: DeletePersonCommand }): Promise<any>;
     /**
      * `POST /settings/create-user`
      */

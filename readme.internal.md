@@ -270,15 +270,16 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>root.deviceData</code> (5)</summary>
+<summary><code>root.deviceData</code> (6)</summary>
 
-| Method                  | Request                             | Summary                             |
-| ----------------------- | ----------------------------------- | ----------------------------------- |
-| `storeFile()`           | `POST /device-data/store-file`      |                                     |
-| `storeDeviceActivity()` | `POST /device-data/activity`        |                                     |
-| `storeDeviceOnline()`   | `POST /device-data/online`          |                                     |
-| `storeDeviceOffline()`  | `POST /device-data/offline`         |                                     |
-| `getLastPublicData()`   | `GET /device-data/last-public-data` | Get the last public data of the app |
+| Method                    | Request                               | Summary                             |
+| ------------------------- | ------------------------------------- | ----------------------------------- |
+| `storeFile()`             | `POST /device-data/store-file`        |                                     |
+| `storeDeviceAttributes()` | `POST /device-data/update-attributes` |                                     |
+| `storeDeviceActivity()`   | `POST /device-data/activity`          |                                     |
+| `storeDeviceOnline()`     | `POST /device-data/online`            |                                     |
+| `storeDeviceOffline()`    | `POST /device-data/offline`           |                                     |
+| `getLastPublicData()`     | `GET /device-data/last-public-data`   | Get the last public data of the app |
 
 </details>
 
@@ -414,7 +415,7 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>root.devices</code> (84)</summary>
+<summary><code>root.devices</code> (86)</summary>
 
 | Method                                         | Request                                                           | Summary                                                                        |
 | ---------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
@@ -424,6 +425,7 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 | `getDevice()`                                  | `GET /devices/get`                                                |                                                                                |
 | `getDeviceShallow()`                           | `GET /devices/get-shallow`                                        |                                                                                |
 | `getDeviceShallowBySerial()`                   | `GET /devices/get-shallow-by-serial`                              |                                                                                |
+| `getDeviceShallowByMac()`                      | `GET /devices/get-by-mac`                                         |                                                                                |
 | `getDeviceHardware()`                          | `GET /devices/get-device-hardware`                                |                                                                                |
 | `findDeviceHardwarePartHistory()`              | `GET /devices/device-hardware-part-history`                       |                                                                                |
 | `checkForDeviceAccess()`                       | `GET /devices/check-access`                                       |                                                                                |
@@ -446,6 +448,7 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 | `initAuthenticationCode()`                     | `POST /devices/init-authentication-code`                          |                                                                                |
 | `setBranchToRelease()`                         | `POST /devices/set-branch-to-release`                             |                                                                                |
 | `changeBranch()`                               | `POST /devices/change-branch`                                     |                                                                                |
+| `setTargetBranch()`                            | `POST /devices/set-target-branch`                                 |                                                                                |
 | `storeServiceLogEntry()`                       | `POST /devices/service-log-entry`                                 |                                                                                |
 | `getServiceLogTypes()`                         | `GET /devices/service-log-types`                                  |                                                                                |
 | `getServiceLogEntries()`                       | `GET /devices/service-log-entries`                                |                                                                                |
@@ -513,6 +516,18 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 | `listFilters()`   | `GET /dynamic-list/list-filters`    |         |
 | `storeFilters()`  | `POST /dynamic-list/store-filters`  |         |
 | `removeFilters()` | `POST /dynamic-list/remove-filters` |         |
+
+</details>
+
+<details>
+<summary><code>root.dynamicGraphSettings</code> (4)</summary>
+
+| Method         | Request                                   | Summary |
+| -------------- | ----------------------------------------- | ------- |
+| `list()`       | `GET /dynamic-graph-settings`             |         |
+| `create()`     | `POST /dynamic-graph-settings`            |         |
+| `syncStatus()` | `GET /dynamic-graph-settings/sync-status` |         |
+| `update()`     | `POST /dynamic-graph-settings/{id}`       |         |
 
 </details>
 
@@ -652,7 +667,7 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>root.settings</code> (56)</summary>
+<summary><code>root.settings</code> (58)</summary>
 
 | Method                             | Request                                             | Summary                        |
 | ---------------------------------- | --------------------------------------------------- | ------------------------------ |
@@ -670,6 +685,8 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 | `postPerson()`                     | `POST /settings/person`                             |                                |
 | `getCurrentPerson()`               | `GET /settings/current-person`                      |                                |
 | `mergePerson()`                    | `POST /settings/merge-person`                       |                                |
+| `deletePersonUser()`               | `POST /settings/delete-person-user`                 |                                |
+| `deletePerson()`                   | `POST /settings/delete-person`                      |                                |
 | `postCreateUser()`                 | `POST /settings/create-user`                        |                                |
 | `postResetPassword()`              | `POST /settings/reset-password`                     |                                |
 | `postResetTwoFactorAuth()`         | `POST /settings/reset-two-factor-auth`              |                                |
@@ -888,6 +905,15 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
+<summary><code>local.dynamicGraphSettings</code> (1)</summary>
+
+| Method   | Request                             | Summary |
+| -------- | ----------------------------------- | ------- |
+| `sync()` | `POST /dynamic-graph-settings/sync` |         |
+
+</details>
+
+<details>
 <summary><code>local.ecuSimulator</code> (8)</summary>
 
 | Method          | Request                             | Summary                                                                            |
@@ -904,11 +930,12 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>local.externalIo</code> (1)</summary>
+<summary><code>local.externalIo</code> (2)</summary>
 
-| Method                  | Request                   | Summary                             |
-| ----------------------- | ------------------------- | ----------------------------------- |
-| `postAddNewInputData()` | `POST /external-io/input` | Add input data from external source |
+| Method                  | Request                           | Summary                                                            |
+| ----------------------- | --------------------------------- | ------------------------------------------------------------------ |
+| `postDynamicInput()`    | `POST /external-io/dynamic-input` | Insert a batch of dynamic graph measurements directly by type UUID |
+| `postAddNewInputData()` | `POST /external-io/input`         | Add input data from external source                                |
 
 </details>
 
@@ -923,36 +950,52 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>local.fsm</code> (2)</summary>
+<summary><code>local.fsm</code> (3)</summary>
 
-| Method           | Request                   | Summary       |
-| ---------------- | ------------------------- | ------------- |
-| `submitChoice()` | `POST /fsm/submit-choice` | Submit choice |
-| `clearStale()`   | `POST /fsm/clear-stale`   | Clear Stale   |
+| Method               | Request                   | Summary                                 |
+| -------------------- | ------------------------- | --------------------------------------- |
+| `submitChoice()`     | `POST /fsm/submit-choice` | Submit choice                           |
+| `clearStale()`       | `POST /fsm/clear-stale`   | Clear Stale                             |
+| `getInstanceState()` | `GET /fsm/instance-state` | Get the current state of a FSM instance |
 
 </details>
 
 <details>
-<summary><code>local.graph</code> (16)</summary>
+<summary><code>local.graph</code> (21)</summary>
 
-| Method                   | Request                           | Summary                                                            |
-| ------------------------ | --------------------------------- | ------------------------------------------------------------------ |
-| `getGraphConfig()`       | `GET /graph/config`               | Retrieves graph config for a specific device                       |
-| `getData()`              | `GET /graph/data`                 | Retrieves graph data in a specific period                          |
-| `getIo()`                | `GET /graph/io`                   | Retrieves io data in a specific period                             |
-| `getRoutineData()`       | `GET /graph/routines`             | Retrieves routine data in a specific period                        |
-| `calculateJumpTo()`      | `POST /graph/jump-to`             | Calculate jump to date                                             |
-| `getStatusLogData()`     | `GET /graph/status-log`           | Retrieves status log data in a specific period                     |
-| `getWaterRecycledData()` | `GET /graph/water-recycled`       | Retrieves water recycled data in a specific period                 |
-| `getIncomingWaterData()` | `GET /graph/incoming-water`       | Retrieves incoming water data in a specific period                 |
-| `getPowerUsageData()`    | `GET /graph/power-usage`          | Retrieves power usage data in a specific period                    |
-| `getIoNamesSensorOnly()` | `GET /graph/io-names-sensor-only` | Retrieves the io names which are a sensor                          |
-| `getLastKnownIoState()`  | `GET /graph/last-io`              | Retrieves the last know io state                                   |
-| `setIoManual()`          | `POST /graph/io-manual`           | Set io manual state                                                |
-| `setIoValue()`           | `POST /graph/io-value`            | Set io value state                                                 |
-| `setActiveHeartBeat()`   | `POST /graph/active-heart-beat`   | Set active heart beat                                              |
-| `getDeviceDateRange()`   | `GET /graph/device-date-range`    | Retrieves the date of the first and de last log data of the device |
-| `getDeviceLevels()`      | `GET /graph/device-levels`        | Retrieves the device levels                                        |
+| Method                       | Request                               | Summary                                                                                                   |
+| ---------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `getGraphConfig()`           | `GET /graph/config`                   | Retrieves graph config for a specific device                                                              |
+| `getData()`                  | `GET /graph/data`                     | Retrieves graph data in a specific period                                                                 |
+| `getDynamicData()`           | `GET /graph/dynamic-data`             | Retrieves available dynamic graph lines and data in a specific period                                     |
+| `getIo()`                    | `GET /graph/io`                       | Retrieves io data in a specific period                                                                    |
+| `getRoutineData()`           | `GET /graph/routines`                 | Retrieves routine data in a specific period                                                               |
+| `calculateJumpTo()`          | `POST /graph/jump-to`                 | Calculate jump to date                                                                                    |
+| `getStatusLogData()`         | `GET /graph/status-log`               | Retrieves status log data in a specific period                                                            |
+| `getWaterRecycledData()`     | `GET /graph/water-recycled`           | Retrieves water recycled data in a specific period                                                        |
+| `getIncomingWaterData()`     | `GET /graph/incoming-water`           | Retrieves incoming water data in a specific period                                                        |
+| `getPowerUsageData()`        | `GET /graph/power-usage`              | Retrieves power usage data in a specific period                                                           |
+| `getE2eFixtureWindowAudit()` | `GET /graph/e2e-fixture-window-audit` | Retrieves the e2e fixture window audit net (the newest io_data in-window writes with the writer identity) |
+| `getIoNamesSensorOnly()`     | `GET /graph/io-names-sensor-only`     | Retrieves the io names which are a sensor                                                                 |
+| `getLastKnownIoState()`      | `GET /graph/last-io`                  | Retrieves the last know io state                                                                          |
+| `getManualIoAccess()`        | `GET /graph/manual-io-access`         | Check whether manual IO control is currently allowed                                                      |
+| `setIoManual()`              | `POST /graph/io-manual`               | Set io manual state                                                                                       |
+| `setIoValue()`               | `POST /graph/io-value`                | Set io value state                                                                                        |
+| `setActiveHeartBeat()`       | `POST /graph/active-heart-beat`       | Set active heart beat                                                                                     |
+| `getDeviceDateRange()`       | `GET /graph/device-date-range`        | Retrieves the date of the first and de last log data of the device                                        |
+| `getDeviceLevels()`          | `GET /graph/device-levels`            | Retrieves the device levels                                                                               |
+| `getOptions()`               | `GET /graph/export/options`           | Lists available device export fields                                                                      |
+| `export()`                   | `POST /graph/export`                  | Exports selected device data to Excel for at most one month                                               |
+
+</details>
+
+<details>
+<summary><code>local.graphImport</code> (2)</summary>
+
+| Method      | Request                      | Summary |
+| ----------- | ---------------------------- | ------- |
+| `preview()` | `POST /graph/import/preview` |         |
+| `import()`  | `POST /graph/import`         |         |
 
 </details>
 
@@ -1070,11 +1113,18 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>local.rootConnect</code> (1)</summary>
+<summary><code>local.rootConnect</code> (8)</summary>
 
-| Method                  | Request                    | Summary    |
-| ----------------------- | -------------------------- | ---------- |
-| `storeDeviceProgress()` | `GET /root-connect/device` | Get device |
+| Method                            | Request                                           | Summary                                                      |
+| --------------------------------- | ------------------------------------------------- | ------------------------------------------------------------ |
+| `storeDeviceProgress()`           | `GET /root-connect/device`                        | Get device                                                   |
+| `getDeviceByMac()`                | `GET /root-connect/device-by-mac`                 | Get device by its ECU MAC address (with device attributes)   |
+| `getEcuById()`                    | `GET /root-connect/ecu-by-id`                     | Get ECU by its id                                            |
+| `getDeviceNeedsSettingsUpdated()` | `GET /root-connect/device-needs-settings-updated` | Get whether the device needs its settings updated            |
+| `restartDevice()`                 | `POST /root-connect/restart-device`               | Restart the device through HDMConnect                        |
+| `changeEcu()`                     | `POST /root-connect/change-ecu`                   | Change the ECU of a device (by MAC address) through HDMRoot  |
+| `setTargetBranch()`               | `POST /root-connect/set-target-branch`            | Set the device target branch                                 |
+| `getForceUploadState()`           | `GET /root-connect/force-upload-state`            | Get the force-upload state of the device (fase-1 Redis flag) |
 
 </details>
 
@@ -1089,38 +1139,39 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>local.settings</code> (28)</summary>
+<summary><code>local.settings</code> (29)</summary>
 
-| Method                             | Request                                      | Summary                                                          |
-| ---------------------------------- | -------------------------------------------- | ---------------------------------------------------------------- |
-| `listPossibleSettings()`           | `GET /settings/list`                         | Lists possible settings                                          |
-| `getLastKnownSettings()`           | `GET /settings/last`                         | Get last know setting values                                     |
-| `getLastKnownSpecificSetting()`    | `GET /settings/last-specific`                | Get last known setting values from specific settings             |
-| `getLastKnownDistPumpSetting()`    | `GET /settings/last-dist-pump-settings`      | Get last known distribution pump setting value                   |
-| `refreshDistPumpSettings()`        | `POST /settings/refresh-dist-pump-settings`  | Refresh distribution pump setting value from device              |
-| `changeDistPumpSetting()`          | `POST /settings/change-dist-pump-setting`    | Change the distribution pump speed setting of a Hydraloop        |
-| `getLastKnownPrioritySetting()`    | `GET /settings/last-priority-setting`        | Get last known priority setting value                            |
-| `refreshPrioritySetting()`         | `POST /settings/refresh-priority-setting`    | Refresh priority setting value from device                       |
-| `changePrioritySetting()`          | `POST /settings/change-priority-setting`     | Change the priority setting of a Hydraloop                       |
-| `getLastKnownStateSettings()`      | `GET /settings/last-state-settings`          | Get last known state setting values                              |
-| `refreshStateSettings()`           | `POST /settings/refresh-state-settings`      | Refresh state setting values from device                         |
-| `updateDeviceSetting()`            | `POST /settings/update-device-setting`       |                                                                  |
-| `getLastKnownSettingsBeforeDate()` | `GET /settings/last-before-date`             | Get last known setting values before date                        |
-| `changeSystemActive()`             | `POST /settings/change-system-active`        | Change the Hydraloop system active setting                       |
-| `changeFactoryState()`             | `POST /settings/change-factory-state`        | Change the Hydraloop factory state setting                       |
-| `changeRecycleAfterDate()`         | `POST /settings/change-recycle-after-date`   | Change the Hydraloop recycle after date setting                  |
-| `changeSoapBombActive()`           | `POST /settings/change-soap-bomb-active`     | Change the Hydraloop soap bomb setting                           |
-| `getSimulationScenario()`          | `GET /settings/simulation-scenario`          | Get the ECU-simulator scenario of a simulator device             |
-| `changeSimulationScenario()`       | `POST /settings/simulation-scenario`         | Change the ECU-simulator scenario of a simulator device          |
-| `changeSetting()`                  | `POST /settings/change`                      | Change a Hydraloop device setting                                |
-| `refreshSetting()`                 | `POST /settings/refresh`                     | Ask Hydraloop device to send the setting                         |
-| `getHistory()`                     | `GET /settings/history`                      | List value history of setting                                    |
-| `requestAppAuthorisation()`        | `POST /settings/request-app-authentication`  | Request App Authentication                                       |
-| `migrateEcuData()`                 | `POST /settings/migrate-ecu-data`            | Migrate ECU data                                                 |
-| `changeBypassMode()`               | `POST /settings/change-bypass-mode`          | Change bypass mode (activate/deactivate bleach or hair dye mode) |
-| `changeBuzzerSetting()`            | `POST /settings/change-buzzer-setting`       | change buzzer setting                                            |
-| `changeWashingMachineMode()`       | `POST /settings/change-washing-machine-mode` | Change washing machine mode (backup water usage)                 |
-| `changeOperationMode()`            | `POST /settings/change-operation-mode`       | Change washing machine mode (backup water usage)                 |
+| Method                             | Request                                      | Summary                                                             |
+| ---------------------------------- | -------------------------------------------- | ------------------------------------------------------------------- |
+| `listPossibleSettings()`           | `GET /settings/list`                         | Lists possible settings                                             |
+| `getLastKnownSettings()`           | `GET /settings/last`                         | Get last know setting values                                        |
+| `getLastKnownSpecificSetting()`    | `GET /settings/last-specific`                | Get last known setting values from specific settings                |
+| `getLastKnownDistPumpSetting()`    | `GET /settings/last-dist-pump-settings`      | Get last known distribution pump setting value                      |
+| `refreshDistPumpSettings()`        | `POST /settings/refresh-dist-pump-settings`  | Refresh distribution pump setting value from device                 |
+| `changeDistPumpSetting()`          | `POST /settings/change-dist-pump-setting`    | Change the distribution pump speed setting of a Hydraloop           |
+| `getLastKnownPrioritySetting()`    | `GET /settings/last-priority-setting`        | Get last known priority setting value                               |
+| `refreshPrioritySetting()`         | `POST /settings/refresh-priority-setting`    | Refresh priority setting value from device                          |
+| `changePrioritySetting()`          | `POST /settings/change-priority-setting`     | Change the priority setting of a Hydraloop                          |
+| `getTankTreatmentState()`          | `GET /settings/tank-treatment-state`         | Get cleaning limits and timestamped treatment timers for tank menus |
+| `getLastKnownStateSettings()`      | `GET /settings/last-state-settings`          | Get last known state setting values                                 |
+| `refreshStateSettings()`           | `POST /settings/refresh-state-settings`      | Refresh state setting values from device                            |
+| `updateDeviceSetting()`            | `POST /settings/update-device-setting`       |                                                                     |
+| `getLastKnownSettingsBeforeDate()` | `GET /settings/last-before-date`             | Get last known setting values before date                           |
+| `changeSystemActive()`             | `POST /settings/change-system-active`        | Change the Hydraloop system active setting                          |
+| `changeFactoryState()`             | `POST /settings/change-factory-state`        | Change the Hydraloop factory state setting                          |
+| `changeRecycleAfterDate()`         | `POST /settings/change-recycle-after-date`   | Change the Hydraloop recycle after date setting                     |
+| `changeSoapBombActive()`           | `POST /settings/change-soap-bomb-active`     | Change the Hydraloop soap bomb setting                              |
+| `getSimulationScenario()`          | `GET /settings/simulation-scenario`          | Get the ECU-simulator scenario of a simulator device                |
+| `changeSimulationScenario()`       | `POST /settings/simulation-scenario`         | Change the ECU-simulator scenario of a simulator device             |
+| `changeSetting()`                  | `POST /settings/change`                      | Change a Hydraloop device setting                                   |
+| `refreshSetting()`                 | `POST /settings/refresh`                     | Ask Hydraloop device to send the setting                            |
+| `getHistory()`                     | `GET /settings/history`                      | List value history of setting                                       |
+| `requestAppAuthorisation()`        | `POST /settings/request-app-authentication`  | Request App Authentication                                          |
+| `migrateEcuData()`                 | `POST /settings/migrate-ecu-data`            | Migrate ECU data                                                    |
+| `changeBypassMode()`               | `POST /settings/change-bypass-mode`          | Change bypass mode (activate/deactivate bleach or hair dye mode)    |
+| `changeBuzzerSetting()`            | `POST /settings/change-buzzer-setting`       | change buzzer setting                                               |
+| `changeWashingMachineMode()`       | `POST /settings/change-washing-machine-mode` | Change washing machine mode (backup water usage)                    |
+| `changeOperationMode()`            | `POST /settings/change-operation-mode`       | Change washing machine mode (backup water usage)                    |
 
 </details>
 
