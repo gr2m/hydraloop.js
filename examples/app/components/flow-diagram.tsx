@@ -508,7 +508,7 @@ export function FlowDiagram({
           Train {side}
         </text>
 
-        {/* Inlet, active during the INCOMING_WATER routine */}
+        {/* Inlet, active during INCOMING_WATER into the A/B valve's train */}
         <Pipe
           d={a ? "M486 100 H150 V190" : "M514 100 H850 V190"}
           kind="grey"

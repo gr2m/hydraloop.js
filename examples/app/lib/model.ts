@@ -704,11 +704,40 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
             : "Below min",
   };
 
+  // HDM often reports INCOMING_WATER for both trains, or only for the one
+  // the A/B valve doesn't select, while only the selected train's T2 rises.
+  // So incoming water on either side goes to the train of the A/B valve.
+  const filling = fillingTrain(ds, t);
+  const incoming = (["A", "B"] as Side[]).filter(
+    (s) => trains[s].phase === "receiving",
+  );
+  if (filling && incoming.length > 0) {
+    const other: Side = filling === "A" ? "B" : "A";
+    if (trains[other].phase === "receiving") {
+      trains[other] = {
+        ...trains[other],
+        phase: "idle",
+        confidence: "valve",
+        evidence: [...trains[other].evidence, `A/B valve set to ${filling}`],
+      };
+    }
+    const current = routine[filling];
+    if (
+      trains[filling].confidence === "reported" &&
+      current &&
+      ACCEPTING_ROUTINES.has(current.name)
+    ) {
+      trains[filling] = {
+        ...trains[filling],
+        phase: "receiving",
+        confidence: "valve",
+        evidence: [...trains[filling].evidence, `A/B valve set to ${filling}`],
+      };
+    }
+  }
   const inlet: InletState = {
     bypass: on(IO.bypass),
-    receiving: (["A", "B"] as Side[]).filter(
-      (s) => trains[s].phase === "receiving",
-    ),
+    receiving: filling ? (incoming.length > 0 ? [filling] : []) : incoming,
   };
 
   const systemBehaviors = active.filter((b) => b.side === "SYSTEM");
