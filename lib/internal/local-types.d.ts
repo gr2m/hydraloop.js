@@ -6,6 +6,192 @@
  */
 export type LazyLoadEvent = Record<string, unknown>;
 
+export interface Permission {
+  id: string;
+  name: string;
+}
+
+export interface Role {
+  id: string;
+  name: string;
+  main: boolean;
+  description: string;
+  roles: Role[];
+  permissions: Permission[];
+}
+
+export interface LoginUser {
+  id: string;
+  enabled: boolean;
+  username: string;
+  password: string;
+  totpEnabled: boolean;
+  roles: Role[];
+}
+
+export interface Person {
+  id: string;
+  givenname: string;
+  surname: string;
+  displayName: string;
+  email: string;
+  phoneNumber1: string;
+  phoneNumber2: string;
+  pipedrivePersonId: string;
+  odooPersonId: string;
+  odooUserId: string;
+  organisationId: string;
+  organisationName: string;
+  userId: string;
+  userEnabled: boolean;
+  username: string;
+  totpEnabled: boolean;
+  roles: string[];
+  allBoundId: string;
+  enabled: boolean;
+  termsAndConditionsAccepted: string;
+  user: LoginUser;
+}
+
+export interface Organisation {
+  id: string;
+  name: string;
+  parentId: string;
+  parentName: string;
+  address1: string;
+  address2: string;
+  address3: string;
+  phoneNumber1: string;
+  phoneNumber2: string;
+  email: string;
+  pipedriveOrganisationId: string;
+  odooOrganisationId: string;
+  primaryContactPerson: string;
+  longitude: number;
+  latitude: number;
+  ownDivision: boolean;
+  receiveTicketEmail: boolean;
+  accountManagerId: string;
+  accountManagerName: string;
+  defaultAssigneeId: string;
+  defaultAssigneeName: string;
+  defaultSupervisorId: string;
+  defaultSupervisorName: string;
+  numberOfPersons: number;
+  numberOfDevices: number;
+  accountManager: Person;
+  parent: Organisation;
+}
+
+export interface DeviceStatus {
+  deviceId: string;
+  online: boolean;
+  hasNotice: boolean;
+  noticeInfo: string[];
+  hasMinorIssue: boolean;
+  minorIssueInfo: string[];
+  hasMajorIssue: boolean;
+  majorIssueInfo: string[];
+  hasBlockingIssue: boolean;
+  blockingInfo: string[];
+  state: string;
+  storedState: string;
+  fieldTest: boolean;
+  deviceForSpecialUseCases: boolean;
+  hasAttentionRequired: boolean;
+  attentionRequiredInfo: string[];
+}
+
+export interface Device {
+  id: string;
+  ecuId: string;
+  organisationId: string;
+  organisationName: string;
+  serial: string;
+  serialAlias: string;
+  ecuSerial: string;
+  alias: string;
+  deviceVersion: string;
+  deviceVersionAsBuild: string;
+  deviceName: string;
+  mac: string;
+  ethernetMac: string;
+  hardwareVersion: string;
+  bootVersion: string;
+  deviceTypeId: string;
+  baseType: string;
+  type: string;
+  subType: string;
+  voltage: string;
+  color: string;
+  status: string;
+  address: string;
+  address1: string;
+  address2: string;
+  postalCode: string;
+  city: string;
+  region: string;
+  countryId: string;
+  country: string;
+  longitude: number;
+  latitude: number;
+  inletManifoldType: string;
+  toilet: boolean;
+  connectedToilets: number;
+  washingMachine: boolean;
+  auxiliary: boolean;
+  auxiliaryOptionAvailable: boolean;
+  hasTransferUpgradeKit: boolean;
+  liftPumpBefore: boolean;
+  liftPumpAfter: boolean;
+  targetBranch: string;
+  dealer: string;
+  purchaseOrder: string;
+  productionOrder: string;
+  invoice: string;
+  notes: string;
+  lastOnline: string;
+  currentBranch: string;
+  firmwareVersion: string;
+  firmwareCoreVersion: string | null;
+  wifiVersion: string;
+  manual: boolean;
+  online: boolean;
+  factoryTestCompletedDate: string;
+  verificationDate: string;
+  commissionDate: string;
+  endOfWarranty: string;
+  neighbourGroupId: string;
+  neighbourGroupName: string;
+  cascadeGroupId: string;
+  cascadeGroupName: string;
+  cascadeGroupConnectedT3: boolean;
+  cascadeGroupExternalDistPump: boolean;
+  cascadeGroupNumber: number;
+  maintenancePeriod: number;
+  nextMaintenanceDate: string;
+  maintenancePlannedDate: string;
+  lastMaintenanceDate: string;
+  lastMaintenanceType: string;
+  nickname: string;
+  ownerId: string;
+  ownerName: string;
+  owner: Person;
+  neighborDevices?: Device[];
+  timezones?: string[];
+  organisation: Organisation;
+  organisations: string[];
+  boardVersions: string[];
+  settings: Record<string, unknown>;
+  deviceStatus: DeviceStatus;
+  localApiUrl: string;
+  localServerId: string;
+  kits: string[];
+  kitNumbers: string[];
+  vpnAddress: string;
+  vpnAddressUpdated: string;
+}
+
 export interface GraphConfig {
   lines: GraphLine[];
   ios: GraphIo[];
@@ -476,6 +662,21 @@ export interface ResolvedName {
 
 export type ConsoleExecuteResult = {};
 
+export interface DynamicInput {
+  /** UUID of the dynamic graph type */
+  type: string;
+  /** ISO 8601 timestamp (UTC when no offset is supplied), or Unix time in milliseconds */
+  time: unknown;
+  /** Numeric measurement; decimals and negative values are supported */
+  value: number;
+}
+
+export interface DynamicInputData {
+  /** Device UUID */
+  device_id: string;
+  inputs: DynamicInput[];
+}
+
 export interface InputData {
   id: number;
   time: number;
@@ -762,6 +963,12 @@ export interface LocalApi {
      */
     syncDevice(options?: { body?: any }): Promise<any>;
   };
+  dynamicGraphSettings: {
+    /**
+     * `POST /dynamic-graph-settings/sync`
+     */
+    sync(options?: { body?: any }): Promise<any>;
+  };
   ecuSimulator: {
     /**
      * List ECU simulator instances, including orphaned simulator devices
@@ -823,6 +1030,12 @@ export interface LocalApi {
   };
   externalIo: {
     /**
+     * Insert a batch of dynamic graph measurements directly by type UUID
+     *
+     * `POST /external-io/dynamic-input`
+     */
+    postDynamicInput(options: { body: DynamicInputData }): Promise<any>;
+    /**
      * Add input data from external source
      *
      * `POST /external-io/input`
@@ -855,6 +1068,14 @@ export interface LocalApi {
       deviceId: string | number | boolean | Date;
       body?: any;
     }): Promise<any>;
+    /**
+     * Get the current state of a FSM instance
+     *
+     * `GET /fsm/instance-state`
+     */
+    getInstanceState(options: {
+      instanceId: string | number | boolean | Date;
+    }): Promise<any>;
   };
   graph: {
     /**
@@ -878,6 +1099,17 @@ export interface LocalApi {
       minutesInView: string | number | boolean | Date;
       debugData: string | number | boolean | Date;
     }): Promise<GraphRecords>;
+    /**
+     * Retrieves available dynamic graph lines and data in a specific period
+     *
+     * `GET /graph/dynamic-data`
+     */
+    getDynamicData(options: {
+      deviceId: string | number | boolean | Date;
+      from: string | number | boolean | Date;
+      until: string | number | boolean | Date;
+      minutesInView: string | number | boolean | Date;
+    }): Promise<any>;
     /**
      * Retrieves io data in a specific period
      *
@@ -948,6 +1180,14 @@ export interface LocalApi {
       until: string | number | boolean | Date;
     }): Promise<PowerUsageRecords>;
     /**
+     * Retrieves the e2e fixture window audit net (the newest io_data in-window writes with the writer identity)
+     *
+     * `GET /graph/e2e-fixture-window-audit`
+     */
+    getE2eFixtureWindowAudit(options: {
+      deviceId: string | number | boolean | Date;
+    }): Promise<any>;
+    /**
      * Retrieves the io names which are a sensor
      *
      * `GET /graph/io-names-sensor-only`
@@ -961,6 +1201,12 @@ export interface LocalApi {
     getLastKnownIoState(options: {
       deviceId: string | number | boolean | Date;
     }): Promise<IoState[]>;
+    /**
+     * Check whether manual IO control is currently allowed
+     *
+     * `GET /graph/manual-io-access`
+     */
+    getManualIoAccess(options?: {}): Promise<any>;
     /**
      * Set io manual state
      *
@@ -995,6 +1241,28 @@ export interface LocalApi {
     getDeviceLevels(options: {
       deviceId: string | number | boolean | Date;
     }): Promise<DeviceLevels>;
+    /**
+     * Lists available device export fields
+     *
+     * `GET /graph/export/options`
+     */
+    getOptions(options?: {}): Promise<any>;
+    /**
+     * Exports selected device data to Excel for at most one month
+     *
+     * `POST /graph/export`
+     */
+    export(options?: { body?: any }): Promise<any>;
+  };
+  graphImport: {
+    /**
+     * `POST /graph/import/preview`
+     */
+    preview(options?: { body?: any }): Promise<any>;
+    /**
+     * `POST /graph/import`
+     */
+    import(options?: { body?: any }): Promise<any>;
   };
   hdmLocal: {
     /**
@@ -1242,6 +1510,54 @@ export interface LocalApi {
     storeDeviceProgress(options: {
       deviceId: string | number | boolean | Date;
     }): Promise<any>;
+    /**
+     * Get device by its ECU MAC address (with device attributes)
+     *
+     * `GET /root-connect/device-by-mac`
+     */
+    getDeviceByMac(options: {
+      mac: string | number | boolean | Date;
+    }): Promise<Device>;
+    /**
+     * Get ECU by its id
+     *
+     * `GET /root-connect/ecu-by-id`
+     */
+    getEcuById(options: { id: string | number | boolean | Date }): Promise<any>;
+    /**
+     * Get whether the device needs its settings updated
+     *
+     * `GET /root-connect/device-needs-settings-updated`
+     */
+    getDeviceNeedsSettingsUpdated(options: {
+      deviceId: string | number | boolean | Date;
+    }): Promise<any>;
+    /**
+     * Restart the device through HDMConnect
+     *
+     * `POST /root-connect/restart-device`
+     */
+    restartDevice(options?: { body?: any }): Promise<any>;
+    /**
+     * Change the ECU of a device (by MAC address) through HDMRoot
+     *
+     * `POST /root-connect/change-ecu`
+     */
+    changeEcu(options?: { body?: any }): Promise<any>;
+    /**
+     * Set the device target branch
+     *
+     * `POST /root-connect/set-target-branch`
+     */
+    setTargetBranch(options?: { body?: any }): Promise<any>;
+    /**
+     * Get the force-upload state of the device (fase-1 Redis flag)
+     *
+     * `GET /root-connect/force-upload-state`
+     */
+    getForceUploadState(options: {
+      deviceId: string | number | boolean | Date;
+    }): Promise<any>;
   };
   serverActivity: {
     /**
@@ -1327,6 +1643,14 @@ export interface LocalApi {
      */
     changePrioritySetting(options: {
       body: SettingChangePrioritySettingCommand;
+    }): Promise<any>;
+    /**
+     * Get cleaning limits and timestamped treatment timers for tank menus
+     *
+     * `GET /settings/tank-treatment-state`
+     */
+    getTankTreatmentState(options: {
+      deviceId: string | number | boolean | Date;
     }): Promise<any>;
     /**
      * Get last known state setting values

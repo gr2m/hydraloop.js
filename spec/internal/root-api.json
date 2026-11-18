@@ -676,6 +676,34 @@
         "tags": ["devices"]
       }
     },
+    "/devices/get-by-mac": {
+      "get": {
+        "operationId": "DevicesController_getDeviceShallowByMac",
+        "parameters": [
+          {
+            "name": "mac",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["devices"]
+      }
+    },
     "/devices/get-device-hardware": {
       "get": {
         "operationId": "DevicesController_getDeviceHardware",
@@ -718,14 +746,6 @@
           },
           {
             "name": "tag",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "backfill",
             "required": true,
             "in": "query",
             "schema": {
@@ -1165,6 +1185,28 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/DeviceChangeBranchCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["devices"]
+      }
+    },
+    "/devices/set-target-branch": {
+      "post": {
+        "operationId": "DevicesController_setTargetBranch",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTargetBranchCommand"
               }
             }
           }
@@ -3358,6 +3400,50 @@
                 }
               }
             }
+          }
+        },
+        "tags": ["settings"]
+      }
+    },
+    "/settings/delete-person-user": {
+      "post": {
+        "operationId": "SettingsController_deletePersonUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletePersonCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["settings"]
+      }
+    },
+    "/settings/delete-person": {
+      "post": {
+        "operationId": "SettingsController_deletePerson",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletePersonCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
           }
         },
         "tags": ["settings"]
@@ -6656,6 +6742,35 @@
         "tags": ["device-data"]
       }
     },
+    "/device-data/update-attributes": {
+      "post": {
+        "operationId": "DeviceDataController_storeDeviceAttributes",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceDataAttributes"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LazyLoadingResult"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["device-data"]
+      }
+    },
     "/device-data/activity": {
       "post": {
         "operationId": "DeviceDataController_storeDeviceActivity",
@@ -8619,12 +8734,67 @@
         },
         "tags": ["formstack-form"]
       }
+    },
+    "/dynamic-graph-settings": {
+      "get": {
+        "operationId": "DynamicGraphSettingsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["DynamicGraphSettings"]
+      },
+      "post": {
+        "operationId": "DynamicGraphSettingsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["DynamicGraphSettings"]
+      }
+    },
+    "/dynamic-graph-settings/sync-status": {
+      "get": {
+        "operationId": "DynamicGraphSettingsController_syncStatus",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["DynamicGraphSettings"]
+      }
+    },
+    "/dynamic-graph-settings/{id}": {
+      "post": {
+        "operationId": "DynamicGraphSettingsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["DynamicGraphSettings"]
+      }
     }
   },
   "info": {
     "title": "Hydraloop Device Manager - Root",
     "description": "Hydraloop Device Manager Root API description",
-    "version": "8.9.6",
+    "version": "8.9.8",
     "contact": {}
   },
   "tags": [],
@@ -9726,6 +9896,18 @@
         },
         "required": ["deviceId", "branch"]
       },
+      "SetTargetBranchCommand": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "branch": {
+            "type": "string"
+          }
+        },
+        "required": ["deviceId", "branch"]
+      },
       "ServiceLogEntry": {
         "type": "object",
         "properties": {
@@ -10140,6 +10322,15 @@
           "created",
           "updated"
         ]
+      },
+      "DeletePersonCommand": {
+        "type": "object",
+        "properties": {
+          "personId": {
+            "type": "string"
+          }
+        },
+        "required": ["personId"]
       },
       "ResetPasswordCommand": {
         "type": "object",
@@ -11111,6 +11302,27 @@
           }
         },
         "required": ["total"]
+      },
+      "DeviceDataAttributes": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "currentBranch": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "versionCore": {
+            "type": "string"
+          },
+          "manual": {
+            "type": "boolean"
+          }
+        },
+        "required": ["deviceId"]
       },
       "DataWithDeviceId": {
         "type": "object",

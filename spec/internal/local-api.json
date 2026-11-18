@@ -73,6 +73,140 @@
         "tags": ["root-connect"]
       }
     },
+    "/root-connect/device-by-mac": {
+      "get": {
+        "operationId": "RootConnectController_getDeviceByMac",
+        "parameters": [
+          {
+            "name": "mac",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Device"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get device by its ECU MAC address (with device attributes)",
+        "tags": ["root-connect"]
+      }
+    },
+    "/root-connect/ecu-by-id": {
+      "get": {
+        "operationId": "RootConnectController_getEcuById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get ECU by its id",
+        "tags": ["root-connect"]
+      }
+    },
+    "/root-connect/device-needs-settings-updated": {
+      "get": {
+        "operationId": "RootConnectController_getDeviceNeedsSettingsUpdated",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get whether the device needs its settings updated",
+        "tags": ["root-connect"]
+      }
+    },
+    "/root-connect/restart-device": {
+      "post": {
+        "operationId": "RootConnectController_restartDevice",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Restart the device through HDMConnect",
+        "tags": ["root-connect"]
+      }
+    },
+    "/root-connect/change-ecu": {
+      "post": {
+        "operationId": "RootConnectController_changeEcu",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Change the ECU of a device (by MAC address) through HDMRoot",
+        "tags": ["root-connect"]
+      }
+    },
+    "/root-connect/set-target-branch": {
+      "post": {
+        "operationId": "RootConnectController_setTargetBranch",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Set the device target branch",
+        "tags": ["root-connect"]
+      }
+    },
+    "/root-connect/force-upload-state": {
+      "get": {
+        "operationId": "RootConnectController_getForceUploadState",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get the force-upload state of the device (fase-1 Redis flag)",
+        "tags": ["root-connect"]
+      }
+    },
     "/graph/config": {
       "get": {
         "operationId": "GraphController_getGraphConfig",
@@ -168,6 +302,52 @@
           }
         },
         "summary": "Retrieves graph data in a specific period",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/dynamic-data": {
+      "get": {
+        "operationId": "GraphController_getDynamicData",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minutesInView",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Retrieves available dynamic graph lines and data in a specific period",
         "tags": ["graph"]
       }
     },
@@ -488,6 +668,28 @@
         "tags": ["graph"]
       }
     },
+    "/graph/e2e-fixture-window-audit": {
+      "get": {
+        "operationId": "GraphController_getE2eFixtureWindowAudit",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Retrieves the e2e fixture window audit net (the newest io_data in-window writes with the writer identity)",
+        "tags": ["graph"]
+      }
+    },
     "/graph/io-names-sensor-only": {
       "get": {
         "operationId": "GraphController_getIoNamesSensorOnly",
@@ -530,6 +732,19 @@
           }
         },
         "summary": "Retrieves the last know io state",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/manual-io-access": {
+      "get": {
+        "operationId": "GraphController_getManualIoAccess",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Check whether manual IO control is currently allowed",
         "tags": ["graph"]
       }
     },
@@ -658,6 +873,68 @@
         },
         "summary": "Retrieves the device levels",
         "tags": ["graph"]
+      }
+    },
+    "/graph/export/options": {
+      "get": {
+        "operationId": "GraphExportController_getOptions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Lists available device export fields",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/export": {
+      "post": {
+        "operationId": "GraphExportController_export",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Exports selected device data to Excel for at most one month",
+        "tags": ["graph"]
+      }
+    },
+    "/graph/import/preview": {
+      "post": {
+        "operationId": "GraphImportController_preview",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["GraphImport"]
+      }
+    },
+    "/graph/import": {
+      "post": {
+        "operationId": "GraphImportController_import",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["GraphImport"]
+      }
+    },
+    "/dynamic-graph-settings/sync": {
+      "post": {
+        "operationId": "DynamicGraphSettingsController_sync",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["DynamicGraphSettings"]
       }
     },
     "/device-sync-root/devices": {
@@ -1080,6 +1357,28 @@
           }
         },
         "summary": "Change the priority setting of a Hydraloop",
+        "tags": ["settings"]
+      }
+    },
+    "/settings/tank-treatment-state": {
+      "get": {
+        "operationId": "SettingsController_getTankTreatmentState",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get cleaning limits and timestamped treatment timers for tank menus",
         "tags": ["settings"]
       }
     },
@@ -1650,6 +1949,28 @@
           }
         },
         "summary": "Clear Stale",
+        "tags": ["fsm"]
+      }
+    },
+    "/fsm/instance-state": {
+      "get": {
+        "operationId": "FsmController_getInstanceState",
+        "parameters": [
+          {
+            "name": "instanceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Get the current state of a FSM instance",
         "tags": ["fsm"]
       }
     },
@@ -2812,6 +3133,35 @@
         "tags": ["CacheSupportLocal"]
       }
     },
+    "/external-io/dynamic-input": {
+      "post": {
+        "operationId": "ExternalIOController_postDynamicInput",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DynamicInputData"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "400": {
+            "description": "Invalid measurement"
+          },
+          "404": {
+            "description": "Device or dynamic graph type not found"
+          }
+        },
+        "summary": "Insert a batch of dynamic graph measurements directly by type UUID",
+        "tags": ["external-io"]
+      }
+    },
     "/external-io/input": {
       "post": {
         "operationId": "ExternalIOController_postAddNewInputData",
@@ -3360,7 +3710,7 @@
   "info": {
     "title": "Hydraloop Device Manager - Local",
     "description": "Hydraloop Device Manager Local API description",
-    "version": "8.9.6",
+    "version": "8.9.8",
     "contact": {}
   },
   "tags": [],
@@ -3387,6 +3737,756 @@
       }
     },
     "schemas": {
+      "Permission": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["id", "name"]
+      },
+      "Role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "main": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "main",
+          "description",
+          "roles",
+          "permissions"
+        ]
+      },
+      "LoginUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "totpEnabled": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "enabled",
+          "username",
+          "password",
+          "totpEnabled",
+          "roles"
+        ]
+      },
+      "Person": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "givenname": {
+            "type": "string"
+          },
+          "surname": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber1": {
+            "type": "string"
+          },
+          "phoneNumber2": {
+            "type": "string"
+          },
+          "pipedrivePersonId": {
+            "type": "string"
+          },
+          "odooPersonId": {
+            "type": "string"
+          },
+          "odooUserId": {
+            "type": "string"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "organisationName": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "userEnabled": {
+            "type": "boolean"
+          },
+          "username": {
+            "type": "string"
+          },
+          "totpEnabled": {
+            "type": "boolean"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allBoundId": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "termsAndConditionsAccepted": {
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/LoginUser"
+          }
+        },
+        "required": [
+          "id",
+          "givenname",
+          "surname",
+          "displayName",
+          "email",
+          "phoneNumber1",
+          "phoneNumber2",
+          "pipedrivePersonId",
+          "odooPersonId",
+          "odooUserId",
+          "organisationId",
+          "organisationName",
+          "userId",
+          "userEnabled",
+          "username",
+          "totpEnabled",
+          "roles",
+          "allBoundId",
+          "enabled",
+          "termsAndConditionsAccepted",
+          "user"
+        ]
+      },
+      "Organisation": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string"
+          },
+          "parentName": {
+            "type": "string"
+          },
+          "address1": {
+            "type": "string"
+          },
+          "address2": {
+            "type": "string"
+          },
+          "address3": {
+            "type": "string"
+          },
+          "phoneNumber1": {
+            "type": "string"
+          },
+          "phoneNumber2": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "pipedriveOrganisationId": {
+            "type": "string"
+          },
+          "odooOrganisationId": {
+            "type": "string"
+          },
+          "primaryContactPerson": {
+            "type": "string"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "ownDivision": {
+            "type": "boolean"
+          },
+          "receiveTicketEmail": {
+            "type": "boolean"
+          },
+          "accountManagerId": {
+            "type": "string"
+          },
+          "accountManagerName": {
+            "type": "string"
+          },
+          "defaultAssigneeId": {
+            "type": "string"
+          },
+          "defaultAssigneeName": {
+            "type": "string"
+          },
+          "defaultSupervisorId": {
+            "type": "string"
+          },
+          "defaultSupervisorName": {
+            "type": "string"
+          },
+          "numberOfPersons": {
+            "type": "number"
+          },
+          "numberOfDevices": {
+            "type": "number"
+          },
+          "accountManager": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "parent": {
+            "$ref": "#/components/schemas/Organisation"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "parentId",
+          "parentName",
+          "address1",
+          "address2",
+          "address3",
+          "phoneNumber1",
+          "phoneNumber2",
+          "email",
+          "pipedriveOrganisationId",
+          "odooOrganisationId",
+          "primaryContactPerson",
+          "longitude",
+          "latitude",
+          "ownDivision",
+          "receiveTicketEmail",
+          "accountManagerId",
+          "accountManagerName",
+          "defaultAssigneeId",
+          "defaultAssigneeName",
+          "defaultSupervisorId",
+          "defaultSupervisorName",
+          "numberOfPersons",
+          "numberOfDevices",
+          "accountManager",
+          "parent"
+        ]
+      },
+      "DeviceStatus": {
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": "string"
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "hasNotice": {
+            "type": "boolean"
+          },
+          "noticeInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasMinorIssue": {
+            "type": "boolean"
+          },
+          "minorIssueInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasMajorIssue": {
+            "type": "boolean"
+          },
+          "majorIssueInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hasBlockingIssue": {
+            "type": "boolean"
+          },
+          "blockingInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "state": {
+            "type": "string"
+          },
+          "storedState": {
+            "type": "string"
+          },
+          "fieldTest": {
+            "type": "boolean"
+          },
+          "deviceForSpecialUseCases": {
+            "type": "boolean"
+          },
+          "hasAttentionRequired": {
+            "type": "boolean"
+          },
+          "attentionRequiredInfo": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "deviceId",
+          "online",
+          "hasNotice",
+          "noticeInfo",
+          "hasMinorIssue",
+          "minorIssueInfo",
+          "hasMajorIssue",
+          "majorIssueInfo",
+          "hasBlockingIssue",
+          "blockingInfo",
+          "state",
+          "storedState",
+          "fieldTest",
+          "deviceForSpecialUseCases",
+          "hasAttentionRequired",
+          "attentionRequiredInfo"
+        ]
+      },
+      "Device": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "ecuId": {
+            "type": "string"
+          },
+          "organisationId": {
+            "type": "string"
+          },
+          "organisationName": {
+            "type": "string"
+          },
+          "serial": {
+            "type": "string"
+          },
+          "serialAlias": {
+            "type": "string"
+          },
+          "ecuSerial": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "deviceVersion": {
+            "type": "string"
+          },
+          "deviceVersionAsBuild": {
+            "type": "string"
+          },
+          "deviceName": {
+            "type": "string"
+          },
+          "mac": {
+            "type": "string"
+          },
+          "ethernetMac": {
+            "type": "string"
+          },
+          "hardwareVersion": {
+            "type": "string"
+          },
+          "bootVersion": {
+            "type": "string"
+          },
+          "deviceTypeId": {
+            "type": "string"
+          },
+          "baseType": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "subType": {
+            "type": "string"
+          },
+          "voltage": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "address1": {
+            "type": "string"
+          },
+          "address2": {
+            "type": "string"
+          },
+          "postalCode": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "countryId": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "inletManifoldType": {
+            "type": "string"
+          },
+          "toilet": {
+            "type": "boolean"
+          },
+          "connectedToilets": {
+            "type": "number"
+          },
+          "washingMachine": {
+            "type": "boolean"
+          },
+          "auxiliary": {
+            "type": "boolean"
+          },
+          "auxiliaryOptionAvailable": {
+            "type": "boolean"
+          },
+          "hasTransferUpgradeKit": {
+            "type": "boolean"
+          },
+          "liftPumpBefore": {
+            "type": "boolean"
+          },
+          "liftPumpAfter": {
+            "type": "boolean"
+          },
+          "targetBranch": {
+            "type": "string"
+          },
+          "dealer": {
+            "type": "string"
+          },
+          "purchaseOrder": {
+            "type": "string"
+          },
+          "productionOrder": {
+            "type": "string"
+          },
+          "invoice": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "lastOnline": {
+            "type": "string"
+          },
+          "currentBranch": {
+            "type": "string"
+          },
+          "firmwareVersion": {
+            "type": "string"
+          },
+          "firmwareCoreVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "wifiVersion": {
+            "type": "string"
+          },
+          "manual": {
+            "type": "boolean"
+          },
+          "online": {
+            "type": "boolean"
+          },
+          "factoryTestCompletedDate": {
+            "type": "string"
+          },
+          "verificationDate": {
+            "type": "string"
+          },
+          "commissionDate": {
+            "type": "string"
+          },
+          "endOfWarranty": {
+            "type": "string"
+          },
+          "neighbourGroupId": {
+            "type": "string"
+          },
+          "neighbourGroupName": {
+            "type": "string"
+          },
+          "cascadeGroupId": {
+            "type": "string"
+          },
+          "cascadeGroupName": {
+            "type": "string"
+          },
+          "cascadeGroupConnectedT3": {
+            "type": "boolean"
+          },
+          "cascadeGroupExternalDistPump": {
+            "type": "boolean"
+          },
+          "cascadeGroupNumber": {
+            "type": "number"
+          },
+          "maintenancePeriod": {
+            "type": "number"
+          },
+          "nextMaintenanceDate": {
+            "type": "string"
+          },
+          "maintenancePlannedDate": {
+            "type": "string"
+          },
+          "lastMaintenanceDate": {
+            "type": "string"
+          },
+          "lastMaintenanceType": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "ownerId": {
+            "type": "string"
+          },
+          "ownerName": {
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/Person"
+          },
+          "neighborDevices": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Device"
+            }
+          },
+          "timezones": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "organisation": {
+            "$ref": "#/components/schemas/Organisation"
+          },
+          "organisations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "boardVersions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "settings": {
+            "type": "object"
+          },
+          "deviceStatus": {
+            "$ref": "#/components/schemas/DeviceStatus"
+          },
+          "localApiUrl": {
+            "type": "string"
+          },
+          "localServerId": {
+            "type": "string"
+          },
+          "kits": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "kitNumbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "vpnAddress": {
+            "type": "string"
+          },
+          "vpnAddressUpdated": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ecuId",
+          "organisationId",
+          "organisationName",
+          "serial",
+          "serialAlias",
+          "ecuSerial",
+          "alias",
+          "deviceVersion",
+          "deviceVersionAsBuild",
+          "deviceName",
+          "mac",
+          "ethernetMac",
+          "hardwareVersion",
+          "bootVersion",
+          "deviceTypeId",
+          "baseType",
+          "type",
+          "subType",
+          "voltage",
+          "color",
+          "status",
+          "address",
+          "address1",
+          "address2",
+          "postalCode",
+          "city",
+          "region",
+          "countryId",
+          "country",
+          "longitude",
+          "latitude",
+          "inletManifoldType",
+          "toilet",
+          "connectedToilets",
+          "washingMachine",
+          "auxiliary",
+          "auxiliaryOptionAvailable",
+          "hasTransferUpgradeKit",
+          "liftPumpBefore",
+          "liftPumpAfter",
+          "targetBranch",
+          "dealer",
+          "purchaseOrder",
+          "productionOrder",
+          "invoice",
+          "notes",
+          "lastOnline",
+          "currentBranch",
+          "firmwareVersion",
+          "firmwareCoreVersion",
+          "wifiVersion",
+          "manual",
+          "online",
+          "factoryTestCompletedDate",
+          "verificationDate",
+          "commissionDate",
+          "endOfWarranty",
+          "neighbourGroupId",
+          "neighbourGroupName",
+          "cascadeGroupId",
+          "cascadeGroupName",
+          "cascadeGroupConnectedT3",
+          "cascadeGroupExternalDistPump",
+          "cascadeGroupNumber",
+          "maintenancePeriod",
+          "nextMaintenanceDate",
+          "maintenancePlannedDate",
+          "lastMaintenanceDate",
+          "lastMaintenanceType",
+          "nickname",
+          "ownerId",
+          "ownerName",
+          "owner",
+          "organisation",
+          "organisations",
+          "boardVersions",
+          "settings",
+          "deviceStatus",
+          "localApiUrl",
+          "localServerId",
+          "kits",
+          "kitNumbers",
+          "vpnAddress",
+          "vpnAddressUpdated"
+        ]
+      },
       "GraphConfig": {
         "type": "object",
         "properties": {
@@ -4786,6 +5886,51 @@
       "ConsoleExecuteResult": {
         "type": "object",
         "properties": {}
+      },
+      "DynamicInput": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID of the dynamic graph type"
+          },
+          "time": {
+            "description": "ISO 8601 timestamp (UTC when no offset is supplied), or Unix time in milliseconds",
+            "oneOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "number"
+              }
+            ]
+          },
+          "value": {
+            "type": "number",
+            "description": "Numeric measurement; decimals and negative values are supported"
+          }
+        },
+        "required": ["type", "time", "value"]
+      },
+      "DynamicInputData": {
+        "type": "object",
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Device UUID"
+          },
+          "inputs": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DynamicInput"
+            }
+          }
+        },
+        "required": ["device_id", "inputs"]
       },
       "InputData": {
         "type": "object",
