@@ -444,7 +444,7 @@ export type T3State = {
 
 export type SupplyState = {
   pumping: boolean | undefined;
-  /** Water goes to the outlets, not around the circulation loop */
+  /** The pump pressurizes the outlets, also while it circulates through UV */
   toOutlets: boolean | undefined;
   source: "recycled" | "backup" | "unknown";
   toilet: boolean | undefined;
@@ -663,11 +663,18 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
       evidence: receivingFrom.map((s) => `Transfer ${s} open`),
     };
   } else if (circulating) {
+    const pumpOff = on(IO.distributionPump) === false;
     t3 = {
       ...t3Base,
-      label: "Circulating through UV",
+      label: pumpOff
+        ? "Circulation valve open, pump off"
+        : "Circulating through UV",
       confidence: "valve",
-      evidence: ["Circulation valve open", ...(uv ? ["UV on"] : [])],
+      evidence: [
+        "Circulation valve open",
+        ...(pumpOff ? ["Distribution pump off"] : []),
+        ...(uv ? ["UV on"] : []),
+      ],
     };
   } else {
     t3 = {
@@ -682,7 +689,7 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
   const pumping = on(IO.distributionPump);
   const supply: SupplyState = {
     pumping,
-    toOutlets: pumping === undefined ? undefined : pumping && !circulating,
+    toOutlets: pumping,
     source: backup === undefined ? "unknown" : backup ? "backup" : "recycled",
     toilet: on(IO.toilet),
     wash: on(IO.wash),

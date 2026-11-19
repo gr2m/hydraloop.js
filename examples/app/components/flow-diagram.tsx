@@ -807,11 +807,15 @@ export function FlowDiagram({
     );
   };
 
-  const t3ReceivingFromUv = t3.receivingFrom.length > 0 || t3.circulating;
   const backup = io[IO.backupWater];
   const recycledToPump = supply.pumping && supply.source !== "backup";
   const backupToPump = supply.pumping && supply.source === "backup";
   const circulatingThroughUv = t3.circulating && supply.pumping;
+  // Water only leaves UV-C for T3 while something feeds the chamber and the
+  // UV valve isn't closed.
+  const t3ReceivingFromUv =
+    (t3.receivingFrom.length > 0 || circulatingThroughUv) &&
+    io[IO.uvValve]?.on !== false;
   const outletKind: Kind = supply.source === "backup" ? "mains" : "clean";
   const off = (connected: boolean | null) =>
     connected === false ? " is-disconnected" : "";
