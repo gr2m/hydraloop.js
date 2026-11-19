@@ -1,4 +1,6 @@
-import { Fragment } from "react";
+"use client";
+
+import { Fragment, useState, type ReactNode } from "react";
 
 import {
   formatDuration,
@@ -33,6 +35,54 @@ export function ConfidenceTag({ confidence }: { confidence: Confidence }) {
     >
       {CONFIDENCE_LABELS[confidence]}
     </span>
+  );
+}
+
+/** A box of the panel. Its description is hidden until "?" is pressed */
+function StatusBlock({
+  id,
+  title,
+  confidence,
+  className,
+  description,
+  children,
+}: {
+  id: string;
+  title: string;
+  confidence: Confidence;
+  className?: string;
+  description?: ReactNode;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  return (
+    <section
+      className={className ? `status-block ${className}` : "status-block"}
+      aria-labelledby={id}
+    >
+      <div className="status-head">
+        <h3 id={id}>{title}</h3>
+        <ConfidenceTag confidence={confidence} />
+        {description && (
+          <button
+            type="button"
+            className="help-toggle"
+            aria-expanded={open}
+            aria-controls={`${id}-description`}
+            aria-label={`${open ? "Hide" : "Show"} description of ${title}`}
+            onClick={() => setOpen(!open)}
+          >
+            ?
+          </button>
+        )}
+      </div>
+      {description && open && (
+        <p id={`${id}-description`} className="status-evidence">
+          {description}
+        </p>
+      )}
+      {children}
+    </section>
   );
 }
 
@@ -80,11 +130,12 @@ function TrainStatus({ side, state }: { side: Side; state: DeviceState }) {
   const train = state.trains[side];
   const a = side === "A";
   return (
-    <section className="status-block" aria-labelledby={`train-${side}`}>
-      <div className="status-head">
-        <h3 id={`train-${side}`}>Train {side}</h3>
-        <ConfidenceTag confidence={train.confidence} />
-      </div>
+    <StatusBlock
+      id={`train-${side}`}
+      title={`Train ${side}`}
+      confidence={train.confidence}
+      description={[train.detail, ...train.evidence].filter(Boolean).join(", ")}
+    >
       <p className={`status-phase phase-${train.phase}`}>
         {train.label}
         {train.since !== undefined && (
@@ -93,9 +144,6 @@ function TrainStatus({ side, state }: { side: Side; state: DeviceState }) {
             for {formatDuration(state.t - train.since)}
           </span>
         )}
-      </p>
-      <p className="status-evidence">
-        {[train.detail, ...train.evidence].filter(Boolean).join(", ")}
       </p>
       <LevelRow label="T1" level={state.tanks[a ? "t1a" : "t1b"]} />
       <LevelRow label="T2" level={state.tanks[a ? "t2a" : "t2b"]} />
@@ -117,7 +165,7 @@ function TrainStatus({ side, state }: { side: Side; state: DeviceState }) {
         <dt>Transfer</dt>
         <dd>{ago(state.t, train.lastTransfer)}</dd>
       </dl>
-    </section>
+    </StatusBlock>
   );
 }
 
@@ -126,11 +174,20 @@ function NextFilthRemoval({ state }: { state: DeviceState }) {
   const train = filling && state.room.trains[filling];
   const liters = train?.accepting ? train.liters : undefined;
   return (
-    <section className="status-block room" aria-labelledby="next-heading">
-      <div className="status-head">
-        <h3 id="next-heading">Greywater until filth removal</h3>
-        <ConfidenceTag confidence="inferred" />
-      </div>
+    <StatusBlock
+      id="next-heading"
+      title="Greywater until filth removal"
+      confidence="inferred"
+      className="room"
+      description={
+        <>
+          After greywater stops, the train starts filth removal within about 10
+          minutes once T2 holds about 134 L, at about {TRAIN_FULL_LITERS.A} L
+          (A) or {TRAIN_FULL_LITERS.B} L (B) in T1 + T2. About 6 hours later it
+          has transferred about 100 L to T3.
+        </>
+      }
+    >
       <p className="room-value">
         {!train
           ? "Unknown"
@@ -153,24 +210,26 @@ function NextFilthRemoval({ state }: { state: DeviceState }) {
           </>
         )}
       </dl>
-      <p className="status-evidence">
-        After greywater stops, the train starts filth removal within about 10
-        minutes once T2 holds about 134 L, at about {TRAIN_FULL_LITERS.A} L (A)
-        or {TRAIN_FULL_LITERS.B} L (B) in T1 + T2. About 6 hours later it has
-        transferred about 100 L to T3.
-      </p>
-    </section>
+    </StatusBlock>
   );
 }
 
 function RoomSummary({ state }: { state: DeviceState }) {
   const { room } = state;
   return (
-    <section className="status-block room" aria-labelledby="room-heading">
-      <div className="status-head">
-        <h3 id="room-heading">Room for greywater</h3>
-        <ConfidenceTag confidence="inferred" />
-      </div>
+    <StatusBlock
+      id="room-heading"
+      title="Room for greywater"
+      confidence="inferred"
+      className="room"
+      description={
+        <>
+          A train counts as full at about {TRAIN_FULL_LITERS.A} L (A) or{" "}
+          {TRAIN_FULL_LITERS.B} L (B), in T1 + T2 measured while vented. It then
+          starts filth removal and takes no water until it is done.
+        </>
+      }
+    >
       <p className="room-value">
         {room.liters === undefined
           ? "Unknown"
@@ -205,12 +264,7 @@ function RoomSummary({ state }: { state: DeviceState }) {
           );
         })}
       </dl>
-      <p className="status-evidence">
-        A train counts as full at about {TRAIN_FULL_LITERS.A} L (A) or{" "}
-        {TRAIN_FULL_LITERS.B} L (B), in T1 + T2 measured while vented. It then
-        starts filth removal and takes no water until it is done.
-      </p>
-    </section>
+    </StatusBlock>
   );
 }
 
@@ -228,13 +282,13 @@ export function StatusPanel({ state }: { state: DeviceState }) {
       <TrainStatus side="A" state={state} />
       <TrainStatus side="B" state={state} />
 
-      <section className="status-block" aria-labelledby="t3-status">
-        <div className="status-head">
-          <h3 id="t3-status">Storage and outlets</h3>
-          <ConfidenceTag confidence={t3.confidence} />
-        </div>
+      <StatusBlock
+        id="t3-status"
+        title="Storage and outlets"
+        confidence={t3.confidence}
+        description={t3.evidence.join(", ")}
+      >
         <p className="status-phase">{t3.label}</p>
-        <p className="status-evidence">{t3.evidence.join(", ")}</p>
         <LevelRow label="T3" level={state.tanks.t3} />
         <dl className="status-facts">
           <dt>Supply</dt>
@@ -280,7 +334,7 @@ export function StatusPanel({ state }: { state: DeviceState }) {
             </>
           )}
         </dl>
-      </section>
+      </StatusBlock>
     </div>
   );
 }

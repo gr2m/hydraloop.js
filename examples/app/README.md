@@ -22,9 +22,9 @@ And for the last 30 days (see [30-day statistics](#30-day-statistics)):
 
 **Live** (`/live`) refreshes every 10 seconds and shows:
 
-- A flow diagram of both treatment trains (T1 and T2 for A and B), UV-C, T3 storage, T4 backup and the outlets. Tanks show their fill level in liters. Pipes are colored and animated only while a valve or pump signal shows water moving through them. Hover any valve, pump or tank for its raw value.
+- A flow diagram of both treatment trains (T1 and T2 for A and B), UV-C, T3 storage, T4 backup and the outlets. Tanks show their fill level in liters. Pipes are colored and animated only while a valve or pump signal shows water moving through them, and drawn with more contrast while their valves are open without water moving. The pipes from the distribution pump to the outlets are always pressurized, so they are always drawn open. On/off valves are parallel to their pipe while open and across it while closed. The bypass and A/B valves are triangles pointing to their inlet, filled where the water flows through them to the open outlet. Pump impellers spin while the pump runs. Hover any valve, pump or tank for its raw value.
 - The state of each train (the HDM routine and its sub-state), of storage and of the outlets, and when each train last received water and transferred to T3. Each state says how it was determined: **HDM routine**, **Valve signal**, or **Inferred**.
-- Key events of the last hour (routines, firmware behaviors and key valves), and all raw signals.
+- All raw signals.
 
 **History** (`/history`) shows 6 hours to 7 days:
 

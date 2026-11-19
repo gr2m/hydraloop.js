@@ -2,9 +2,8 @@
 
 import { useMemo } from "react";
 
-import { deviceEvents, stateAt, type Dataset } from "@/lib/model";
+import { stateAt, type Dataset } from "@/lib/model";
 
-import { EventTable } from "./event-table";
 import { DiagramLegend, FlowDiagram, FlowSummary } from "./flow-diagram";
 import { SignalTable } from "./signal-table";
 import { SessionKeepAlive } from "./session-keep-alive";
@@ -20,7 +19,6 @@ export function LiveDashboard({ initial }: { initial: Dataset }) {
     () => stateAt(dataset, latest ?? dataset.until),
     [dataset, latest],
   );
-  const events = useMemo(() => deviceEvents(dataset), [dataset]);
 
   return (
     <>
@@ -48,11 +46,6 @@ export function LiveDashboard({ initial }: { initial: Dataset }) {
           </figure>
           <StatusPanel state={state} />
         </div>
-
-        <section className="section" aria-labelledby="events-heading">
-          <h2 id="events-heading">Last 8 hours</h2>
-          <EventTable events={events} caption="Events in the last 8 hours" />
-        </section>
 
         <section className="section" aria-labelledby="signals-heading">
           <h2 id="signals-heading" className="sr-only">
