@@ -1,6 +1,7 @@
 // Schematic of the H600: inlet, two treatment trains, UV, storage, backup
 // and outlets. Pipes are colored and animated only while a routine, valve,
-// pump or sensor signal shows water moving through them.
+// pump or sensor signal shows water moving through them. Pipes that their
+// valves leave open, but without water moving, are drawn with more contrast.
 
 import {
   caption,
@@ -27,28 +28,34 @@ function Pipe({
   d,
   kind,
   active,
-  unknown = false,
-  bridge = false,
+  open = false,
+  square = false,
   arrow,
   title,
 }: {
   d: string;
   kind: Kind;
   active: boolean | undefined;
-  unknown?: boolean;
-  /** Draw a gap where this pipe crosses pipes drawn before it */
-  bridge?: boolean;
+  /** The valves on this pipe are open, so water can move through it */
+  open?: boolean;
+  /** Square ends, for pipes that end at a distributor */
+  square?: boolean;
   /** Draw an outlet arrow at this point, pointing in this direction */
   arrow?: { x: number; y: number; dir: "down" | "right" | "left" };
   /** Tooltip, for pipes without a valve or pump */
   title?: string;
 }) {
   const state =
-    unknown || active === undefined ? "unknown" : active ? "active" : "idle";
+    active === undefined
+      ? "unknown"
+      : active
+        ? "active"
+        : open
+          ? "open"
+          : "idle";
   return (
-    <g className={`pipe kind-${kind} is-${state}`}>
+    <g className={`pipe kind-${kind} is-${state}${square ? " is-square" : ""}`}>
       {title && <title>{title}</title>}
-      {bridge && <path d={d} className="pipe-bridge" />}
       <path d={d} className="pipe-base" />
       {state === "active" && <path d={d} className="pipe-flow" />}
       {arrow && (
@@ -78,12 +85,14 @@ function ioTitle(
   return `${label}: ${io.on ? words[0] : words[1]}${since} (${name} = ${io.value})`;
 }
 
+/** An on/off valve. Parallel to the pipe while open, across it while closed */
 function Valve({
   x,
   y,
   vertical = false,
   kind,
   io,
+  active = false,
   name,
   label,
   labelAnchor = "start",
@@ -95,6 +104,8 @@ function Valve({
   vertical?: boolean;
   kind: Kind;
   io: IoValue | undefined;
+  /** Water is moving through the valve */
+  active?: boolean;
   name: string;
   label: string;
   labelAnchor?: "start" | "middle" | "end";
@@ -103,30 +114,32 @@ function Valve({
 }) {
   const state = io === undefined ? "unknown" : io.on ? "open" : "closed";
   const s = 10;
-  const points = vertical
-    ? [
-        `${x - 8},${y - s} ${x + 8},${y - s} ${x},${y}`,
-        `${x - 8},${y + s} ${x + 8},${y + s} ${x},${y}`,
-      ]
-    : [
-        `${x - s},${y - 8} ${x - s},${y + 8} ${x},${y}`,
-        `${x + s},${y - 8} ${x + s},${y + 8} ${x},${y}`,
-      ];
+  // Unknown valves are drawn half-way, neither open nor closed
+  const angle =
+    (vertical ? 90 : 0) + (state === "open" ? 0 : state === "closed" ? 90 : 45);
   const title = ioTitle(label || caption({}, name), name, io, [
     "open",
     "closed",
   ]);
   return (
     <g
-      className={`valve kind-${kind} is-${state}`}
+      className={`valve kind-${kind} is-${state}${state === "open" && active ? " is-flowing" : ""}`}
       tabIndex={0}
       role="img"
       aria-label={title}
     >
       <title suppressHydrationWarning>{title}</title>
       <rect x={x - 14} y={y - 14} width={28} height={28} className="hit" />
-      <polygon points={points[0]} />
-      <polygon points={points[1]} />
+      <g
+        className="valve-body"
+        style={{
+          transform: `rotate(${angle}deg)`,
+          transformOrigin: `${x}px ${y}px`,
+        }}
+      >
+        <polygon points={`${x - s},${y - 8} ${x - s},${y + 8} ${x},${y}`} />
+        <polygon points={`${x + s},${y - 8} ${x + s},${y + 8} ${x},${y}`} />
+      </g>
       {label && (
         <text
           x={x + labelDx}
@@ -141,37 +154,182 @@ function Valve({
   );
 }
 
+type Outlet = {
+  /** undefined while the valve state is unknown */
+  open: boolean | undefined;
+  /** Water is moving through this outlet */
+  active: boolean;
+};
+
+/** Half the width of a pipe */
+const PIPE = 3.5;
+/** Height of a distributor triangle, from its tip to its base */
+const DISTRIBUTOR = 24;
+
+/**
+ * Where the pipes of a distributor at (x, y) end: the pipes cross at (x, y)
+ * and end where the triangle is as wide as a pipe
+ */
+function distributorEnds(x: number, y: number, inlet: "up" | "left") {
+  const d = DISTRIBUTOR - 2 * PIPE;
+  return inlet === "up"
+    ? { inlet: y - d, outlets: [x - d, x + d] }
+    : { inlet: x - d, outlets: [y + d, y - d] };
+}
+
+/**
+ * A valve with one inlet and two outlets, drawn as a triangle with its tip
+ * at the inlet and its other tips at the outlets. Its pipes cross at (x, y),
+ * the inlet comes from above or from the left. The water flows through the
+ * part of the triangle between the outer borders of the inlet pipe and the
+ * open outlet's pipe, so it lines up with both. The rest is an outline.
+ */
+function Distributor({
+  x,
+  y,
+  inlet = "up",
+  kind,
+  io,
+  name,
+  label,
+  words,
+  outlets,
+  labelAnchor = "middle",
+  labelDx = 0,
+  labelDy = 4,
+}: {
+  x: number;
+  y: number;
+  inlet?: "up" | "left";
+  kind: Kind;
+  io: IoValue | undefined;
+  name: string;
+  label: string;
+  /** What the valve does while on and off */
+  words: [string, string];
+  /** Left and right, or top and bottom with the inlet on the left */
+  outlets: [Outlet, Outlet];
+  labelAnchor?: "start" | "middle" | "end";
+  labelDx?: number;
+  labelDy?: number;
+}) {
+  const p = PIPE;
+  const w = DISTRIBUTOR;
+  // Drawn with the inlet above, then turned for an inlet on the left
+  const up = inlet === "up";
+  const at = ([dx, dy]: [number, number]) =>
+    up ? `${x + dx},${y + dy}` : `${x + dy},${y - dx}`;
+  const shape = (points: [number, number][]) => points.map(at).join(" ");
+  // With the inlet on the left, the left outlet turns to the bottom
+  const [left, right] = up ? outlets : [outlets[1], outlets[0]];
+  const state = (outlet: Outlet) =>
+    outlet.open === undefined
+      ? "unknown"
+      : !outlet.open
+        ? "closed"
+        : outlet.active
+          ? "flowing"
+          : "open";
+  const open = left.open ? -1 : right.open ? 1 : 0;
+  const title = ioTitle(label, name, io, words);
+  return (
+    <g
+      className={`distributor kind-${kind}`}
+      tabIndex={0}
+      role="img"
+      aria-label={title}
+    >
+      <title suppressHydrationWarning>{title}</title>
+      <rect
+        x={up ? x - w - 4 : x + p - w - 4}
+        y={up ? y + p - w - 4 : y - w - 4}
+        width={up ? 2 * w + 8 : w + 8}
+        height={up ? w + 8 : 2 * w + 8}
+        className="hit"
+      />
+      <g className="valve-body">
+        {open === 0 || left.open === undefined ? (
+          <polygon
+            points={shape([
+              [0, p - w],
+              [-w, p],
+              [w, p],
+            ])}
+            className={`is-${state(left)}`}
+          />
+        ) : (
+          <>
+            {/* The open side, from the far border of the inlet pipe */}
+            <polygon
+              points={shape([
+                [open * w, p],
+                [0, p - w],
+                [-open * p, 2 * p - w],
+                [-open * p, p],
+              ])}
+              className={`is-${state(open < 0 ? left : right)}`}
+            />
+            {/* What is left on the closed side */}
+            <polygon
+              points={shape([
+                [-open * p, 2 * p - w],
+                [-open * w, p],
+                [-open * p, p],
+              ])}
+              className="is-closed"
+            />
+          </>
+        )}
+      </g>
+      <text
+        x={x + labelDx}
+        y={y + labelDy}
+        textAnchor={labelAnchor}
+        className="diagram-label"
+      >
+        {label}
+      </text>
+    </g>
+  );
+}
+
+/** Curved impeller blades around (0, 0), from the hub out to radius r */
+function impellerPath(r: number) {
+  const hub = r * 0.3;
+  const point = (a: number, d: number) =>
+    `${(d * Math.cos(a)).toFixed(2)} ${(d * Math.sin(a)).toFixed(2)}`;
+  return Array.from({ length: 6 }, (_, i) => {
+    const a = (i * Math.PI) / 3;
+    return `M${point(a, hub)} Q${point(a + 0.2, r * 0.7)} ${point(a + 0.75, r)}`;
+  }).join(" ");
+}
+
+/** A pump: an impeller in its casing, spinning while the pump runs */
 function Pump({
   x,
   y,
   r = 15,
-  dir,
   kind,
   io,
   name,
   label,
   labelAnchor = "start",
   labelDx = 22,
+  labelDy = 4,
 }: {
   x: number;
   y: number;
   r?: number;
-  dir: "up" | "down" | "right";
   kind: Kind;
   io: IoValue | undefined;
   name: string;
   label: string;
   labelAnchor?: "start" | "end";
   labelDx?: number;
+  labelDy?: number;
 }) {
   const state = io === undefined ? "unknown" : io.on ? "on" : "off";
-  const t = r * 0.55;
-  const triangle =
-    dir === "up"
-      ? `${x - t},${y + t * 0.6} ${x + t},${y + t * 0.6} ${x},${y - t}`
-      : dir === "down"
-        ? `${x - t},${y - t * 0.6} ${x + t},${y - t * 0.6} ${x},${y + t}`
-        : `${x - t * 0.6},${y - t} ${x - t * 0.6},${y + t} ${x + t},${y}`;
+  const blades = r * 0.72;
   const title = ioTitle(label, name, io, ["running", "off"]);
   return (
     <g
@@ -181,11 +339,18 @@ function Pump({
       aria-label={title}
     >
       <title suppressHydrationWarning>{title}</title>
-      <circle cx={x} cy={y} r={r} />
-      <polygon points={triangle} />
+      <circle cx={x} cy={y} r={r} className="pump-casing" />
+      <g transform={`translate(${x} ${y})`}>
+        <g className="impeller">
+          {/* Centers the box the impeller spins around */}
+          <circle r={blades + 1} className="impeller-box" />
+          <path d={impellerPath(blades)} className="impeller-blades" />
+          <circle r={r * 0.22} className="impeller-hub" />
+        </g>
+      </g>
       <text
         x={x + (labelAnchor === "end" ? -labelDx : labelDx)}
-        y={y + 4}
+        y={y + labelDy}
         textAnchor={labelAnchor}
         className="diagram-label"
       >
@@ -483,6 +648,11 @@ export function FlowDiagram({
   device: DeviceInfo;
 }) {
   const { io, tanks, inlet, supply, t3 } = state;
+  const ab = io[IO.abSelector];
+  const selected: Side | undefined = ab ? (ab.on ? "B" : "A") : undefined;
+  const bypass = io[IO.bypass];
+  const bypassEnds = distributorEnds(500, 24, "left");
+  const abEnds = distributorEnds(500, 100, "up");
 
   const train = (side: Side) => {
     const a = side === "A";
@@ -496,6 +666,7 @@ export function FlowDiagram({
     const bubbles = io[sideIo("bubbles_block", side)];
     const receiving = inlet.receiving.includes(side);
     const drainX = a ? 30 : 970;
+    const transferring = transfer?.on;
     const skimming = state.trains[side].skimming;
     return (
       <g key={side}>
@@ -510,9 +681,15 @@ export function FlowDiagram({
 
         {/* Inlet, active during INCOMING_WATER into the A/B valve's train */}
         <Pipe
-          d={a ? "M486 100 H150 V190" : "M514 100 H850 V190"}
+          d={
+            a
+              ? `M${abEnds.outlets[0]} 100 H150 V190`
+              : `M${abEnds.outlets[1]} 100 H850 V190`
+          }
           kind="grey"
           active={receiving}
+          open={selected === side}
+          square
         />
 
         {/* Air pump into T2 */}
@@ -521,7 +698,6 @@ export function FlowDiagram({
           x={t2c}
           y={136}
           r={13}
-          dir="down"
           kind="air"
           io={air}
           name={sideIo("air_pump", side)}
@@ -582,12 +758,14 @@ export function FlowDiagram({
           d={`M${t1c} 360 V410 H${drainX}`}
           kind="waste"
           active={waste?.on}
+          open={waste?.on}
         />
         {/* Shared by the skim overflow and the waste valve */}
         <Pipe
           d={`M${drainX} 410 V470`}
           kind="waste"
           active={skimming || waste?.on}
+          open={waste?.on}
           arrow={{ x: drainX, y: 470, dir: "down" }}
         />
         <Valve
@@ -596,6 +774,7 @@ export function FlowDiagram({
           vertical
           kind="waste"
           io={waste}
+          active={waste?.on}
           name={sideIo("waste_clean_tank", side)}
           label="Waste"
           labelAnchor={a ? "end" : "start"}
@@ -609,7 +788,8 @@ export function FlowDiagram({
         <Pipe
           d={a ? `M${t2c} 360 V420 H488 V440` : `M${t2c} 360 V420 H512 V440`}
           kind="clean"
-          active={transfer?.on}
+          active={transferring}
+          open={transferring}
         />
         <Valve
           x={t2c}
@@ -617,6 +797,7 @@ export function FlowDiagram({
           vertical
           kind="clean"
           io={transfer}
+          active={transferring}
           name={sideIo("transfer_path", side)}
           label="Transfer"
           labelAnchor={a ? "start" : "end"}
@@ -626,15 +807,18 @@ export function FlowDiagram({
     );
   };
 
+  const t3ReceivingFromUv = t3.receivingFrom.length > 0 || t3.circulating;
+  const backup = io[IO.backupWater];
   const recycledToPump = supply.pumping && supply.source !== "backup";
   const backupToPump = supply.pumping && supply.source === "backup";
+  const circulatingThroughUv = t3.circulating && supply.pumping;
   const outletKind: Kind = supply.source === "backup" ? "mains" : "clean";
   const off = (connected: boolean | null) =>
     connected === false ? " is-disconnected" : "";
 
   return (
     <svg
-      viewBox="0 0 1000 815"
+      viewBox="0 -38 1000 853"
       className="flow-diagram"
       role="group"
       aria-label="Water flow through the H600"
@@ -652,62 +836,84 @@ export function FlowDiagram({
       </defs>
 
       {/* Inlet and bypass */}
-      <text
-        x={500}
-        y={16}
-        textAnchor="middle"
-        className="diagram-label is-strong"
-      >
+      <text x={60} y={10} className="diagram-label is-strong">
         Greywater from showers and baths
       </text>
       <Pipe
-        d="M500 26 V90"
+        d={`M60 24 H${bypassEnds.inlet}`}
         kind="grey"
         active={inlet.receiving.length > 0 || inlet.bypass}
+        open={bypass?.on || (bypass?.on === false && selected !== undefined)}
+        square
       />
       <Pipe
-        d="M500 58 H935"
+        d={`M500 ${bypassEnds.outlets[0]} V${abEnds.inlet}`}
+        kind="grey"
+        active={inlet.receiving.length > 0}
+        open={bypass?.on === false && selected !== undefined}
+        square
+      />
+      <Pipe
+        d={`M500 ${bypassEnds.outlets[1]} V-22 H935`}
         kind="grey"
         active={inlet.bypass}
-        arrow={{ x: 935, y: 58, dir: "right" }}
+        open={bypass?.on}
+        square
+        arrow={{ x: 935, y: -22, dir: "right" }}
       />
-      <Valve
-        x={700}
-        y={58}
+      <Distributor
+        x={500}
+        y={24}
+        inlet="left"
         kind="grey"
-        io={io[IO.bypass]}
+        io={bypass}
         name={IO.bypass}
         label="Bypass"
-        labelAnchor="middle"
-        labelDx={0}
-        labelDy={-16}
+        words={["to the sewer", "to the trains"]}
+        outlets={[
+          { open: bypass?.on, active: inlet.bypass === true },
+          {
+            open: bypass && !bypass.on,
+            active: inlet.receiving.length > 0,
+          },
+        ]}
+        labelAnchor="start"
+        labelDx={14}
       />
-      <text x={948} y={62} className="diagram-label">
+      <text x={948} y={-18} className="diagram-label">
         Sewer
       </text>
 
       {train("A")}
       {train("B")}
 
-      {/* The A/B valve does not follow incoming water, so it is shown
-          without a direction */}
-      <Valve
+      <Distributor
         x={500}
         y={100}
         kind="grey"
-        io={io[IO.abSelector]}
+        io={ab}
         name={IO.abSelector}
         label="A/B valve"
-        labelAnchor="middle"
-        labelDx={0}
-        labelDy={30}
+        words={["to train B", "to train A"]}
+        outlets={[
+          {
+            open: selected && selected === "A",
+            active: inlet.receiving.includes("A"),
+          },
+          {
+            open: selected && selected === "B",
+            active: inlet.receiving.includes("B"),
+          },
+        ]}
+        labelDy={24}
       />
 
       {/* UV and into T3 */}
       <Pipe
         d="M500 474 V530"
         kind="clean"
-        active={t3.receivingFrom.length > 0 || t3.circulating}
+        active={t3ReceivingFromUv}
+        open={io[IO.uvValve]?.on}
       />
       <g
         className={`uv is-${t3.uv === undefined ? "unknown" : t3.uv ? "on" : "off"}`}
@@ -729,6 +935,7 @@ export function FlowDiagram({
         vertical
         kind="clean"
         io={io[IO.uvValve]}
+        active={t3ReceivingFromUv}
         name={IO.uvValve}
         label="UV valve"
       />
@@ -749,6 +956,7 @@ export function FlowDiagram({
         d="M640 640 V680 H970 V735"
         kind="waste"
         active={t3.draining}
+        open={io[IO.wasteStorageTank]?.on}
         arrow={{ x: 970, y: 735, dir: "down" }}
       />
       <Valve
@@ -756,6 +964,7 @@ export function FlowDiagram({
         y={680}
         kind="waste"
         io={io[IO.wasteStorageTank]}
+        active={t3.draining}
         name={IO.wasteStorageTank}
         label="T3 drain"
         labelAnchor="middle"
@@ -766,21 +975,20 @@ export function FlowDiagram({
         Drain
       </text>
 
-      {/* T4 backup, filled from mains through an air gap */}
-      <Pipe d="M115 470 V522" kind="mains" active={undefined} unknown />
-      <text x={127} y={486} className="diagram-label">
-        Mains
-      </text>
-      <text x={127} y={502} className="diagram-label is-muted">
-        air gap
-      </text>
+      {/* T4 backup */}
       <BackupTank x={60} y={540} w={130} h={100} state={state} />
-      <Pipe d="M115 640 V680 H250" kind="mains" active={backupToPump} />
+      <Pipe
+        d="M115 640 V680 H244"
+        kind="mains"
+        active={backupToPump}
+        open={backup?.on}
+      />
       <Valve
         x={185}
         y={680}
         kind="mains"
-        io={io[IO.backupWater]}
+        io={backup}
+        active={backupToPump}
         name={IO.backupWater}
         label="Backup"
         labelAnchor="middle"
@@ -788,23 +996,28 @@ export function FlowDiagram({
         labelDy={-16}
       />
 
-      {/* T3 to the distribution pump */}
-      <Pipe d="M360 640 V680 H270" kind="clean" active={recycledToPump} />
-      <Pipe d="M260 680 V704" kind={outletKind} active={supply.pumping} />
+      {/* T3 to the distribution pump, unless the outlets get backup water */}
+      <Pipe
+        d="M360 640 V680 H276"
+        kind="clean"
+        active={recycledToPump}
+        open={backup?.on === false}
+      />
 
       {/* Circulation: the distribution pump pushes T3 water through UV */}
       <Pipe
-        d="M276 720 H312 V465 H460"
+        d="M260 664 V465 H460"
         kind="clean"
-        active={t3.circulating && supply.pumping}
-        bridge
+        active={circulatingThroughUv}
+        open={t3.circulating}
       />
       <Valve
-        x={312}
-        y={590}
+        x={260}
+        y={500}
         vertical
         kind="clean"
         io={io[IO.circulation]}
+        active={circulatingThroughUv}
         name={IO.circulation}
         label="Circulation"
         labelAnchor="end"
@@ -813,25 +1026,36 @@ export function FlowDiagram({
 
       <Pump
         x={260}
-        y={720}
+        y={680}
         r={16}
-        dir="down"
         kind={outletKind}
         io={io[IO.distributionPump]}
         name={IO.distributionPump}
         label="Distribution"
-        labelAnchor="end"
-        labelDx={24}
+        labelDx={20}
+        labelDy={26}
       />
 
-      {/* Outlets, active by their demand sensor */}
-      <Pipe d="M260 736 V760" kind={outletKind} active={supply.toOutlets} />
-      <Pipe d="M150 760 H360" kind={outletKind} active={supply.toOutlets} />
+      {/* Outlets, active by their demand sensor. The pipes to them are always
+          pressurized, from T3 or T4, so they are open even without a reading */}
+      <Pipe
+        d="M260 696 V760"
+        kind={outletKind}
+        active={supply.toOutlets ?? false}
+        open
+      />
+      <Pipe
+        d="M150 760 H360"
+        kind={outletKind}
+        active={supply.toOutlets ?? false}
+        open
+      />
       <g className={`outlet${off(device.outlets.toilet)}`}>
         <Pipe
           d="M150 760 V782"
           kind={outletKind}
-          active={supply.toilet}
+          active={supply.toilet ?? false}
+          open
           arrow={{ x: 150, y: 782, dir: "down" }}
         />
         <Sensor
@@ -850,7 +1074,8 @@ export function FlowDiagram({
         <Pipe
           d="M260 760 V782"
           kind={outletKind}
-          active={supply.wash}
+          active={supply.wash ?? false}
+          open
           arrow={{ x: 260, y: 782, dir: "down" }}
         />
         <Sensor
@@ -870,6 +1095,7 @@ export function FlowDiagram({
           d="M360 760 H440 V782"
           kind={outletKind}
           active={supply.auxiliary}
+          open={io[IO.auxiliary]?.on}
           arrow={{ x: 440, y: 782, dir: "down" }}
         />
         <Valve
@@ -877,6 +1103,7 @@ export function FlowDiagram({
           y={760}
           kind={outletKind}
           io={io[IO.auxiliary]}
+          active={supply.auxiliary}
           name={IO.auxiliary}
           label=""
         />
@@ -893,8 +1120,6 @@ export function DiagramLegend() {
     ["grey", "Greywater"],
     ["clean", "Treated water"],
     ["mains", "Mains backup"],
-    ["waste", "To drain"],
-    ["air", "Air"],
   ];
   return (
     <ul className="legend" aria-label="Legend">
@@ -905,12 +1130,12 @@ export function DiagramLegend() {
         </li>
       ))}
       <li>
-        <span className="legend-swatch is-idle" />
-        No flow
+        <span className="legend-swatch is-open" />
+        Open, no flow
       </li>
       <li>
-        <span className="legend-swatch is-unknown" />
-        Not measured
+        <span className="legend-swatch is-idle" />
+        No flow
       </li>
     </ul>
   );

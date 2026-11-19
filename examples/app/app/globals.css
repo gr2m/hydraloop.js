@@ -18,6 +18,7 @@
   --air: #8f8f8f;
   --uv: #7c3aed;
   --pipe-idle: #e6e6e6;
+  --pipe-open: #a8a8a8;
 
   --online: #16893f;
   --offline: #d93036;
@@ -47,6 +48,7 @@
     --air: #8f8f8f;
     --uv: #a78bfa;
     --pipe-idle: #262626;
+    --pipe-open: #5c5c5c;
 
     --online: #4cc274;
     --offline: #ff6166;
@@ -74,6 +76,7 @@
   --water-waste: #c99572;
   --uv: #a78bfa;
   --pipe-idle: #262626;
+  --pipe-open: #5c5c5c;
   --online: #4cc274;
   --offline: #ff6166;
   --warn-bg: #2a2110;
@@ -526,58 +529,75 @@ tr.is-selectable:hover td {
 .legend-swatch.is-idle {
   background: var(--pipe-idle);
 }
-.legend-swatch.is-unknown {
-  height: 0;
-  border-top: 3px dotted var(--border-strong);
-  border-radius: 0;
-  background: none;
+.legend-swatch.is-open {
+  background: var(--pipe-open);
 }
 
 .status-panel {
   display: grid;
-  gap: 28px;
+  gap: 16px;
 }
 .status-block + .status-block {
   border-top: 1px solid var(--border);
-  padding-top: 24px;
+  padding-top: 14px;
 }
 .status-head {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
 }
 .status-head h3 {
+  margin-right: auto;
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);
 }
+.help-toggle {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--bg);
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: center;
+  cursor: pointer;
+}
+.help-toggle:hover {
+  color: var(--fg);
+  border-color: var(--fg);
+}
+.help-toggle[aria-expanded="true"] {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+}
 .room-value {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
-  margin-top: 4px;
-}
-.room .status-evidence {
-  margin: 12px 0 0;
+  margin-top: 2px;
 }
 .status-phase {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: -0.01em;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 .status-phase .muted {
   font-weight: 400;
-  font-size: 15px;
+  font-size: 14px;
   letter-spacing: 0;
 }
 .status-evidence {
   color: var(--muted);
   font-size: 13px;
-  margin: 2px 0 12px;
-  min-height: 1.5em;
+  margin: 4px 0 0;
 }
 
 .level-row {
@@ -587,7 +607,7 @@ tr.is-selectable:hover td {
   gap: 10px;
   font-size: 13px;
   font-variant-numeric: tabular-nums;
-  margin: 6px 0;
+  margin: 4px 0;
 }
 .level-label {
   font-weight: 500;
@@ -616,8 +636,8 @@ tr.is-selectable:hover td {
 .status-facts {
   display: grid;
   grid-template-columns: 100px minmax(0, 1fr);
-  gap: 4px 12px;
-  margin: 12px 0 0;
+  gap: 2px 12px;
+  margin: 8px 0 0;
   font-size: 13px;
 }
 .status-facts dt {
@@ -641,7 +661,8 @@ tr.is-selectable:hover td {
 .flow-diagram [tabindex]:focus-visible {
   outline: none;
 }
-.flow-diagram [tabindex]:focus-visible > :is(circle, polygon, rect:not(.hit)) {
+.flow-diagram [tabindex]:focus-visible > :is(circle, polygon, rect:not(.hit)),
+.flow-diagram [tabindex]:focus-visible > .valve-body > polygon {
   stroke: var(--focus);
   stroke-width: 2.5;
 }
@@ -653,8 +674,14 @@ tr.is-selectable:hover td {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.pipe.is-square :is(.pipe-base, .pipe-flow) {
+  stroke-linecap: butt;
+}
 .pipe.kind-air .pipe-base {
   stroke-width: 3;
+}
+.pipe.is-open .pipe-base {
+  stroke: var(--pipe-open);
 }
 .pipe.is-active .pipe-base {
   stroke: var(--k);
@@ -663,11 +690,6 @@ tr.is-selectable:hover td {
   stroke: var(--border-strong);
   stroke-width: 3;
   stroke-dasharray: 0.5 7;
-}
-.pipe-bridge {
-  fill: none;
-  stroke: var(--bg);
-  stroke-width: 15;
 }
 .pipe-flow {
   fill: none;
@@ -683,6 +705,9 @@ tr.is-selectable:hover td {
 }
 .pipe-arrow {
   fill: var(--pipe-idle);
+}
+.pipe.is-open .pipe-arrow {
+  fill: var(--pipe-open);
 }
 .pipe.is-active .pipe-arrow {
   fill: var(--k);
@@ -707,36 +732,95 @@ tr.is-selectable:hover td {
   stroke-width: 1.5;
   stroke-linejoin: round;
 }
+.valve-body {
+  transition: transform 0.3s ease;
+}
+/* Outlined, so an open valve stands out from its pipe without water */
 .valve.is-open polygon {
+  fill: var(--pipe-open);
+  stroke: var(--bg);
+  stroke-width: 1;
+}
+.valve.is-flowing polygon {
   fill: var(--k);
   stroke: var(--k);
+  stroke-width: 1.5;
 }
 .valve.is-unknown polygon {
   stroke: var(--subtle);
   stroke-dasharray: 2 2;
 }
 
-.pump circle {
+/* A distributor is filled like its pipe where the water flows through it,
+   the rest is a low-contrast outline */
+.distributor polygon {
+  fill: var(--bg);
+  stroke: var(--border-strong);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.distributor polygon.is-open {
+  fill: var(--pipe-open);
+  stroke: none;
+}
+.distributor polygon.is-flowing {
+  fill: var(--k);
+  stroke: none;
+}
+.distributor polygon.is-unknown {
+  stroke: var(--subtle);
+  stroke-dasharray: 2 2;
+}
+
+.pump-casing {
   fill: var(--bg);
   stroke: var(--muted);
   stroke-width: 1.5;
 }
-.pump polygon {
+.impeller {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.impeller-box {
+  fill: none;
+}
+.impeller-blades {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+.impeller-hub {
   fill: var(--muted);
 }
-.pump.is-on circle {
+.pump.is-on .pump-casing {
   fill: var(--k);
   stroke: var(--k);
 }
-.pump.is-on polygon {
+.pump.is-on .impeller {
+  animation: spin 1.2s linear infinite;
+}
+.pump.is-on .impeller-blades {
+  stroke: var(--bg);
+}
+.pump.is-on .impeller-hub {
   fill: var(--bg);
 }
-.pump.is-unknown circle {
+.pump.is-unknown .pump-casing {
   stroke: var(--subtle);
   stroke-dasharray: 2 2;
 }
-.pump.is-unknown polygon {
+.pump.is-unknown .impeller-blades {
+  stroke: var(--subtle);
+}
+.pump.is-unknown .impeller-hub {
   fill: var(--subtle);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .tank-shell {
@@ -891,8 +975,12 @@ tr.is-selectable:hover td {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pipe-flow {
+  .pipe-flow,
+  .pump.is-on .impeller {
     animation: none;
+  }
+  .valve-body {
+    transition: none;
   }
   .bubbles {
     display: none;
