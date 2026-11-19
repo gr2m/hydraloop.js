@@ -101,9 +101,12 @@ export type Dataset = {
   from: number;
   until: number;
   fetchedAt: number;
-  /** Tank levels in liters (converted with the device's calibration tables) */
+  /** Tank levels in liters (see `t1PointsToLiters` and `pressureToLiters`) */
   tanks: Record<TankId, Point[]>;
-  /** Capacity in liters, the last entry of the calibration table */
+  /**
+   * Scale in liters: T1's capacity, else the last entry of the calibration
+   * table (the most the sensor can report, not the tank's capacity)
+   */
   tankMax: Record<TankId, number>;
   /** IO values by IO name, one point per change, sorted by time */
   io: Record<string, Point[]>;
@@ -210,6 +213,37 @@ export function pressureToLiters(p: number, table: LevelTable): number {
     }
   }
   return table[table.length - 1].l;
+}
+
+// ── Tank capacities ────────────────────────────────────────────────────────
+
+// Estimated from Hydraloop's H600 V2.1 CAD model, not certified by Hydraloop:
+// T1 holds about 24 L, T2 about 200 L. The `t1t2Levels` calibration table
+// ends at 185 L, which fits T2 (T2 drops by about as much as T3 rises during
+// transfers), but not T1: T1 reads up to ~930 pressure points, past the
+// table's end at 703 points, which would be 185 L in a 24 L tank.
+
+/** Physical capacity in liters, estimated from the H600 CAD model */
+export const TANK_CAPACITY: Partial<Record<TankId, number>> = {
+  t1a: 24,
+  t1b: 24,
+  t2a: 200,
+  t2b: 200,
+};
+
+/**
+ * T1 pressure points while full: the median while filth spills over the skim
+ * overflow (`REMOVE_FILTH_ON_HEIGHT`), about 855–870 on both trains of an H600
+ */
+export const T1_FULL_POINTS = 865;
+
+/**
+ * T1 pressure points to liters, linear from empty (0 points) to full. When T2
+ * is vented, T1 drops by about as much as T2 rises with this scale: 22 L for
+ * a full T1, as the median of 110 ventings, with a wide spread (13–32 L).
+ */
+export function t1PointsToLiters(p: number): number {
+  return Math.max(0, Math.min(1, p / T1_FULL_POINTS)) * TANK_CAPACITY.t1a!;
 }
 
 export function routineSide(side: string | null | undefined): RoutineSide {
@@ -349,9 +383,10 @@ const PHASE_LABELS: Record<TrainPhase, string> = {
 
 // T2 is a closed tank. The air pump pressurizes it to push water up into T1,
 // and `release_air` vents it, which lets the water fall back. Its level
-// sensor measures pressure, so while T2 holds air pressure, the reading is
-// higher than the water in it: when the air is released, T1 drops by tens of
-// liters but T2 barely rises. Derived from an H600's data, not documented.
+// sensor measures pressure, so while T2 holds air pressure, the reading can
+// be higher than the water in it. The effect looks small: when the air is
+// released, T1 drops by about 6 L and T2 rises by about as much (medians of
+// 110 ventings). Derived from an H600's data, not documented.
 
 const AIR_IN = ["air_pump", "add_air_valve"];
 
@@ -398,7 +433,10 @@ export type IoValue = { on: boolean; value: number; since: number | undefined };
 
 export type TankLevel = {
   liters: number | undefined;
+  /** Scale in liters, see `Dataset.tankMax` */
   max: number;
+  /** Physical capacity, estimated from the H600 CAD model (see TANK_CAPACITY) */
+  capacity: number | undefined;
   pct: number | undefined;
   /** Liters per minute over the previous 10 minutes */
   trend: number | undefined;
@@ -516,6 +554,7 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
     tanks[id] = {
       liters,
       max,
+      capacity: TANK_CAPACITY[id],
       pct:
         liters === undefined || !max
           ? undefined
@@ -772,14 +811,13 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
 // - After each incoming water, SKIM_LEVEL_DETERMINATION checks the train
 //   with T2 vented. Once T2 holds about 134 L, the train starts
 //   FILTH_REMOVAL, the A/B valve switches to the other train, and the train
-//   doesn't accept water for the ~4.5 h it lasts. In T1 + T2, that is about
-//   290 L for train A and 280 L for train B, ±15 L.
+//   doesn't accept water for the ~4.5 h it lasts.
 // - The bypass opens when neither train can accept water.
-// T1 + T2 is only valid while T2 is vented (see t2Pressurized), which
-// happens about once an hour.
+// T2 is only valid while vented (see t2Pressurized), which happens about once
+// an hour. Greywater also fills T1, but T1 holds at most about 24 L.
 
-/** Total of T1 + T2 at which a train is full and starts FILTH_REMOVAL */
-export const TRAIN_FULL_LITERS: Record<Side, number> = { A: 290, B: 280 };
+/** T2 at which a train is full and starts FILTH_REMOVAL */
+export const TRAIN_FULL_LITERS = 134;
 
 /** Routines in which a train accepts greywater */
 export const ACCEPTING_ROUTINES = new Set([
@@ -788,8 +826,11 @@ export const ACCEPTING_ROUTINES = new Set([
   "TRANSFER",
 ]);
 
-/** How far off TRAIN_FULL_LITERS was for single filth removals */
-export const TRAIN_FULL_SPREAD = 15;
+/**
+ * Uncertainty of the room for greywater: the threshold was 132–135 L, and
+ * T1, which holds some of the water, was at 15–19 L when checked
+ */
+export const TRAIN_FULL_SPREAD = 10;
 
 /**
  * The train that the A/B valve sends greywater to. The valve is also
@@ -807,9 +848,8 @@ export function fillingTrain(ds: Dataset, t: number): Side | undefined {
 /** Vent openings shorter than this don't settle the levels */
 const MIN_VENT = 60_000;
 
-/** T1 + T2 in liters, measured while T2 was vented, one point per venting */
-export function ventedTotals(ds: Dataset, side: Side): Point[] {
-  const t1 = ds.tanks[side === "A" ? "t1a" : "t1b"];
+/** T2 in liters, measured while it was vented, one point per venting */
+export function ventedLevels(ds: Dataset, side: Side): Point[] {
   const t2 = ds.tanks[side === "A" ? "t2a" : "t2b"];
   const vents = onIntervals(
     ds.io[sideIo("release_air", side)],
@@ -820,17 +860,15 @@ export function ventedTotals(ds: Dataset, side: Side): Point[] {
   for (const vent of vents) {
     // The second half of the vent, after the water settled
     const from = (vent.start + vent.end) / 2;
-    const totals: number[] = [];
-    for (let i = Math.max(0, indexAt(t1, from)); i < t1.length; i++) {
-      const p = t1[i];
+    const levels: number[] = [];
+    for (let i = Math.max(0, indexAt(t2, from)); i < t2.length; i++) {
+      const p = t2[i];
       if (p.t > vent.end) break;
-      if (p.t < from) continue;
-      const other = valueAt(t2, p.t);
-      if (other !== undefined) totals.push(p.v + other);
+      if (p.t >= from) levels.push(p.v);
     }
-    if (totals.length === 0) continue;
-    totals.sort((a, b) => a - b);
-    result.push({ t: vent.end, v: totals[totals.length >> 1] });
+    if (levels.length === 0) continue;
+    levels.sort((a, b) => a - b);
+    result.push({ t: vent.end, v: levels[levels.length >> 1] });
   }
   return result;
 }
@@ -839,8 +877,8 @@ export type TrainRoom = {
   side: Side;
   /** Liters the train can still take, 0 while it doesn't accept water */
   liters: number | undefined;
-  /** T1 + T2 at the last venting */
-  total: number | undefined;
+  /** T2 at the last venting */
+  t2: number | undefined;
   measuredAt: number | undefined;
   accepting: boolean | undefined;
   reason: string;
@@ -860,15 +898,15 @@ export type Room = {
 const roomCache = new WeakMap<Dataset, Record<Side, Point[]>>();
 
 export function roomAt(ds: Dataset, t: number): Room {
-  let totals = roomCache.get(ds);
-  if (!totals) {
-    totals = { A: ventedTotals(ds, "A"), B: ventedTotals(ds, "B") };
-    roomCache.set(ds, totals);
+  let vented = roomCache.get(ds);
+  if (!vented) {
+    vented = { A: ventedLevels(ds, "A"), B: ventedLevels(ds, "B") };
+    roomCache.set(ds, vented);
   }
   const bypass = (stepAt(ds.io[IO.bypass], t)?.v ?? 0) > 0;
 
   const train = (side: Side): TrainRoom => {
-    const last = stepAt(totals[side], t);
+    const last = stepAt(vented[side], t);
     const routine = routineAt(ds, side, t).current;
     const waste =
       (stepAt(ds.io[sideIo("waste_clean_tank", side)], t)?.v ?? 0) > 0;
@@ -881,7 +919,7 @@ export function roomAt(ds: Dataset, t: number): Room {
       return {
         side,
         liters: 0,
-        total: last?.v,
+        t2: last?.v,
         measuredAt: last?.t,
         accepting: false,
         reason: `${busy}, not accepting water`,
@@ -891,7 +929,7 @@ export function roomAt(ds: Dataset, t: number): Room {
       return {
         side,
         liters: undefined,
-        total: undefined,
+        t2: undefined,
         measuredAt: undefined,
         accepting: routine ? true : undefined,
         reason: "No venting with level data yet",
@@ -899,11 +937,11 @@ export function roomAt(ds: Dataset, t: number): Room {
     }
     return {
       side,
-      liters: Math.max(0, TRAIN_FULL_LITERS[side] - last.v),
-      total: last.v,
+      liters: Math.max(0, TRAIN_FULL_LITERS - last.v),
+      t2: last.v,
       measuredAt: last.t,
       accepting: true,
-      reason: last.v >= TRAIN_FULL_LITERS[side] ? "Full" : "Accepting water",
+      reason: last.v >= TRAIN_FULL_LITERS ? "Full" : "Accepting water",
     };
   };
 
@@ -1286,6 +1324,14 @@ export function formatDuration(ms: number) {
   if (hours < 24) return rest ? `${hours} h ${rest} min` : `${hours} h`;
   const days = Math.floor(hours / 24);
   return `${days} d ${hours % 24} h`;
+}
+
+/** Explains the capacity of a tank whose scale is the sensor's range */
+export function capacityNote(level: TankLevel) {
+  if (level.capacity === undefined) return "";
+  return level.capacity === Math.round(level.max)
+    ? `The tank holds about ${level.capacity} L (estimated from Hydraloop's 3D model).`
+    : `The scale is the sensor's range of ${Math.round(level.max)} L. The tank holds about ${level.capacity} L (estimated from Hydraloop's 3D model).`;
 }
 
 export function formatLiters(liters: number | undefined) {

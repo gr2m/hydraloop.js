@@ -3,6 +3,7 @@
 import { Fragment, useState, type ReactNode } from "react";
 
 import {
+  capacityNote,
   formatDuration,
   TRAIN_FULL_LITERS,
   TRAIN_FULL_SPREAD,
@@ -100,9 +101,13 @@ function LevelRow({ label, level }: { label: string; level: TankLevel }) {
       <span
         className="level-value"
         title={
-          level.pressurized
-            ? "The tank holds air pressure, which adds to the reading. The water is at most this."
-            : undefined
+          [
+            level.pressurized &&
+              "The tank holds air pressure, which adds to the reading. The water is at most this.",
+            capacityNote(level),
+          ]
+            .filter(Boolean)
+            .join(" ") || undefined
         }
       >
         {level.pressurized && level.liters !== undefined && "≤ "}
@@ -182,9 +187,8 @@ function NextFilthRemoval({ state }: { state: DeviceState }) {
       description={
         <>
           After greywater stops, the train starts filth removal within about 10
-          minutes once T2 holds about 134 L, at about {TRAIN_FULL_LITERS.A} L
-          (A) or {TRAIN_FULL_LITERS.B} L (B) in T1 + T2. About 6 hours later it
-          has transferred about 100 L to T3.
+          minutes once T2 holds about {TRAIN_FULL_LITERS} L, measured while
+          vented. About 6 hours later it has transferred about 100 L to T3.
         </>
       }
     >
@@ -224,9 +228,9 @@ function RoomSummary({ state }: { state: DeviceState }) {
       className="room"
       description={
         <>
-          A train counts as full at about {TRAIN_FULL_LITERS.A} L (A) or{" "}
-          {TRAIN_FULL_LITERS.B} L (B), in T1 + T2 measured while vented. It then
-          starts filth removal and takes no water until it is done.
+          A train counts as full at about {TRAIN_FULL_LITERS} L in T2, measured
+          while vented. It then starts filth removal and takes no water until it
+          is done.
         </>
       }
     >
@@ -251,14 +255,13 @@ function RoomSummary({ state }: { state: DeviceState }) {
                   : train.accepting
                     ? `≈ ${Math.round(train.liters)} L`
                     : `0 L, ${train.reason.charAt(0).toLowerCase()}${train.reason.slice(1)}`}
-                {train.total !== undefined &&
-                  train.measuredAt !== undefined && (
-                    <span className="muted">
-                      {" "}
-                      · {Math.round(train.total)} L in the train{" "}
-                      {formatDuration(state.t - train.measuredAt)} ago
-                    </span>
-                  )}
+                {train.t2 !== undefined && train.measuredAt !== undefined && (
+                  <span className="muted">
+                    {" "}
+                    · {Math.round(train.t2)} L in T2{" "}
+                    {formatDuration(state.t - train.measuredAt)} ago
+                  </span>
+                )}
               </dd>
             </Fragment>
           );

@@ -6,6 +6,8 @@ import {
   behaviorIntervals,
   routineSide,
   pressureToLiters,
+  t1PointsToLiters,
+  TANK_CAPACITY,
   TANK_IDS,
   TANK_LINES,
   type Dataset,
@@ -176,6 +178,15 @@ export async function loadDataset(
   const tanks = {} as Record<TankId, Point[]>;
   const tankMax = {} as Record<TankId, number>;
   for (const id of TANK_IDS) {
+    if (id === "t1a" || id === "t1b") {
+      // The calibration table doesn't fit T1, see t1PointsToLiters
+      tankMax[id] = TANK_CAPACITY[id]!;
+      tanks[id] = toPoints(
+        graphData[TANK_LINES[id]],
+        (y) => Math.round(t1PointsToLiters(y) * 10) / 10,
+      );
+      continue;
+    }
     const table = tableFor(id);
     tankMax[id] = table.length ? table[table.length - 1].l : 0;
     tanks[id] = toPoints(graphData[TANK_LINES[id]], (y) =>
@@ -187,7 +198,9 @@ export async function loadDataset(
     }
   }
   if (!levelTables) {
-    warnings.push("Tank levels are shown in raw pressure points, not liters.");
+    warnings.push(
+      "T2 and T3 levels are shown in raw pressure points, not liters.",
+    );
   }
 
   const ioPoints: Record<string, Point[]> = {};

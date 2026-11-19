@@ -4,6 +4,7 @@
 // valves leave open, but without water moving, are drawn with more contrast.
 
 import {
+  capacityNote,
   caption,
   IO,
   sideIo,
@@ -471,12 +472,12 @@ function Tank({
   const title = !known
     ? `${label}: no level data`
     : pressurized
-      ? `${label} ${sub ?? ""}: reads ${Math.round(level!.liters!)} L, but the tank holds air pressure, which adds to the reading. The water is at most that.`
+      ? `${label} ${sub ?? ""}: reads ${Math.round(level!.liters!)} L, but the tank holds air pressure, which adds to the reading. The water is at most that. ${capacityNote(level!)}`.trimEnd()
       : `${label} ${sub ?? ""}: ${Math.round(level!.liters!)} of ${Math.round(level!.max)} L (${Math.round(pct * 100)}%)${
           trend !== undefined
             ? `, ${trend >= 0 ? "+" : ""}${trend.toFixed(1)} L/min`
             : ""
-        }`;
+        }. ${capacityNote(level!)}`.trimEnd();
   return (
     <g
       className={`tank kind-${kind}`}

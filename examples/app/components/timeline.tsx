@@ -430,7 +430,7 @@ export function Timeline({
             );
           }
           if (row.type === "room") {
-            const max = TRAIN_FULL_LITERS.A + TRAIN_FULL_LITERS.B;
+            const max = TRAIN_FULL_LITERS * 2;
             const yScale = (v: number) =>
               row.y + row.h - (Math.min(v, max) / max) * row.h;
             return (

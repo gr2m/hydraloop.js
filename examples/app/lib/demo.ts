@@ -9,6 +9,7 @@ import "server-only";
 import type { LoadOptions } from "./hdm";
 import {
   IO,
+  TANK_CAPACITY,
   transfers,
   type Dataset,
   type Point,
@@ -25,6 +26,11 @@ const T12_MAX = 185;
 const T3_MAX = 280;
 const T1_MIN = 30;
 const T2_MIN = 40;
+
+/** The simulation moves T1 on T2's scale, T1 holds much less (see TANK_CAPACITY) */
+function t1Liters(v: number) {
+  return Math.max(0, (v / T12_MAX) * TANK_CAPACITY.t1a!);
+}
 
 type Phase = "idle" | "receiving" | "treating" | "transferring" | "cleaning";
 
@@ -314,9 +320,9 @@ function run(now: number) {
 
     if ((t / MINUTE) % 2 === 0) {
       const jitter = () => (noise() - 0.5) * 0.6;
-      tanks.t1a.push({ t, v: trains.A.t1 + jitter() });
+      tanks.t1a.push({ t, v: t1Liters(trains.A.t1 + jitter()) });
       tanks.t2a.push({ t, v: trains.A.t2 + jitter() });
-      tanks.t1b.push({ t, v: trains.B.t1 + jitter() });
+      tanks.t1b.push({ t, v: t1Liters(trains.B.t1 + jitter()) });
       tanks.t2b.push({ t, v: trains.B.t2 + jitter() });
       tanks.t3.push({ t, v: t3 + jitter() });
     }
@@ -335,9 +341,9 @@ function run(now: number) {
     demo: true,
     tanks,
     tankMax: {
-      t1a: T12_MAX,
+      t1a: TANK_CAPACITY.t1a!,
       t2a: T12_MAX,
-      t1b: T12_MAX,
+      t1b: TANK_CAPACITY.t1b!,
       t2b: T12_MAX,
       t3: T3_MAX,
     },
