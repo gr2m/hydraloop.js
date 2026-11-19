@@ -449,6 +449,21 @@ tr.is-selectable {
 tr.is-selectable:hover td {
   background: var(--surface);
 }
+/* The background reaches a bit past the text, as the cells have no padding
+   on the outside */
+tr.is-selected td,
+tr.is-selected:hover td {
+  background: var(--border);
+}
+tr.is-selected td:first-child {
+  box-shadow: -8px 0 0 var(--border);
+}
+tr.is-selected td:last-child {
+  box-shadow: 8px 0 0 var(--border);
+}
+tr.is-selected:focus-visible {
+  outline: none;
+}
 
 .table-toolbar {
   display: flex;
@@ -461,6 +476,13 @@ tr.is-selectable:hover td {
 }
 .event-table > .button {
   margin-top: 12px;
+}
+/* Keep the time on one line, and let the long signal names wrap instead */
+.event-table td:first-child {
+  white-space: nowrap;
+}
+.event-table td:last-child {
+  overflow-wrap: anywhere;
 }
 
 .disclosure summary {
@@ -1098,6 +1120,9 @@ tr.is-selectable:hover td {
   grid-template-columns: minmax(0, 7fr) minmax(380px, 5fr);
   gap: 48px;
   align-items: start;
+}
+.history-main {
+  min-width: 0;
 }
 .history-state {
   position: sticky;

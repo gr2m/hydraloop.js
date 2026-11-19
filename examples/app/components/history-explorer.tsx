@@ -151,6 +151,9 @@ export function HistoryExplorer() {
   const select = (t: number) => {
     setCursor(t);
     setPinned(true);
+    // The diagram stays in view next to the tables on wide screens
+    const aside = document.querySelector(".history-state");
+    if (aside && getComputedStyle(aside).position === "sticky") return;
     document
       .getElementById("timeline")
       ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -290,21 +293,151 @@ export function HistoryExplorer() {
             </dl>
 
             <div className="history-grid">
-              <section
-                id="timeline"
-                className="history-timeline"
-                aria-label="Timeline"
-              >
-                <Timeline
-                  dataset={dataset}
-                  cursor={cursor}
-                  pinned={pinned}
-                  onCursor={(t, pin) => {
-                    setCursor(t);
-                    if (pin !== undefined) setPinned(pin);
-                  }}
-                />
-              </section>
+              <div className="history-main">
+                <section
+                  id="timeline"
+                  className="history-timeline"
+                  aria-label="Timeline"
+                >
+                  <Timeline
+                    dataset={dataset}
+                    cursor={cursor}
+                    pinned={pinned}
+                    onCursor={(t, pin) => {
+                      setCursor(t);
+                      if (pin !== undefined) setPinned(pin);
+                    }}
+                  />
+                </section>
+
+                <section
+                  className="section"
+                  aria-labelledby="transfers-heading"
+                >
+                  <h2 id="transfers-heading">Transfers to T3</h2>
+                  <p className="section-lede">
+                    From the transfer valve opening to it closing. The volume is
+                    the change of T3, so toilet flushes drawing from T3 at the
+                    same time make it smaller. T1+T2 is not used, as T2 reads
+                    high while it holds air pressure.
+                  </p>
+                  {transferList.length === 0 ? (
+                    <p className="empty">No transfers in this period.</p>
+                  ) : (
+                    <table>
+                      <caption className="sr-only">Transfers to T3</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Train</th>
+                          <th scope="col">Started</th>
+                          <th scope="col" className="numeric">
+                            Duration
+                          </th>
+                          <th scope="col" className="numeric">
+                            Into T3
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {transferList.map((t) => (
+                          <tr
+                            key={`${t.side}-${t.start}`}
+                            className="is-selectable"
+                            onClick={() => select(t.start)}
+                          >
+                            <td>{t.side}</td>
+                            <td>
+                              <Time t={t.start} format="datetime" />
+                              {t.clipped && (
+                                <span className="muted"> (earlier)</span>
+                              )}
+                            </td>
+                            <td className="numeric">
+                              {formatDuration(t.end - t.start)}
+                              {t.open && <span className="muted"> so far</span>}
+                            </td>
+                            <td className="numeric">{signed(t.t3Change)}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </section>
+
+                {cleaningList.length > 0 && (
+                  <section
+                    className="section"
+                    aria-labelledby="cleaning-heading"
+                  >
+                    <h2 id="cleaning-heading">Filth removal</h2>
+                    <p className="section-lede">
+                      The <span className="mono">FILTH_REMOVAL</span> routine as
+                      reported by HDM. A normal run holds T1 at the top for
+                      about 4.5 hours, so filth and foam spill over the skim
+                      overflow to the drain. That overflow has no valve signal,
+                      so it&apos;s inferred. The waste valve usually stays
+                      closed; when it opens right after the routine, T1 is
+                      emptied to the drain. Select a run to see the moment water
+                      leaves the train.
+                    </p>
+                    <table>
+                      <caption className="sr-only">Filth removal runs</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Train</th>
+                          <th scope="col">Started</th>
+                          <th scope="col" className="numeric">
+                            Duration
+                          </th>
+                          <th scope="col" className="numeric">
+                            Skimming
+                          </th>
+                          <th scope="col" className="numeric">
+                            Waste valve open
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {cleaningList.map((c) => (
+                          <tr
+                            key={`${c.side}-${c.start}`}
+                            className="is-selectable"
+                            onClick={() => select(c.focus)}
+                          >
+                            <td>{c.side}</td>
+                            <td>
+                              <Time t={c.start} format="datetime" />
+                            </td>
+                            <td className="numeric">
+                              {formatDuration(c.end - c.start)}
+                              {c.open && <span className="muted"> so far</span>}
+                            </td>
+                            <td className="numeric">
+                              {c.skimming ? formatDuration(c.skimming) : "–"}
+                            </td>
+                            <td className="numeric">
+                              {c.waste ? formatDuration(c.waste) : "–"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </section>
+                )}
+
+                <section
+                  className="section"
+                  aria-labelledby="history-events-heading"
+                >
+                  <h2 id="history-events-heading">Events</h2>
+                  <EventTable
+                    events={events}
+                    caption="Events in the selected range"
+                    timeFormat="datetime"
+                    onSelect={select}
+                  />
+                </section>
+              </div>
               <aside
                 className="history-state"
                 aria-label="State at the selected time"
@@ -327,127 +460,6 @@ export function HistoryExplorer() {
                 )}
               </aside>
             </div>
-
-            <section className="section" aria-labelledby="transfers-heading">
-              <h2 id="transfers-heading">Transfers to T3</h2>
-              <p className="section-lede">
-                From the transfer valve opening to it closing. The volume is the
-                change of T3, so toilet flushes drawing from T3 at the same time
-                make it smaller. T1+T2 is not used, as T2 reads high while it
-                holds air pressure.
-              </p>
-              {transferList.length === 0 ? (
-                <p className="empty">No transfers in this period.</p>
-              ) : (
-                <table>
-                  <caption className="sr-only">Transfers to T3</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Train</th>
-                      <th scope="col">Started</th>
-                      <th scope="col" className="numeric">
-                        Duration
-                      </th>
-                      <th scope="col" className="numeric">
-                        Into T3
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transferList.map((t) => (
-                      <tr
-                        key={`${t.side}-${t.start}`}
-                        className="is-selectable"
-                        onClick={() => select(t.start)}
-                      >
-                        <td>{t.side}</td>
-                        <td>
-                          <Time t={t.start} format="datetime" />
-                          {t.clipped && (
-                            <span className="muted"> (earlier)</span>
-                          )}
-                        </td>
-                        <td className="numeric">
-                          {formatDuration(t.end - t.start)}
-                          {t.open && <span className="muted"> so far</span>}
-                        </td>
-                        <td className="numeric">{signed(t.t3Change)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </section>
-
-            {cleaningList.length > 0 && (
-              <section className="section" aria-labelledby="cleaning-heading">
-                <h2 id="cleaning-heading">Filth removal</h2>
-                <p className="section-lede">
-                  The <span className="mono">FILTH_REMOVAL</span> routine as
-                  reported by HDM. A normal run holds T1 at the top for about
-                  4.5 hours, so filth and foam spill over the skim overflow to
-                  the drain. That overflow has no valve signal, so it&apos;s
-                  inferred. The waste valve usually stays closed; when it opens
-                  right after the routine, T1 is emptied to the drain. Select a
-                  run to see the moment water leaves the train.
-                </p>
-                <table>
-                  <caption className="sr-only">Filth removal runs</caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Train</th>
-                      <th scope="col">Started</th>
-                      <th scope="col" className="numeric">
-                        Duration
-                      </th>
-                      <th scope="col" className="numeric">
-                        Skimming
-                      </th>
-                      <th scope="col" className="numeric">
-                        Waste valve open
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {cleaningList.map((c) => (
-                      <tr
-                        key={`${c.side}-${c.start}`}
-                        className="is-selectable"
-                        onClick={() => select(c.focus)}
-                      >
-                        <td>{c.side}</td>
-                        <td>
-                          <Time t={c.start} format="datetime" />
-                        </td>
-                        <td className="numeric">
-                          {formatDuration(c.end - c.start)}
-                          {c.open && <span className="muted"> so far</span>}
-                        </td>
-                        <td className="numeric">
-                          {c.skimming ? formatDuration(c.skimming) : "–"}
-                        </td>
-                        <td className="numeric">
-                          {c.waste ? formatDuration(c.waste) : "–"}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </section>
-            )}
-
-            <section
-              className="section"
-              aria-labelledby="history-events-heading"
-            >
-              <h2 id="history-events-heading">Events</h2>
-              <EventTable
-                events={events}
-                caption="Events in the selected range"
-                timeFormat="datetime"
-                onSelect={select}
-              />
-            </section>
           </>
         )}
       </main>
