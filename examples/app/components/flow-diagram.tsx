@@ -451,6 +451,7 @@ function Tank({
   label,
   sub,
   aeration,
+  small,
 }: {
   x: number;
   y: number;
@@ -461,23 +462,33 @@ function Tank({
   label: string;
   sub?: string;
   aeration?: boolean;
+  /**
+   * A tank too narrow for its text: the label and the level in percent go
+   * next to it, before (`start`) or after (`end`) it
+   */
+  small?: "start" | "end";
 }) {
-  const known = level?.pct !== undefined;
-  const pct = level?.pct ?? 0;
+  const known = level?.liters !== undefined && level.max > 0;
+  // The shell stands for the tank's capacity, which can be more than the
+  // sensor's range
+  const size = level?.capacity ?? level?.max ?? 0;
+  const fill = known ? Math.max(0, Math.min(1, level!.liters! / size)) : 0;
+  const percent = `${Math.round(fill * 100)}%`;
   const trend = level?.trend;
   const arrow =
     trend === undefined || Math.abs(trend) < 0.3 ? "" : trend > 0 ? "↑" : "↓";
-  const fillHeight = h * pct;
-  const pressurized = level?.pressurized === true;
+  const fillHeight = h * fill;
   const title = !known
     ? `${label}: no level data`
-    : pressurized
-      ? `${label} ${sub ?? ""}: reads ${Math.round(level!.liters!)} L, but the tank holds air pressure, which adds to the reading. The water is at most that. ${capacityNote(level!)}`.trimEnd()
-      : `${label} ${sub ?? ""}: ${Math.round(level!.liters!)} of ${Math.round(level!.max)} L (${Math.round(pct * 100)}%)${
+    : small
+      ? `${label} ${sub ?? ""}: ${percent} full. ${capacityNote(level!)}`.trimEnd()
+      : `${label} ${sub ?? ""}: ${Math.round(level!.liters!)} L (${percent})${
           trend !== undefined
             ? `, ${trend >= 0 ? "+" : ""}${trend.toFixed(1)} L/min`
             : ""
         }. ${capacityNote(level!)}`.trimEnd();
+  const textX = small === "end" ? x + w + 10 : small ? x - 10 : x + 12;
+  const anchor = small === "start" ? "end" : "start";
   return (
     <g
       className={`tank kind-${kind}`}
@@ -491,7 +502,7 @@ function Tank({
         y={y}
         width={w}
         height={h}
-        rx={8}
+        rx={small ? 5 : 8}
         className={known ? "tank-shell" : "tank-shell is-unknown"}
       />
       {known && (
@@ -501,7 +512,7 @@ function Tank({
             y={y + h - fillHeight}
             width={w - 2}
             height={Math.max(0, fillHeight - 1)}
-            rx={fillHeight > 8 ? 7 : 0}
+            rx={fillHeight > 8 ? (small ? 4 : 7) : 0}
             className="tank-fill"
           />
           <line
@@ -509,14 +520,14 @@ function Tank({
             x2={x + w - 1}
             y1={y + h - fillHeight}
             y2={y + h - fillHeight}
-            className={pressurized ? "tank-surface is-dashed" : "tank-surface"}
+            className="tank-surface"
           />
         </>
       )}
       {[0.25, 0.5, 0.75].map((f) => (
         <line
           key={f}
-          x1={x + w - 8}
+          x1={x + w - (small ? 5 : 8)}
           x2={x + w}
           y1={y + h - h * f}
           y2={y + h - h * f}
@@ -524,7 +535,12 @@ function Tank({
         />
       ))}
       <Bubbles x={x} y={y} w={w} h={h} active={aeration} />
-      <text x={x + 12} y={y + 22} className="tank-label">
+      <text
+        x={textX}
+        y={small ? y + h / 2 - 6 : y + 22}
+        textAnchor={anchor}
+        className="tank-label"
+      >
         {label}
         {sub && (
           <tspan className="tank-sub" dx={6}>
@@ -532,23 +548,29 @@ function Tank({
           </tspan>
         )}
       </text>
-      {known && (
+      {known && small && (
+        <text
+          x={textX}
+          y={y + h / 2 + 20}
+          textAnchor={anchor}
+          className="tank-value"
+        >
+          {percent}
+        </text>
+      )}
+      {known && !small && (
         <>
           <text
             x={x + 12}
             y={y + h - (h > 100 ? 30 : 26)}
-            className={pressurized ? "tank-value is-pressurized" : "tank-value"}
+            className="tank-value"
           >
-            {pressurized && "≤ "}
             {Math.round(level!.liters!)} L{" "}
-            {arrow && !pressurized && (
-              <tspan className="tank-trend">{arrow}</tspan>
-            )}
+            {arrow && <tspan className="tank-trend">{arrow}</tspan>}
           </text>
           <text x={x + 12} y={y + h - 12} className="tank-meta">
-            {pressurized
-              ? "Pressurized"
-              : `${Math.round(pct * 100)}% of ${Math.round(level!.max)} L`}
+            {percent} of {level!.capacity ? "~" : ""}
+            {Math.round(size)} L
           </text>
         </>
       )}
@@ -657,10 +679,11 @@ export function FlowDiagram({
 
   const train = (side: Side) => {
     const a = side === "A";
-    const t1x = a ? 85 : 785;
-    const t2x = a ? 235 : 635;
-    const t1c = t1x + 65;
-    const t2c = t2x + 65;
+    // Tank areas are to scale: T1 ~24 L, T2 ~200 L, T3 ~280 L (TANK_CAPACITY)
+    const t1x = a ? 140 : 839;
+    const t2x = a ? 214 : 614;
+    const t1c = t1x + 10;
+    const t2c = t2x + 86;
     const transfer = io[sideIo("transfer_path", side)];
     const waste = io[sideIo("waste_clean_tank", side)];
     const air = io[sideIo("air_pump", side)];
@@ -684,8 +707,8 @@ export function FlowDiagram({
         <Pipe
           d={
             a
-              ? `M${abEnds.outlets[0]} 100 H150 V190`
-              : `M${abEnds.outlets[1]} 100 H850 V190`
+              ? `M${abEnds.outlets[0]} 100 H${t1c} V232`
+              : `M${abEnds.outlets[1]} 100 H${t1c} V232`
           }
           kind="grey"
           active={receiving}
@@ -694,7 +717,7 @@ export function FlowDiagram({
         />
 
         {/* Air pump into T2 */}
-        <Pipe d={`M${t2c} 151 V190`} kind="air" active={air?.on} />
+        <Pipe d={`M${t2c} 151 V232`} kind="air" active={air?.on} />
         <Pump
           x={t2c}
           y={136}
@@ -709,27 +732,28 @@ export function FlowDiagram({
 
         {/* Exchange from T2 into T1 */}
         <Pipe
-          d={a ? "M235 340 H215" : "M765 340 H785"}
+          d={a ? "M214 340 H161" : "M786 340 H839"}
           kind="grey"
           active={state.trains[side].t2ToT1}
         />
 
         <Tank
           x={t1x}
-          y={190}
-          w={130}
-          h={170}
+          y={232}
+          w={21}
+          h={128}
           level={tanks[a ? "t1a" : "t1b"]}
           kind="grey"
           label="T1"
           sub={side}
           aeration={bubbles?.on}
+          small={a ? "start" : "end"}
         />
         <Tank
           x={t2x}
-          y={190}
-          w={130}
-          h={170}
+          y={232}
+          w={172}
+          h={128}
           level={tanks[a ? "t2a" : "t2b"]}
           kind="grey"
           label="T2"
@@ -740,14 +764,14 @@ export function FlowDiagram({
         {/* Skim overflow at the top of T1, down the drain line. It has no
             valve, so it is shown from the FILTH_REMOVAL routine. */}
         <Pipe
-          d={a ? `M85 205 H${drainX} V410` : `M915 205 H${drainX} V410`}
+          d={a ? `M140 237 H${drainX} V410` : `M860 237 H${drainX} V410`}
           kind="waste"
           active={skimming}
           title={`Skim overflow of T1 ${side}${skimming ? ": filth spilling over to the drain (inferred from the FILTH_REMOVAL routine)" : ""}`}
         />
         <text
           x={a ? 57 : 943}
-          y={300}
+          y={228}
           textAnchor="middle"
           className="diagram-label"
         >
@@ -915,7 +939,7 @@ export function FlowDiagram({
 
       {/* UV and into T3 */}
       <Pipe
-        d="M500 474 V530"
+        d="M500 474 V540"
         kind="clean"
         active={t3ReceivingFromUv}
         open={io[IO.uvValve]?.on}
@@ -946,10 +970,10 @@ export function FlowDiagram({
       />
 
       <Tank
-        x={330}
-        y={530}
-        w={340}
-        h={110}
+        x={346}
+        y={540}
+        w={309}
+        h={100}
         level={tanks.t3}
         kind="clean"
         label="T3"

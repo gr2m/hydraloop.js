@@ -330,8 +330,7 @@ export function HistoryExplorer() {
                   <p className="section-lede">
                     From the transfer valve opening to it closing. The volume is
                     the change of T3, so toilet flushes drawing from T3 at the
-                    same time make it smaller. T1+T2 is not used, as T2 reads
-                    high while it holds air pressure.
+                    same time make it smaller.
                   </p>
                   {transferList.length === 0 ? (
                     <p className="empty">No transfers in this period.</p>

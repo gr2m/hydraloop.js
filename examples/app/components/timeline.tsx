@@ -17,7 +17,6 @@ import {
   roomSeries,
   routineSegments,
   sideIo,
-  t2PressurizedIntervals,
   TANK_LABELS,
   TRAIN_FULL_LITERS,
   valueAt,
@@ -179,19 +178,6 @@ function buildLanes(ds: Dataset, showAll: boolean) {
     );
 
   const label = (name: string) => caption(ds.captions, name);
-  // T2 reads high while it holds air pressure
-  const pressureLane = (side: "A" | "B"): Lane => ({
-    key: `t2-pressure-${side}`,
-    label: `T2 ${side} pressurized`,
-    kind: "air",
-    noDataUntil: ds.io[sideIo("release_air", side)]?.length
-      ? Math.max(from, Math.min(until, ds.io[sideIo("release_air", side)][0].t))
-      : until,
-    segments: t2PressurizedIntervals(ds, side).map((i) => ({
-      ...i,
-      title: `T2 ${side} pressurized, its level reads high: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`,
-    })),
-  });
   const keyLanes: Lane[] = [
     ioLane(IO.bypass, label(IO.bypass), "grey"),
     ioLane(sideIo("transfer_path", "A"), "Transfer A", "clean"),
@@ -200,8 +186,6 @@ function buildLanes(ds: Dataset, showAll: boolean) {
     ioLane(sideIo("waste_clean_tank", "B"), "Waste B", "waste"),
     ioLane(sideIo("air_pump", "A"), "Air pump A", "air"),
     ioLane(sideIo("air_pump", "B"), "Air pump B", "air"),
-    pressureLane("A"),
-    pressureLane("B"),
     ioLane(IO.uvPower, label(IO.uvPower), "uv"),
     ioLane(IO.circulation, "Circulation", "clean"),
     ioLane(IO.distributionPump, "Distribution", "clean"),
@@ -272,18 +256,12 @@ export function Timeline({
   // Vertical layout
   const rows: Row[] = [];
   let y = AXIS_H;
-  const trainMax = Math.max(
-    dataset.tankMax.t1a,
-    dataset.tankMax.t2a,
-    dataset.tankMax.t1b,
-    dataset.tankMax.t2b,
-    1,
-  );
+  const trainMax = Math.max(dataset.tankMax.t2a, dataset.tankMax.t2b, 1);
   rows.push({ type: "room", key: "room", y, h: CHART_H });
   y += CHART_H + 18;
   for (const [key, label, tanks, kind, max] of [
-    ["train-a", "Train A", ["t1a", "t2a"], "grey", trainMax],
-    ["train-b", "Train B", ["t1b", "t2b"], "grey", trainMax],
+    ["train-a", "Train A", ["t2a"], "grey", trainMax],
+    ["train-b", "Train B", ["t2b"], "grey", trainMax],
     ["t3", "T3 storage", ["t3"], "clean", Math.max(dataset.tankMax.t3, 1)],
   ] as const) {
     rows.push({

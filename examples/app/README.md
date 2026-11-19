@@ -22,13 +22,13 @@ And for the last 30 days (see [30-day statistics](#30-day-statistics)):
 
 **Live** (`/live`) refreshes every 10 seconds and shows:
 
-- A flow diagram of both treatment trains (T1 and T2 for A and B), UV-C, T3 storage, T4 backup and the outlets. Tanks show their fill level in liters (see [Tank levels and capacities](#tank-levels-and-capacities)). Pipes are colored and animated only while a valve or pump signal shows water moving through them, and drawn with more contrast while their valves are open without water moving. The pipes from the distribution pump to the outlets are always pressurized, so they are always drawn open. On/off valves are parallel to their pipe while open and across it while closed. The bypass and A/B valves are triangles pointing to their inlet, filled where the water flows through them to the open outlet. Pump impellers spin while the pump runs. Hover any valve, pump or tank for its raw value.
+- A flow diagram of both treatment trains (T1 and T2 for A and B), UV-C, T3 storage, T4 backup and the outlets. Tank areas are to scale with their capacities: T1 holds about 24 L, T2 about 200 L and T3 about 280 L. T2 and T3 show their fill level in liters, T1 only in percent (see [Tank levels and capacities](#tank-levels-and-capacities)). Pipes are colored and animated only while a valve or pump signal shows water moving through them, and drawn with more contrast while their valves are open without water moving. The pipes from the distribution pump to the outlets are always pressurized, so they are always drawn open. On/off valves are parallel to their pipe while open and across it while closed. The bypass and A/B valves are triangles pointing to their inlet, filled where the water flows through them to the open outlet. Pump impellers spin while the pump runs. Hover any valve, pump or tank for its raw value.
 - The state of each train (the HDM routine and its sub-state), of storage and of the outlets, and when each train last received water and transferred to T3. Each state says how it was determined: **HDM routine**, **Valve signal**, or **Inferred**.
 - All raw signals.
 
 **History** (`/history`) shows 6 hours to 7 days:
 
-- Synchronized tracks of the tank levels, the HDM routines, and the valves and pumps.
+- Synchronized tracks of the levels of T2 and T3, the HDM routines, and the valves and pumps. `getIo()` returns only a few days of valve data, regardless of the requested range. The history view marks the time without data.
 - Move the pointer over the timeline to see the flow diagram at that moment. Click to pin it, use the arrow keys to step.
 - Transfers to T3 with their duration and the change of T3, filth removal runs, and all events.
 
@@ -60,7 +60,7 @@ The live and history views estimate how much more greywater the H600 can take be
 - Greywater only enters the train selected by the A/B valve, and only in `STANDBY` (or `INCOMING_WATER`).
 - A train starts `FILTH_REMOVAL` when it is full (see [Next filth removal](#next-filth-removal)), and takes no water for the ~4.5 h it lasts.
 
-So the estimate is the sum over the trains that accept water of `134 L − T2` ([`TRAIN_FULL_LITERS`](lib/model.ts)). T2 is taken from the last time it was vented (about once an hour), as its reading can be too high while pressurized. A train in `FILTH_REMOVAL` or with its waste valve open counts as 0, and so does the whole H600 while the bypass is open. The history chart shades the times the bypass was open, to compare. The live view loads the last 8 hours, so that it includes a venting of both trains. If only one train has a venting, the estimate is shown as a lower bound (`≥ X L`) from that train alone.
+So the estimate is the sum over the trains that accept water of `134 L − T2` ([`TRAIN_FULL_LITERS`](lib/model.ts)). T2 is taken from the last time it was vented (about once an hour), as the H600 checks it vented, too. A train in `FILTH_REMOVAL` or with its waste valve open counts as 0, and so does the whole H600 while the bypass is open. The history chart shades the times the bypass was open, to compare. The live view loads the last 8 hours, so that it includes a venting of both trains. If only one train has a venting, the estimate is shown as a lower bound (`≥ X L`) from that train alone.
 
 ### Next filth removal
 
@@ -97,11 +97,11 @@ A normal `FILTH_REMOVAL` run lasts about 4.5 hours, mostly in `REMOVE_FILTH_ON_H
 
 The tanks have pressure sensors. `getDeviceLevels()` returns two calibration tables from pressure points to liters: `t3Levels` for T3, up to 280 L, and `t1t2Levels`, up to 185 L at 703 points. HDM uses `t1t2Levels` for both T1 and T2.
 
-| Tank | Capacity                  | Liters in the app                                         |
-| ---- | ------------------------- | --------------------------------------------------------- |
-| T1   | ~24 L (CAD estimate)      | Pressure points scaled linearly, 0 to 865 points ↦ 0–24 L |
-| T2   | ~195–205 L (CAD estimate) | `t1t2Levels`, shown on its 185 L scale                    |
-| T3   | ~280 L (CAD estimate)     | `t3Levels`                                                |
+| Tank | Capacity                  | Level in the app                                                                 |
+| ---- | ------------------------- | -------------------------------------------------------------------------------- |
+| T1   | ~24 L (CAD estimate)      | Pressure points scaled linearly, 0 to 865 points ↦ 0–24 L. Shown in percent only |
+| T2   | ~195–205 L (CAD estimate) | `t1t2Levels`, shown on its 185 L scale                                           |
+| T3   | ~280 L (CAD estimate)     | `t3Levels`                                                                       |
 
 The capacities are estimated from Hydraloop's [3D model of the H600 V2.1](https://info.hydraloop.com/manuals/3d-files-hydraloop-h600/). They are not specified by Hydraloop. A 2022 owner's manual lists 360 L for the upper treatment tanks of an H600 combined, about 180 L per train, without separating T1 and T2.
 
@@ -114,11 +114,7 @@ In `STANDBY`, T1 reads ~450–470 points, about 12–13 L. To check the scale: w
 
 ### T2 readings while pressurized
 
-T2 is a closed tank. The air pump pressurizes it to push water up into T1, and `release_air` vents it, which lets the water fall back into T2. The level sensors measure pressure, so while T2 holds air pressure, its reading can be higher than the water in it. The effect looks small: when the air is released, T2 rises by about as much as T1 drops (see above).
-
-The app treats T2 as pressurized while `release_air` is closed and `air_pump` or `add_air_valve` ran since it closed (about 90% of the time). It then shows T2 as "≤ … L · Pressurized", and the timeline has a lane for it. Transfer volumes use the change of T3, not of T1+T2. This is derived from an H600's data and not documented by Hydraloop.
-
-`getIo()` returns only a few days of valve data, regardless of the requested range. The history view marks the time without data.
+T2 is a closed tank. The air pump pressurizes it to push water up into T1, and `release_air` vents it, which lets the water fall back into T2. The level sensors measure pressure, so the air pressure in T2 could add to its reading. The effect looks small: when the air is released, T2 rises by about as much as T1 drops (see above). So the app shows T2's reading as it is.
 
 ## Run
 

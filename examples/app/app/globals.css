@@ -909,9 +909,6 @@ tr.is-selected:focus-visible {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
-.tank-value.is-pressurized {
-  fill: var(--muted);
-}
 .tank-trend {
   font-weight: 400;
   fill: var(--muted);

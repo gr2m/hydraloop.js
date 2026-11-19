@@ -87,7 +87,16 @@ function StatusBlock({
   );
 }
 
-function LevelRow({ label, level }: { label: string; level: TankLevel }) {
+function LevelRow({
+  label,
+  level,
+  percent,
+}: {
+  label: string;
+  level: TankLevel;
+  /** Show the level in percent, for T1, whose liters are a rough estimate */
+  percent?: boolean;
+}) {
   const pct = level.pct;
   const trend = level.trend;
   return (
@@ -98,28 +107,24 @@ function LevelRow({ label, level }: { label: string; level: TankLevel }) {
           <span className="level-fill" style={{ width: `${pct * 100}%` }} />
         )}
       </span>
-      <span
-        className="level-value"
-        title={
-          [
-            level.pressurized &&
-              "The tank holds air pressure, which adds to the reading. The water is at most this.",
-            capacityNote(level),
-          ]
-            .filter(Boolean)
-            .join(" ") || undefined
-        }
-      >
-        {level.pressurized && level.liters !== undefined && "≤ "}
-        {formatLiters(level.liters)}
-        <span className="muted"> / {Math.round(level.max)} L</span>
+      <span className="level-value" title={capacityNote(level) || undefined}>
+        {percent ? (
+          pct === undefined ? (
+            "–"
+          ) : (
+            `${Math.round(pct * 100)}%`
+          )
+        ) : (
+          <>
+            {formatLiters(level.liters)}
+            <span className="muted"> / {Math.round(level.max)} L</span>
+          </>
+        )}
       </span>
       <span className="level-trend">
-        {level.pressurized
-          ? "Pressurized"
-          : trend === undefined || Math.abs(trend) < 0.3
-            ? ""
-            : `${trend > 0 ? "+" : "−"}${Math.abs(trend).toFixed(1)} L/min`}
+        {percent || trend === undefined || Math.abs(trend) < 0.3
+          ? ""
+          : `${trend > 0 ? "+" : "−"}${Math.abs(trend).toFixed(1)} L/min`}
       </span>
     </div>
   );
@@ -150,7 +155,7 @@ function TrainStatus({ side, state }: { side: Side; state: DeviceState }) {
           </span>
         )}
       </p>
-      <LevelRow label="T1" level={state.tanks[a ? "t1a" : "t1b"]} />
+      <LevelRow label="T1" level={state.tanks[a ? "t1a" : "t1b"]} percent />
       <LevelRow label="T2" level={state.tanks[a ? "t2a" : "t2b"]} />
       <dl className="status-facts">
         {train.behaviors.length > 0 && (

@@ -379,54 +379,6 @@ const PHASE_LABELS: Record<TrainPhase, string> = {
   unknown: "Unknown",
 };
 
-// ── T2 pressure ────────────────────────────────────────────────────────────
-
-// T2 is a closed tank. The air pump pressurizes it to push water up into T1,
-// and `release_air` vents it, which lets the water fall back. Its level
-// sensor measures pressure, so while T2 holds air pressure, the reading can
-// be higher than the water in it. The effect looks small: when the air is
-// released, T1 drops by about 6 L and T2 rises by about as much (medians of
-// 110 ventings). Derived from an H600's data, not documented.
-
-const AIR_IN = ["air_pump", "add_air_valve"];
-
-/** Vent closed, and air pumped in since it closed */
-export function t2Pressurized(ds: Dataset, side: Side, t: number) {
-  const vent = ds.io[sideIo("release_air", side)];
-  const v = stepAt(vent, t);
-  if (!vent || !v) return undefined;
-  if (v.v > 0) return false;
-  const closedAt = onSince(vent, t) ?? v.t;
-  return AIR_IN.some((name) => {
-    const points = ds.io[sideIo(name, side)];
-    if (!points) return false;
-    if ((stepAt(points, closedAt)?.v ?? 0) > 0) return true;
-    return points.some((p) => p.t > closedAt && p.t <= t && p.v > 0);
-  });
-}
-
-/** Intervals during which T2 was pressurized, within the dataset's range */
-export function t2PressurizedIntervals(ds: Dataset, side: Side): Interval[] {
-  const names = ["release_air", ...AIR_IN].map((n) => sideIo(n, side));
-  if (!ds.io[names[0]]) return [];
-  const changes = names
-    .flatMap((name) => (ds.io[name] ?? []).map((p) => ({ ...p, name })))
-    .sort((a, b) => a.t - b.t);
-  const values: Record<string, number> = {};
-  let charged = false;
-  const points: Point[] = [];
-  for (const c of changes) {
-    values[c.name] = c.v;
-    if (values[names[0]] > 0) charged = false;
-    else if (AIR_IN.some((n) => values[sideIo(n, side)] > 0)) charged = true;
-    const pressurized = values[names[0]] === 0 && charged ? 1 : 0;
-    if (points[points.length - 1]?.v !== pressurized) {
-      points.push({ t: c.t, v: pressurized });
-    }
-  }
-  return onIntervals(points, ds.from, ds.until);
-}
-
 // ── State at a point in time ───────────────────────────────────────────────
 
 export type IoValue = { on: boolean; value: number; since: number | undefined };
@@ -440,11 +392,6 @@ export type TankLevel = {
   pct: number | undefined;
   /** Liters per minute over the previous 10 minutes */
   trend: number | undefined;
-  /**
-   * T2 only: the tank holds air pressure, which adds to the reading. The
-   * liters are then not the actual volume.
-   */
-  pressurized?: boolean;
 };
 
 export type TrainState = {
@@ -565,8 +512,6 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
           : (liters - before) / (TREND_WINDOW / 60_000),
     };
   }
-  tanks.t2a.pressurized = t2Pressurized(ds, "A", t);
-  tanks.t2b.pressurized = t2Pressurized(ds, "B", t);
 
   const io: Record<string, IoValue | undefined> = {};
   for (const [name, points] of Object.entries(ds.io)) {
@@ -813,8 +758,8 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
 //   FILTH_REMOVAL, the A/B valve switches to the other train, and the train
 //   doesn't accept water for the ~4.5 h it lasts.
 // - The bypass opens when neither train can accept water.
-// T2 is only valid while vented (see t2Pressurized), which happens about once
-// an hour. Greywater also fills T1, but T1 holds at most about 24 L.
+// So T2 is taken from its last venting, which happens about once an hour.
+// Greywater also fills T1, but T1 holds at most about 24 L.
 
 /** T2 at which a train is full and starts FILTH_REMOVAL */
 export const TRAIN_FULL_LITERS = 134;
@@ -1257,10 +1202,7 @@ export function deviceEvents(ds: Dataset): DeviceEvent[] {
 
 export type Transfer = Interval & {
   side: Side;
-  /**
-   * Change of T3 in liters between start and end. T1+T2 can't be used, as
-   * T2 reads high while pressurized.
-   */
+  /** Change of T3 in liters between start and end */
   t3Change: number | undefined;
 };
 
