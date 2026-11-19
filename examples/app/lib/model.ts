@@ -920,16 +920,26 @@ export function roomAt(ds: Dataset, t: number): Room {
   return { liters, partial, bypass, filling: fillingTrain(ds, t), trains };
 }
 
-/** Room for greywater over the dataset's range, at `steps` points */
-export function roomSeries(ds: Dataset, steps: number): Point[] {
-  const result: Point[] = [];
+/**
+ * Room for greywater over the dataset's range, at `steps` points, and the
+ * greywater the filling train takes until it starts filth removal
+ */
+export function roomSeries(
+  ds: Dataset,
+  steps: number,
+): { room: Point[]; next: Point[] } {
+  const room: Point[] = [];
+  const next: Point[] = [];
   for (let i = 0; i <= steps; i++) {
     const t = ds.from + ((ds.until - ds.from) * i) / steps;
-    const room = roomAt(ds, t);
-    if (room.liters !== undefined && !room.partial)
-      result.push({ t, v: room.liters });
+    const r = roomAt(ds, t);
+    if (r.liters !== undefined && !r.partial) room.push({ t, v: r.liters });
+    const train = r.filling && r.trains[r.filling];
+    if (!train) continue;
+    if (r.bypass || train.accepting === false) next.push({ t, v: 0 });
+    else if (train.liters !== undefined) next.push({ t, v: train.liters });
   }
-  return result;
+  return { room, next };
 }
 
 // ── Water being cleaned ────────────────────────────────────────────────────

@@ -258,7 +258,10 @@ export function Timeline({
   const steps = Math.max(100, Math.round(plotW / 2));
   // The room series is sampled at even steps, so a gap is a missing sample
   const roomGap = ((dataset.until - dataset.from) / steps) * 1.5;
-  const room = useMemo(() => roomSeries(dataset, steps), [dataset, steps]);
+  const { room, next } = useMemo(
+    () => roomSeries(dataset, steps),
+    [dataset, steps],
+  );
   const bypass = useMemo(
     () => onIntervals(dataset.io[IO.bypass], dataset.from, dataset.until),
     [dataset],
@@ -430,8 +433,6 @@ export function Timeline({
             const max = TRAIN_FULL_LITERS.A + TRAIN_FULL_LITERS.B;
             const yScale = (v: number) =>
               row.y + row.h - (Math.min(v, max) / max) * row.h;
-            const current =
-              cursor !== undefined ? valueAt(room, cursor) : undefined;
             return (
               <g key={row.key} className="chart room-chart">
                 <text x={0} y={row.y + 12} className="row-label is-strong">
@@ -489,16 +490,45 @@ export function Timeline({
                   d={areaPath(room, x, yScale, row.y + row.h, roomGap)}
                   className="chart-area"
                 />
-                <path
-                  d={linePath(room, x, yScale, roomGap)}
-                  className="chart-line"
-                />
-                {current !== undefined && (
-                  <g className="cursor-value">
-                    <circle cx={x(cursor!)} cy={yScale(current)} r={3.5} />
-                  </g>
-                )}
-                {room.length === 0 && (
+                {(
+                  [
+                    [room, "Total", "Room for greywater, both trains"],
+                    [next, "Next", "Greywater until filth removal"],
+                  ] as const
+                ).map(([points, label, title], i) => {
+                  const last = points[points.length - 1];
+                  const v =
+                    cursor !== undefined ? valueAt(points, cursor) : undefined;
+                  return (
+                    <g
+                      key={label}
+                      className={
+                        i === 0 ? "series is-primary" : "series is-secondary"
+                      }
+                    >
+                      <title>{title}</title>
+                      <path
+                        d={linePath(points, x, yScale, roomGap)}
+                        className="chart-line"
+                      />
+                      {last && (
+                        <text
+                          x={x(last.t) + 6}
+                          y={yScale(last.v) + 4}
+                          className="series-label"
+                        >
+                          {label}
+                        </text>
+                      )}
+                      {v !== undefined && (
+                        <g className="cursor-value">
+                          <circle cx={x(cursor!)} cy={yScale(v)} r={3.5} />
+                        </g>
+                      )}
+                    </g>
+                  );
+                })}
+                {room.length === 0 && next.length === 0 && (
                   <text
                     x={LABEL_W + plotW / 2}
                     y={row.y + row.h / 2}
