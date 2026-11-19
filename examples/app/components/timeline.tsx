@@ -162,16 +162,15 @@ function buildLanes(ds: Dataset, showAll: boolean) {
       segments: valveRoutineSegments(ds)
         .filter((s) => s.side === side)
         .map((s) => {
-          const text = s.valve
-            ? `${humanize(s.name)}, A/B valve set to ${s.valve}`
-            : humanize(s.name);
+          const text = humanize(s.name);
           const states = [...new Set(s.states.map((x) => humanize(x.state)))];
           return {
             start: s.start,
             end: s.end,
             text,
-            kind: s.phase,
-            title: `${SIDE_LABEL[side]}: ${text}, ${formatTime(s.start, "datetime")} – ${s.open ? "now" : formatTime(s.end, "datetime")}\n${states.join(", ")}`,
+            // Not selected by the A/B valve, so the train takes no water
+            kind: s.valve && s.phase === "idle" ? "inactive" : s.phase,
+            title: `${SIDE_LABEL[side]}: ${text}${s.valve ? `, A/B valve set to ${s.valve}` : ""}, ${formatTime(s.start, "datetime")} – ${s.open ? "now" : formatTime(s.end, "datetime")}\n${states.join(", ")}`,
           };
         }),
     }))

@@ -1084,16 +1084,19 @@ export function routineSegments(ds: Dataset): RoutineSegment[] {
 }
 
 /**
- * Routine segments where INCOMING_WATER is split at A/B valve switches. The
- * parts while the valve selects the other train get the "idle" phase and
- * `valve` set to that train, as no greywater enters (see `stateAt`).
+ * Routine segments where STANDBY and INCOMING_WATER are split at A/B valve
+ * switches. The parts while the valve selects the other train get `valve`
+ * set to that train, as no greywater enters, and INCOMING_WATER gets the
+ * "idle" phase (see `stateAt`).
  */
+const VALVE_ROUTINES = new Set(["STANDBY", "INCOMING_WATER"]);
+
 export function valveRoutineSegments(
   ds: Dataset,
 ): (RoutineSegment & { valve?: Side })[] {
   const switches = (ds.io[IO.abSelector] ?? []).map((p) => p.t);
   return routineSegments(ds).flatMap((s) => {
-    if (s.name !== "INCOMING_WATER" || s.side === "SYSTEM") return [s];
+    if (!VALVE_ROUTINES.has(s.name) || s.side === "SYSTEM") return [s];
     const cuts = [s.start, ...switches.filter((t) => t > s.start && t < s.end)];
     const parts: (RoutineSegment & { valve?: Side })[] = [];
     cuts.forEach((start, i) => {

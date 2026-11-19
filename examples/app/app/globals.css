@@ -1257,6 +1257,9 @@ tr.is-selected:focus-visible {
 .segment.kind-idle {
   --k: var(--border-strong);
 }
+.segment.kind-inactive {
+  --k: transparent;
+}
 .segment.kind-other {
   --k: var(--subtle);
 }
@@ -1272,6 +1275,9 @@ tr.is-selected:focus-visible {
 .segment.kind-treating .segment-label,
 .segment.kind-idle .segment-label {
   fill: var(--fg);
+}
+.segment.kind-inactive .segment-label {
+  fill: var(--muted);
 }
 .lane.kind-routine .segment:hover rect,
 .lane .segment:hover rect {
