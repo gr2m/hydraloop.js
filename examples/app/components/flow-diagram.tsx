@@ -450,6 +450,7 @@ function Tank({
   kind,
   label,
   sub,
+  side,
   aeration,
   small,
 }: {
@@ -461,6 +462,8 @@ function Tank({
   kind: Kind;
   label: string;
   sub?: string;
+  /** The train, named in the tooltip only */
+  side?: Side;
   aeration?: boolean;
   /**
    * A tank too narrow for its text: the label and the level in percent go
@@ -478,11 +481,12 @@ function Tank({
   const arrow =
     trend === undefined || Math.abs(trend) < 0.3 ? "" : trend > 0 ? "↑" : "↓";
   const fillHeight = h * fill;
+  const name = [label, side ?? sub].filter(Boolean).join(" ");
   const title = !known
-    ? `${label}: no level data`
+    ? `${name}: no level data`
     : small
-      ? `${label} ${sub ?? ""}: ${percent} full. ${capacityNote(level!)}`.trimEnd()
-      : `${label} ${sub ?? ""}: ${Math.round(level!.liters!)} L (${percent})${
+      ? `${name}: ${percent} full. ${capacityNote(level!)}`.trimEnd()
+      : `${name}: ${Math.round(level!.liters!)} L (${percent})${
           trend !== undefined
             ? `, ${trend >= 0 ? "+" : ""}${trend.toFixed(1)} L/min`
             : ""
@@ -745,7 +749,7 @@ export function FlowDiagram({
           level={tanks[a ? "t1a" : "t1b"]}
           kind="grey"
           label="T1"
-          sub={side}
+          side={side}
           aeration={bubbles?.on}
           small={a ? "start" : "end"}
         />
@@ -757,7 +761,7 @@ export function FlowDiagram({
           level={tanks[a ? "t2a" : "t2b"]}
           kind="grey"
           label="T2"
-          sub={side}
+          side={side}
           aeration={air?.on}
         />
 
@@ -1149,6 +1153,7 @@ export function DiagramLegend() {
     ["grey", "Greywater"],
     ["clean", "Treated water"],
     ["mains", "Mains backup"],
+    ["waste", "Filth removal"],
   ];
   return (
     <ul className="legend" aria-label="Legend">

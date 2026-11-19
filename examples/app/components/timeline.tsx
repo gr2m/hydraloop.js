@@ -15,11 +15,11 @@ import {
   IO,
   onIntervals,
   roomSeries,
-  routineSegments,
   sideIo,
   TANK_LABELS,
   TRAIN_FULL_LITERS,
   valueAt,
+  valveRoutineSegments,
   type Dataset,
   type Point,
   type RoutineSide,
@@ -159,10 +159,12 @@ function buildLanes(ds: Dataset, showAll: boolean) {
       key: `routine-${side}`,
       label: SIDE_LABEL[side],
       kind: "routine",
-      segments: routineSegments(ds)
+      segments: valveRoutineSegments(ds)
         .filter((s) => s.side === side)
         .map((s) => {
-          const text = humanize(s.name);
+          const text = s.valve
+            ? `${humanize(s.name)}, A/B valve set to ${s.valve}`
+            : humanize(s.name);
           const states = [...new Set(s.states.map((x) => humanize(x.state)))];
           return {
             start: s.start,

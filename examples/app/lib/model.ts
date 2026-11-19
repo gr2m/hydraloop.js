@@ -1083,6 +1083,41 @@ export function routineSegments(ds: Dataset): RoutineSegment[] {
     .sort((a, b) => a.start - b.start);
 }
 
+/**
+ * Routine segments where INCOMING_WATER is split at A/B valve switches. The
+ * parts while the valve selects the other train get the "idle" phase and
+ * `valve` set to that train, as no greywater enters (see `stateAt`).
+ */
+export function valveRoutineSegments(
+  ds: Dataset,
+): (RoutineSegment & { valve?: Side })[] {
+  const switches = (ds.io[IO.abSelector] ?? []).map((p) => p.t);
+  return routineSegments(ds).flatMap((s) => {
+    if (s.name !== "INCOMING_WATER" || s.side === "SYSTEM") return [s];
+    const cuts = [s.start, ...switches.filter((t) => t > s.start && t < s.end)];
+    const parts: (RoutineSegment & { valve?: Side })[] = [];
+    cuts.forEach((start, i) => {
+      const end = cuts[i + 1] ?? s.end;
+      const filling = fillingTrain(ds, start);
+      const valve = filling && filling !== s.side ? filling : undefined;
+      const last = parts[parts.length - 1];
+      if (last && last.valve === valve) {
+        last.end = end;
+        return;
+      }
+      parts.push({
+        ...s,
+        start,
+        end,
+        open: s.open && end === s.end,
+        phase: valve ? "idle" : s.phase,
+        valve,
+      });
+    });
+    return parts;
+  });
+}
+
 export type DeviceEvent = {
   /**
    * `<source>:<t>:<suffix>`, unique within a dataset, e.g.
