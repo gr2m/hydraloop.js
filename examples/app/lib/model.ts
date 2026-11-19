@@ -1101,6 +1101,11 @@ export function routineSegments(ds: Dataset): RoutineSegment[] {
 }
 
 export type DeviceEvent = {
+  /**
+   * `<source>:<t>:<suffix>`, unique within a dataset, e.g.
+   * `routine:1763550000000:A-FILTH_REMOVAL-ENTRY`
+   */
+  id: string;
   t: number;
   side: RoutineSide;
   label: string;
@@ -1163,6 +1168,7 @@ export function deviceEvents(ds: Dataset): DeviceEvent[] {
     previous.set(r.side, r.name);
     if (r.t < ds.from || r.t > ds.until) continue;
     events.push({
+      id: `routine:${r.t}:${r.side}-${r.name}-${r.state}`,
       t: r.t,
       side: r.side,
       label: changed
@@ -1180,6 +1186,7 @@ export function deviceEvents(ds: Dataset): DeviceEvent[] {
     for (const [t, engaged] of edges) {
       if (t < ds.from || t > ds.until) continue;
       events.push({
+        id: `behavior:${t}:${b.name}-${engaged ? "engaged" : "disengaged"}`,
         t,
         side: b.side,
         label: `${b.label} ${engaged ? "started" : "ended"}`,
@@ -1197,6 +1204,7 @@ export function deviceEvents(ds: Dataset): DeviceEvent[] {
         continue;
       }
       events.push({
+        id: `io:${points[i].t}:${name}-${after ? "on" : "off"}`,
         t: points[i].t,
         side: ioSide(name),
         label: ioEventLabel(ds.captions, name, after),

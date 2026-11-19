@@ -1,40 +1,49 @@
 "use client";
 
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import {
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
 
 import type { DeviceEvent } from "@/lib/model";
 
-import { Time, type TimeFormat } from "./time";
+import { clockFormat, formatTime, Time } from "./time";
 
 export function EventTable({
   events,
   caption,
-  timeFormat = "seconds",
   limit = 30,
+  selected,
   onSelect,
 }: {
   events: DeviceEvent[];
   caption: string;
-  timeFormat?: TimeFormat;
   limit?: number;
-  onSelect?: (t: number) => void;
+  /** The id of the selected event */
+  selected?: string;
+  onSelect?: (event: DeviceEvent, id: string) => void;
 }) {
-  const [showAll, setShowAll] = useState(false);
+  // A selected event that isn't a key event, e.g. from a shared link, shows
+  // all of them
+  const [showAll, setShowAll] = useState(
+    () => !!selected && events.some((e) => !e.key && e.id === selected),
+  );
   const [expanded, setExpanded] = useState(false);
-  /** The event selected last, while it is listed */
-  const [selected, setSelected] = useState<string>();
   const [focusSelected, setFocusSelected] = useState(false);
   const body = useRef<HTMLTableSectionElement>(null);
   const filtered = showAll ? events : events.filter((e) => e.key);
-  const visible = expanded ? filtered : filtered.slice(0, limit);
-  const selectedIndex = filtered.findIndex((e) => eventId(e) === selected);
+  const selectedIndex = filtered.findIndex((e) => e.id === selected);
+  const visible =
+    expanded || selectedIndex >= limit ? filtered : filtered.slice(0, limit);
 
   const select = (index: number) => {
     const event = filtered[index];
     if (!event || !onSelect) return;
     if (index >= limit) setExpanded(true);
-    setSelected(eventId(event));
-    onSelect(event.t);
+    onSelect(event, event.id);
   };
 
   // Enter and space select the focused event. Then up and left go to the
@@ -101,41 +110,49 @@ export function EventTable({
           </thead>
           <tbody ref={body} onKeyDown={onSelect && onKey}>
             {visible.map((e, i) => (
-              <tr
-                key={`${e.t}-${e.detail}-${i}`}
-                data-index={i}
-                className={
-                  onSelect
-                    ? i === selectedIndex
-                      ? "is-selectable is-selected"
-                      : "is-selectable"
-                    : undefined
-                }
-                tabIndex={
-                  onSelect
-                    ? i === (selectedIndex === -1 ? 0 : selectedIndex)
-                      ? 0
-                      : -1
-                    : undefined
-                }
-                aria-current={
-                  onSelect && i === selectedIndex ? "true" : undefined
-                }
-                onClick={
-                  onSelect &&
-                  (() => {
-                    select(i);
-                    setFocusSelected(true);
-                  })
-                }
-              >
-                <td className="mono">
-                  <Time t={e.t} format={timeFormat} />
-                </td>
-                <td>{e.side === "SYSTEM" ? "–" : e.side}</td>
-                <td>{e.label}</td>
-                <td className="mono muted">{e.detail}</td>
-              </tr>
+              <Fragment key={e.id}>
+                {(i === 0 || day(visible[i - 1].t) !== day(e.t)) && (
+                  <tr className="day-row">
+                    <th scope="colgroup" colSpan={4}>
+                      <Time t={e.t} format="date" />
+                    </th>
+                  </tr>
+                )}
+                <tr
+                  data-index={i}
+                  className={
+                    onSelect
+                      ? i === selectedIndex
+                        ? "is-selectable is-selected"
+                        : "is-selectable"
+                      : undefined
+                  }
+                  tabIndex={
+                    onSelect
+                      ? i === (selectedIndex === -1 ? 0 : selectedIndex)
+                        ? 0
+                        : -1
+                      : undefined
+                  }
+                  aria-current={
+                    onSelect && i === selectedIndex ? "true" : undefined
+                  }
+                  onClick={
+                    onSelect &&
+                    (() => {
+                      select(i);
+                      setFocusSelected(true);
+                    })
+                  }
+                >
+                  <td className="mono">
+                    <Time t={e.t} format={clockFormat(e.t)} />
+                  </td>
+                  <td>{e.side === "SYSTEM" ? "–" : e.side}</td>
+                  <td>{e.label}</td>
+                  <td className="mono muted">{e.detail}</td>
+                </tr>
+              </Fragment>
             ))}
           </tbody>
         </table>
@@ -153,6 +170,7 @@ export function EventTable({
   );
 }
 
-function eventId(e: DeviceEvent) {
-  return `${e.t}-${e.side}-${e.detail}`;
+/** The calendar day in the browser's time zone */
+function day(t: number) {
+  return formatTime(t, "date");
 }
