@@ -56,6 +56,7 @@ export function HistoryExplorer() {
   const initialEnd = Number(params.get("end")) || undefined;
   /** A pinned moment from the URL, applied once its range has loaded */
   const initialAt = useRef(Number(params.get("at")) || undefined);
+  const initialEvent = useRef(params.get("event") ?? undefined);
 
   const [range, setRange] = useState<RangeKey>(initialRange);
   /** End of the range, undefined for "now" */
@@ -65,15 +66,24 @@ export function HistoryExplorer() {
   const [error, setError] = useState<string>();
   const [cursor, setCursor] = useState<number>();
   const [pinned, setPinned] = useState(false);
+  /** The id of the event selected in the events table */
+  const [event, setEvent] = useState<string>();
+  // The selection ends when the cursor moves away from the event. Its time is
+  // the second part of the id, `<source>:<t>:<suffix>`
+  const selectedEvent =
+    pinned && event && Number(event.split(":")[1]) === Math.round(cursor ?? NaN)
+      ? event
+      : undefined;
 
-  // Keep the URL shareable: range, end and the pinned moment
+  // Keep the URL shareable: range, end, the pinned moment and the event
   useEffect(() => {
     const search = new URLSearchParams({ range });
     if (end) search.set("end", String(end));
     if (pinned && cursor !== undefined)
       search.set("at", String(Math.round(cursor)));
+    if (selectedEvent) search.set("event", selectedEvent);
     window.history.replaceState(null, "", `?${search}`);
-  }, [range, end, pinned, cursor]);
+  }, [range, end, pinned, cursor, selectedEvent]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -99,6 +109,8 @@ export function HistoryExplorer() {
         const keep = at !== undefined && at >= next.from && at <= next.until;
         setCursor(keep ? at : undefined);
         setPinned(keep);
+        setEvent(keep ? initialEvent.current : undefined);
+        initialEvent.current = undefined;
       })
       .catch((e) => {
         if (!controller.signal.aborted)
@@ -433,8 +445,11 @@ export function HistoryExplorer() {
                   <EventTable
                     events={events}
                     caption="Events in the selected range"
-                    timeFormat="datetime"
-                    onSelect={select}
+                    selected={selectedEvent}
+                    onSelect={(e, id) => {
+                      setEvent(id);
+                      select(e.t);
+                    }}
                   />
                 </section>
               </div>

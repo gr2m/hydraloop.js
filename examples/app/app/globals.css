@@ -484,6 +484,14 @@ tr.is-selected:focus-visible {
 .event-table td:last-child {
   overflow-wrap: anywhere;
 }
+/* A line where a new day begins */
+.event-table .day-row th {
+  padding-top: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--muted);
+}
 
 .disclosure summary {
   cursor: pointer;
