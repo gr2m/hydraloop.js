@@ -494,6 +494,38 @@ function Bubbles({
   );
 }
 
+/** Drops of water falling inside a tank from `y` onto its surface */
+function Drips({
+  x,
+  y,
+  bottom,
+  active,
+}: {
+  x: number;
+  y: number;
+  /** The water's surface */
+  bottom: number | undefined;
+  active: boolean;
+}) {
+  if (!active || bottom === undefined || bottom - y < 4) return null;
+  return (
+    <g className="drips kind-grey" aria-hidden>
+      {[0, 0.3, 0.6].map((delay) => (
+        <circle
+          key={delay}
+          cx={x}
+          cy={y}
+          r={1.6}
+          style={{
+            animationDelay: `${delay}s`,
+            ["--fall" as string]: `${bottom - y}px`,
+          }}
+        />
+      ))}
+    </g>
+  );
+}
+
 /** How full the tank's shell is, 0 to 1, or undefined without a reading */
 function fillOf(level: TankLevel | undefined) {
   if (level?.liters === undefined || level.max <= 0) return undefined;
@@ -891,9 +923,20 @@ export function FlowDiagram({
     const skimming = state.trains[side].skimming;
     const t2Level = tanks[a ? "t2a" : "t2b"];
     const t2Fill = fillOf(t2Level);
-    // Two pipes connect T1 and T2: one halfway up, and one whose bottom
-    // edge meets T2's lower corner (7 px pipe, 5 px corner radius)
-    const exchangeYs = [232 + 128 / 2, 360 - 5 - 3.5];
+    const t1Fill = fillOf(tanks[a ? "t1a" : "t1b"]);
+    // Two pipes connect T1 and T2: one whose upper edge is at 40% of T1's
+    // height, so the bubbles circulate water from that level up, and one whose
+    // bottom edge meets T2's lower corner (7 px pipe, 5 px corner radius)
+    const exchangeYs = [
+      t1Bottom - (t1Bottom - 232) * 0.4 + PIPE,
+      360 - 5 - PIPE,
+    ];
+    /** An exchange pipe at `y` holds water */
+    const exchangeFilled = (y: number) =>
+      (t1Fill !== undefined &&
+        t1Bottom - (t1Bottom - 232) * t1Fill <= y - PIPE + 1e-6) ||
+      (t2Fill !== undefined && 360 - 128 * t2Fill <= y - PIPE);
+    const upperFilled = exchangeFilled(exchangeYs[0]);
     // The transfer pipe leaves T1 towards T2, halfway between the lower
     // exchange pipe and T1's bottom. It crosses the air pipe, passes below T2
     // and turns down into UV-C. Its valve is centered between T2's inner edge
@@ -1012,13 +1055,14 @@ export function FlowDiagram({
         />
 
         {/* Exchange between T1 and T2, open connections: each holds water
-        while T2's surface is above the pipe's upper edge. The bubbles in T1
-        lift its water through the upper pipe into T2, which flows back
-        through the lower one. A transfer from T2 into T1 is not animated */}
+        while T1's or T2's surface is at or above the pipe's upper edge. The
+        bubbles in T1 lift its water through the upper pipe into T2, which
+        flows back through the lower one. A transfer from T2 into T1 is not
+        animated */}
         {exchangeYs.map((y, i) => {
           const t1End = a ? t1x + 21 : t1x;
           const t2End = a ? t2x : t2x + 172;
-          const filled = t2Fill !== undefined && 360 - 128 * t2Fill <= y - 3.5;
+          const filled = exchangeFilled(y);
           return (
             <g key={y}>
               {/* A gap in the air pipe into T1, which passes behind */}
@@ -1050,6 +1094,17 @@ export function FlowDiagram({
           small={a ? "start" : "end"}
           square
         />
+        {/* Incoming greywater drips from the inlet's end onto T1's surface */}
+        <Drips
+          x={t1c}
+          y={232}
+          bottom={
+            t1Fill === undefined
+              ? undefined
+              : t1Bottom - (t1Bottom - 232) * t1Fill
+          }
+          active={receiving}
+        />
         <Tank
           x={t2x}
           y={232}
@@ -1062,6 +1117,14 @@ export function FlowDiagram({
           pressurized={(addingAir || holdingAir) && 232 - addAirY}
           pressureHeld={holdingAir}
           venting={release?.on ? releaseX : undefined}
+        />
+        {/* While water circulates and T2's surface is below the upper
+            exchange pipe, it drips from the pipe down T2's outer wall */}
+        <Drips
+          x={a ? t2x + 4 : t2x + 172 - 4}
+          y={exchangeYs[0] + PIPE}
+          bottom={t2Fill === undefined ? undefined : 360 - 128 * t2Fill}
+          active={bubbling === true && upperFilled}
         />
 
         {/* Skim overflow at the top of T1, down the drain line. It has no
@@ -1246,7 +1309,7 @@ export function FlowDiagram({
             active: inlet.receiving.includes("B"),
           },
         ]}
-        labelDy={-14}
+        labelDy={24}
       />
 
       {/* UV and into T3 */}

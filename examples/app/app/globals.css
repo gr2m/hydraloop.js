@@ -983,6 +983,27 @@ tr.is-selected:focus-visible {
   }
 }
 
+/* Water dripping from the upper exchange pipe onto T2's surface */
+.drips circle {
+  fill: var(--k);
+  opacity: 0;
+  animation: drip 0.9s ease-in infinite;
+}
+@keyframes drip {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15%,
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(var(--fall));
+    opacity: 0;
+  }
+}
+
 /* Air pumped into T2 presses on the water. Same colors and rhythm as the air
    pipe's .pipe-flow */
 .pressure-fill {
@@ -1104,6 +1125,7 @@ tr.is-selected:focus-visible {
     transition: none;
   }
   .bubbles,
+  .drips,
   .vent-ring {
     display: none;
   }
