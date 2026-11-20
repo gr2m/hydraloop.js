@@ -519,16 +519,18 @@ function Drips({
   y,
   bottom,
   active,
+  kind = "grey",
 }: {
   x: number;
   y: number;
   /** The water's surface */
   bottom: number | undefined;
   active: boolean;
+  kind?: Kind;
 }) {
   if (!active || bottom === undefined || bottom - y < 4) return null;
   return (
-    <g className="drips kind-grey" aria-hidden>
+    <g className={`drips kind-${kind}`} aria-hidden>
       {[0, 0.3, 0.6].map((delay) => (
         <circle
           key={delay}
@@ -1398,6 +1400,7 @@ export function FlowDiagram({
   const t3ReceivingFromUv =
     (t3.receivingFrom.length > 0 || circulatingThroughUv) &&
     io[IO.uvValve]?.on !== false;
+  const t3Fill = fillOf(tanks.t3);
   const outletKind: Kind = supply.source === "backup" ? "mains" : "clean";
   const off = (connected: boolean | null) =>
     connected === false ? " is-disconnected" : "";
@@ -1537,6 +1540,14 @@ export function FlowDiagram({
         label="T3"
         sub="Recycled water"
         square
+      />
+      {/* Water from UV-C drips onto T3's surface */}
+      <Drips
+        x={500}
+        y={540}
+        bottom={t3Fill === undefined ? undefined : 640 - 100 * t3Fill}
+        active={!!t3ReceivingFromUv}
+        kind="clean"
       />
 
       {/* T3 drain, out of T3's right side at its bottom, across from the
