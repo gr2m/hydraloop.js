@@ -1526,6 +1526,18 @@ tr.is-selected:focus-visible {
   font-size: 14px;
 }
 
+/* Manually switched IOs in the timeline and signal table */
+.lane-manual {
+  fill: url(#timeline-manual);
+}
+.manual-line {
+  stroke: var(--fg);
+  stroke-width: 1.5;
+}
+.tag.is-manual {
+  border-style: dashed;
+}
+
 /* ── Responsive ─────────────────────────────────────────────────────────── */
 
 @media (max-width: 1180px) {

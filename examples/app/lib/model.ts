@@ -110,6 +110,12 @@ export type Dataset = {
   tankMax: Record<TankId, number>;
   /** IO values by IO name, one point per change, sorted by time */
   io: Record<string, Point[]>;
+  /**
+   * Whether an IO is switched manually (1) instead of by the firmware (0),
+   * e.g. by a technician or a maintenance procedure in the HDM web app. Same
+   * shape as `io`.
+   */
+  manual?: Record<string, Point[]>;
   /** Human readable IO names from the graph config */
   captions: Record<string, string>;
   /** Routine changes, sorted by time. Includes the last one before `from`. */
@@ -451,7 +457,13 @@ const PHASE_LABELS: Record<TrainPhase, string> = {
 
 // ── State at a point in time ───────────────────────────────────────────────
 
-export type IoValue = { on: boolean; value: number; since: number | undefined };
+export type IoValue = {
+  on: boolean;
+  value: number;
+  since: number | undefined;
+  /** Switched manually instead of by the firmware */
+  manual: boolean;
+};
 
 export type TankLevel = {
   liters: number | undefined;
@@ -591,7 +603,12 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
   const io: Record<string, IoValue | undefined> = {};
   for (const [name, points] of Object.entries(ds.io)) {
     const p = stepAt(points, t);
-    io[name] = p && { on: p.v > 0, value: p.v, since: onSince(points, t) };
+    io[name] = p && {
+      on: p.v > 0,
+      value: p.v,
+      since: onSince(points, t),
+      manual: (stepAt(ds.manual?.[name], t)?.v ?? 0) > 0,
+    };
   }
   const on = (name: string) => io[name]?.on;
 
@@ -1297,7 +1314,7 @@ export type DeviceEvent = {
   side: RoutineSide;
   label: string;
   detail: string;
-  source: "routine" | "behavior" | "io";
+  source: "routine" | "behavior" | "io" | "manual";
   /** Key events are shown by default, others only on request */
   key: boolean;
 };
@@ -1403,7 +1420,30 @@ export function deviceEvents(ds: Dataset): DeviceEvent[] {
       });
     }
   }
+  for (const [name, points] of Object.entries(ds.manual ?? {})) {
+    for (let i = 0; i < points.length; i++) {
+      // Before the first point, the IO is taken to be automatic
+      const before = i > 0 && points[i - 1].v > 0;
+      const after = points[i].v > 0;
+      if (before === after) continue;
+      if (points[i].t < ds.from || points[i].t > ds.until) continue;
+      events.push({
+        id: `manual:${points[i].t}:${name}-${after ? "on" : "off"}`,
+        t: points[i].t,
+        side: ioSide(name),
+        label: `${caption(ds.captions, name)} ${after ? "switched manually" : "back to automatic"}`,
+        detail: `${name} manual ${after ? 1 : 0}`,
+        source: "manual",
+        key: true,
+      });
+    }
+  }
   return events.sort((a, b) => b.t - a.t);
+}
+
+/** Intervals during which an IO was switched manually, within [from, until] */
+export function manualIntervals(ds: Dataset, name: string) {
+  return onIntervals(ds.manual?.[name], ds.from, ds.until);
 }
 
 export type Transfer = Interval & {

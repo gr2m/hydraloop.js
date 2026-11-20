@@ -97,7 +97,8 @@ function ioTitle(
 ) {
   if (!io) return `${label}: no data (${name})`;
   const since = io.since ? ` since ${formatTime(io.since)}` : "";
-  return `${label}: ${io.on ? words[0] : words[1]}${since} (${name} = ${io.value})`;
+  const manual = io.manual ? ", switched manually" : "";
+  return `${label}: ${io.on ? words[0] : words[1]}${since}${manual} (${name} = ${io.value})`;
 }
 
 /** An on/off valve. Parallel to the pipe while open, across it while closed */

@@ -15,6 +15,7 @@ import {
   IO,
   IO_GROUPS,
   isScheduledRestart,
+  manualIntervals,
   onIntervals,
   OTHER_BEHAVIORS,
   roomSeries,
@@ -49,6 +50,8 @@ type Lane = {
   kind: string;
   /** No data before this time */
   noDataUntil?: number;
+  /** Times the IO was switched manually instead of by the firmware */
+  manual?: { start: number; end: number; title: string }[];
   segments: {
     start: number;
     end: number;
@@ -143,6 +146,10 @@ function buildLanes(ds: Dataset) {
     segments: onIntervals(ds.io[name], from, until).map((i) => ({
       ...i,
       title: `${label}: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`,
+    })),
+    manual: manualIntervals(ds, name).map((i) => ({
+      ...i,
+      title: `${label} switched manually: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`,
     })),
   });
 
@@ -398,6 +405,9 @@ export function Timeline({
   };
 
   const cursorX = cursor !== undefined ? x(cursor) : undefined;
+  const hasManual = Object.values(dataset.manual ?? {}).some((points) =>
+    points.some((p) => p.v > 0),
+  );
 
   return (
     <div className="timeline" ref={ref}>
@@ -423,6 +433,15 @@ export function Timeline({
             patternTransform="rotate(45)"
           >
             <line x1="0" y1="0" x2="0" y2="6" className="hatch-line" />
+          </pattern>
+          <pattern
+            id="timeline-manual"
+            width="5"
+            height="5"
+            patternUnits="userSpaceOnUse"
+            patternTransform="rotate(-45)"
+          >
+            <line x1="0" y1="0" x2="0" y2="5" className="manual-line" />
           </pattern>
         </defs>
         {/* Axis */}
@@ -757,6 +776,21 @@ export function Timeline({
                   </g>
                 );
               })}
+              {lane.manual?.map((m) => {
+                const mx = x(m.start);
+                return (
+                  <rect
+                    key={m.start}
+                    x={mx}
+                    y={row.y}
+                    width={Math.max(3, x(m.end) - mx)}
+                    height={LANE_H}
+                    className="lane-manual"
+                  >
+                    <title>{m.title}</title>
+                  </rect>
+                );
+              })}
             </g>
           );
         })}
@@ -787,6 +821,8 @@ export function Timeline({
           {pinned
             ? "Pinned. Click the timeline or press Escape to release."
             : "Click the timeline to pin a moment."}
+          {hasManual &&
+            " Hatched: switched manually instead of by the firmware, e.g. by a technician."}
         </p>
       </div>
     </div>

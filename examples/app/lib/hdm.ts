@@ -217,15 +217,27 @@ export async function loadDataset(
   for (const [name, points] of Object.entries(ioData?.value ?? {})) {
     ioPoints[name] = toPoints(points);
   }
+  const manualPoints: Record<string, Point[]> = {};
+  for (const [name, points] of Object.entries(ioData?.manual ?? {})) {
+    manualPoints[name] = toPoints(points);
+  }
   // Add the last known state, which may be older than the range
   for (const state of lastIoData) {
     const t = Date.parse(state.time);
-    const points = (ioPoints[state.type] ??= []);
-    const last = points[points.length - 1];
     if (!Number.isFinite(t)) continue;
-    if (!last || t > last.t) points.push({ t, v: state.value });
+    for (const [record, v] of [
+      [ioPoints, state.value],
+      [manualPoints, state.manual],
+    ] as const) {
+      const points = (record[state.type] ??= []);
+      const last = points[points.length - 1];
+      if (!last || t > last.t) points.push({ t, v });
+    }
   }
-  for (const points of Object.values(ioPoints)) {
+  for (const points of [
+    ...Object.values(ioPoints),
+    ...Object.values(manualPoints),
+  ]) {
     points.sort((a, b) => a.t - b.t);
   }
 
@@ -258,12 +270,14 @@ export async function loadDataset(
     }),
   );
 
-  for (const [name, points] of Object.entries(ioPoints)) {
-    // `getIo()` returns days of changes regardless of `from`. Keep the range,
-    // plus the last change before it for the state at `from`.
-    const first = points.findIndex((p) => p.t >= from);
-    const start = first === -1 ? points.length - 1 : Math.max(0, first - 1);
-    ioPoints[name] = points.slice(start);
+  // `getIo()` returns days of changes regardless of `from`. Keep the range,
+  // plus the last change before it for the state at `from`.
+  for (const record of [ioPoints, manualPoints]) {
+    for (const [name, points] of Object.entries(record)) {
+      const first = points.findIndex((p) => p.t >= from);
+      const start = first === -1 ? points.length - 1 : Math.max(0, first - 1);
+      record[name] = points.slice(start);
+    }
   }
 
   const captions: Record<string, string> = {};
@@ -291,6 +305,7 @@ export async function loadDataset(
     tanks,
     tankMax,
     io: ioPoints,
+    manual: manualPoints,
     captions,
     routines: routineEvents,
     ventedBefore,

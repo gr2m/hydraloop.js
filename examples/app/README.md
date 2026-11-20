@@ -31,6 +31,7 @@ And for the last 30 days (see [30-day statistics](#30-day-statistics)):
 - Synchronized tracks of the levels of T2 and T3, the HDM routines, and the valves and pumps. `getIo()` returns only a few days of valve data, regardless of the requested range. The history view marks the time without data.
 - Move the pointer over the timeline to see the flow diagram at that moment. Click to pin it, use the arrow keys to step.
 - Transfers to T3 with their duration and the change of T3, filth removal runs, and all events.
+- Valves and pumps that were switched manually, e.g. by a technician or a maintenance procedure in the HDM web app, are hatched, with an event when they were switched manually and back to automatic (see [Manual overrides](#manual-overrides)).
 
 ## Phases and signals
 
@@ -88,6 +89,10 @@ In 30 days of an H600's data, every `FILTH_REMOVAL` that ran to its end took abo
 ### Behaviors
 
 Besides the valve values, `getIo()` returns firmware _behaviors_ with an `engaged` and a `disengaged` event, e.g. `fullT1T2WasteSoapBombA` while train A is emptied to the drain because of too much soap, `fullT3WasteCleaning`, `t4OverflowBackflush` or `bypassByAppBypassValve`. A trailing `A` or `B` names the train. The app shows them as events, in a timeline lane per train, and in the status of the train while engaged. `pressingOptButton` is engaged for about 12 hours at a time, nearly always, and disengages for about 25 seconds during each scheduled restart. It isn't documented, so the app shows it under Other, with the battery, buzzer and auxiliary signals.
+
+### Manual overrides
+
+Besides the value of each valve and pump, `getIo()` returns `manual`: 1 while it is switched manually instead of by the firmware, `getLastKnownIoState()` the current `manual` and `stuckPower`. In the data of an H600, outputs were switched manually during a technician's maintenance procedures (e.g. "Fill T3 with backup water"), which the service log lists at the same time. The history marks these times, so they aren't taken for the firmware's behavior, and the diagram's hover text and the signal table say so.
 
 ### Filth removal
 

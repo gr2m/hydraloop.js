@@ -31,7 +31,20 @@ export function SignalTable({
             const io = state.io[name];
             return (
               <tr key={name}>
-                <td>{caption(captions, name)}</td>
+                <td>
+                  {caption(captions, name)}
+                  {io?.manual && (
+                    <>
+                      {" "}
+                      <span
+                        className="tag is-manual"
+                        title="Switched manually instead of by the firmware, e.g. by a technician"
+                      >
+                        Manual
+                      </span>
+                    </>
+                  )}
+                </td>
                 <td className="mono muted">{name}</td>
                 <td className="numeric">
                   {io === undefined ? (
