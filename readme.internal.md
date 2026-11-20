@@ -855,13 +855,14 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <details>
-<summary><code>local.connectivity</code> (3)</summary>
+<summary><code>local.connectivity</code> (4)</summary>
 
-| Method              | Request                           | Summary                                             |
-| ------------------- | --------------------------------- | --------------------------------------------------- |
-| `getEvents()`       | `GET /connectivity/events`        | Gets recent connectivity evidence for a device      |
-| `getServerEvents()` | `GET /connectivity/server-events` | Gets recent BoardServer lifecycle evidence          |
-| `getIncidents()`    | `GET /connectivity/incidents`     | Gets classified connectivity incidents for a device |
+| Method                 | Request                              | Summary                                             |
+| ---------------------- | ------------------------------------ | --------------------------------------------------- |
+| `getEvents()`          | `GET /connectivity/events`           | Gets recent connectivity evidence for a device      |
+| `getServerEvents()`    | `GET /connectivity/server-events`    | Gets recent BoardServer lifecycle evidence          |
+| `getOutageSummaries()` | `GET /connectivity/outage-summaries` | Gets outage summaries for the graph period          |
+| `getIncidents()`       | `GET /connectivity/incidents`        | Gets classified connectivity incidents for a device |
 
 </details>
 

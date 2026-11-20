@@ -895,6 +895,16 @@ export interface LocalApi {
      */
     getServerEvents(options: { limit: number }): Promise<any>;
     /**
+     * Gets outage summaries for the graph period
+     *
+     * `GET /connectivity/outage-summaries`
+     */
+    getOutageSummaries(options: {
+      deviceId: string | number | boolean | Date;
+      from: string | number | boolean | Date;
+      until: string | number | boolean | Date;
+    }): Promise<any>;
+    /**
      * Gets classified connectivity incidents for a device
      *
      * `GET /connectivity/incidents`
