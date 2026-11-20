@@ -2026,6 +2026,44 @@
         "tags": ["connectivity"]
       }
     },
+    "/connectivity/outage-summaries": {
+      "get": {
+        "operationId": "ConnectivityController_getOutageSummaries",
+        "parameters": [
+          {
+            "name": "deviceId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Gets outage summaries for the graph period",
+        "tags": ["connectivity"]
+      }
+    },
     "/connectivity/incidents": {
       "get": {
         "operationId": "ConnectivityController_getIncidents",
@@ -3710,7 +3748,7 @@
   "info": {
     "title": "Hydraloop Device Manager - Local",
     "description": "Hydraloop Device Manager Local API description",
-    "version": "8.9.8",
+    "version": "9.0.1",
     "contact": {}
   },
   "tags": [],
