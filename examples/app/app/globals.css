@@ -1335,6 +1335,9 @@ tr.is-selected:focus-visible {
   fill: var(--water-grey);
   fill-opacity: 0.25;
 }
+.room-bypass.is-test {
+  fill-opacity: 0.1;
+}
 .chart-area {
   fill: var(--k);
   fill-opacity: 0.12;

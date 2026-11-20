@@ -763,7 +763,8 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
 //   with T2 vented. Once T2 holds about 134 L, the train starts
 //   FILTH_REMOVAL, the A/B valve switches to the other train, and the train
 //   doesn't accept water for the ~4.5 h it lasts.
-// - The bypass opens when neither train can accept water.
+// - The bypass opens when neither train can accept water. It is also tested
+//   for about a minute every 12 hours, while the trains accept water.
 // So T2 is taken from its last venting, which happens about once an hour.
 // Greywater also fills T1, but T1 holds at most about 24 L.
 
@@ -782,6 +783,21 @@ export const ACCEPTING_ROUTINES = new Set([
  * T1, which holds some of the water, was at 15–19 L when checked
  */
 export const TRAIN_FULL_SPREAD = 10;
+
+/** Bypass openings shorter than this are the test every 12 hours */
+export const BYPASS_TEST = 2 * 60_000;
+
+/**
+ * Whether a bypass opening is the scheduled test. An opening that is still
+ * open or started before the data can't be told apart from a real one.
+ */
+export function isBypassTest(interval: Interval) {
+  return (
+    !interval.open &&
+    !interval.clipped &&
+    interval.end - interval.start < BYPASS_TEST
+  );
+}
 
 /**
  * The train that the A/B valve sends greywater to. The valve is also
@@ -863,21 +879,35 @@ export type Room = {
   liters: number | undefined;
   /** Only one train is known, so `liters` is a lower bound */
   partial: boolean;
+  /** The bypass is open, not counting the scheduled test */
   bypass: boolean;
+  /** The bypass is open for its scheduled test, which doesn't count as full */
+  bypassTest: boolean;
   /** The train that receives greywater, and starts filth removal next */
   filling: Side | undefined;
   trains: Record<Side, TrainRoom>;
 };
 
-const roomCache = new WeakMap<Dataset, Record<Side, Point[]>>();
+const roomCache = new WeakMap<
+  Dataset,
+  { vented: Record<Side, Point[]>; bypass: Interval[] }
+>();
 
 export function roomAt(ds: Dataset, t: number): Room {
-  let vented = roomCache.get(ds);
-  if (!vented) {
-    vented = { A: ventedLevels(ds, "A"), B: ventedLevels(ds, "B") };
-    roomCache.set(ds, vented);
+  let cache = roomCache.get(ds);
+  if (!cache) {
+    cache = {
+      vented: { A: ventedLevels(ds, "A"), B: ventedLevels(ds, "B") },
+      bypass: onIntervals(ds.io[IO.bypass], ds.from, ds.until),
+    };
+    roomCache.set(ds, cache);
   }
-  const bypass = (stepAt(ds.io[IO.bypass], t)?.v ?? 0) > 0;
+  const { vented } = cache;
+  const opening = cache.bypass.find((i) => i.start <= t && t < i.end);
+  const bypassOpen =
+    opening !== undefined || (stepAt(ds.io[IO.bypass], t)?.v ?? 0) > 0;
+  const bypassTest = opening !== undefined && isBypassTest(opening);
+  const bypass = bypassOpen && !bypassTest;
 
   const train = (side: Side): TrainRoom => {
     const last = stepAt(vented[side], t);
@@ -929,7 +959,14 @@ export function roomAt(ds: Dataset, t: number): Room {
     : known.length === 0
       ? undefined
       : known.reduce((sum, l) => sum + l, 0);
-  return { liters, partial, bypass, filling: fillingTrain(ds, t), trains };
+  return {
+    liters,
+    partial,
+    bypass,
+    bypassTest,
+    filling: fillingTrain(ds, t),
+    trains,
+  };
 }
 
 /**

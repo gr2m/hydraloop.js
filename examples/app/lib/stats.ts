@@ -15,6 +15,7 @@
 import {
   ACCEPTING_ROUTINES,
   IO,
+  isBypassTest,
   onIntervals,
   routineAt,
   sideIo,
@@ -26,9 +27,6 @@ import {
 } from "./model";
 
 export const STATS_RANGE = 30 * 24 * 3600_000;
-
-/** The bypass is tested for about a minute every 12 hours */
-const BYPASS_TEST = 2 * 60_000;
 
 /** Liters per second of the distribution pump supplying the outlets */
 export const PUMP_LITERS_PER_SECOND = 0.06;
@@ -158,7 +156,7 @@ export function computeStats(
   }
 
   const bypassIntervals = onIntervals(io[IO.bypass], from, until).filter(
-    (i) => i.open || i.end - i.start >= BYPASS_TEST,
+    (i) => !isBypassTest(i),
   );
   const total: Record<BypassCause, number> = {
     busy: 0,

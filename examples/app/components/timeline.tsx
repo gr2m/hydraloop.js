@@ -13,6 +13,7 @@ import {
   caption,
   humanize,
   IO,
+  isBypassTest,
   onIntervals,
   roomSeries,
   sideIo,
@@ -423,18 +424,21 @@ export function Timeline({
                 <text x={0} y={row.y + 43} className="row-label">
                   liters, estimate
                 </text>
-                {bypass.map((i) => (
-                  <rect
-                    key={i.start}
-                    x={x(i.start)}
-                    y={row.y}
-                    width={Math.max(1.5, x(i.end) - x(i.start))}
-                    height={row.h}
-                    className="room-bypass"
-                  >
-                    <title>{`Bypass open: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`}</title>
-                  </rect>
-                ))}
+                {bypass.map((i) => {
+                  const test = isBypassTest(i);
+                  return (
+                    <rect
+                      key={i.start}
+                      x={x(i.start)}
+                      y={row.y}
+                      width={Math.max(1.5, x(i.end) - x(i.start))}
+                      height={row.h}
+                      className={test ? "room-bypass is-test" : "room-bypass"}
+                    >
+                      <title>{`${test ? "Bypass test" : "Bypass open"}: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`}</title>
+                    </rect>
+                  );
+                })}
                 <line
                   x1={LABEL_W}
                   x2={LABEL_W + plotW}
