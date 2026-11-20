@@ -41,7 +41,7 @@ export const IO = {
   bypass: "grey_water_bypass",
   /**
    * Selects the train that receives greywater (0: A, 1: B). Switched when a
-   * train starts filth removal, and for a minute during the bypass test
+   * train starts filth removal, and for a minute during a restart
    */
   abSelector: "grey_water_ab_selection_valve",
   uvValve: "uv_valve",
@@ -117,12 +117,24 @@ export type Dataset = {
   /** Firmware behaviors (e.g. `fullT1T2WasteSoapBombA`) overlapping the range */
   behaviors: Behavior[];
   /**
+   * Restarts and connection losses from `getOutageSummaries()`. Undefined if
+   * they could not be loaded.
+   */
+  outages?: Outage[];
+  /**
    * T2 in liters at the last venting of each train before `from`, as tank
    * levels are only loaded from `from` (see `ventedLevels`)
    */
   ventedBefore?: Partial<Record<Side, Point>>;
   /** Data that could not be loaded */
   warnings: string[];
+};
+
+/** An outage from `getOutageSummaries()`, e.g. a `scheduled_restart` */
+export type Outage = {
+  start: number;
+  end: number;
+  classification: string;
 };
 
 /**
@@ -845,24 +857,39 @@ export const ACCEPTING_ROUTINES = new Set([
  */
 export const TRAIN_FULL_SPREAD = 10;
 
-/** Bypass openings shorter than this are the test every 12 hours */
-export const BYPASS_TEST = 2 * 60_000;
+/**
+ * Without outages, bypass openings shorter than this are taken for the
+ * scheduled restart
+ */
+const RESTART_MAX = 2 * 60_000;
 
 /**
- * Whether a bypass opening is the scheduled test. An opening that is still
- * open or started before the data can't be told apart from a real one.
+ * Whether a bypass opening is from the controller's scheduled restart every
+ * 12 hours. The bypass valve falls open while the controller is down. Falls
+ * back to the duration if the outages could not be loaded.
  */
-export function isBypassTest(interval: Interval) {
-  return (
-    !interval.open &&
-    !interval.clipped &&
-    interval.end - interval.start < BYPASS_TEST
+export function isScheduledRestart(
+  ds: Pick<Dataset, "outages">,
+  interval: Interval,
+) {
+  if (!ds.outages) {
+    return (
+      !interval.open &&
+      !interval.clipped &&
+      interval.end - interval.start < RESTART_MAX
+    );
+  }
+  return ds.outages.some(
+    (o) =>
+      o.classification === "scheduled_restart" &&
+      o.start < interval.end + 60_000 &&
+      o.end > interval.start - 60_000,
   );
 }
 
 /**
  * The train that the A/B valve sends greywater to. The valve is also
- * switched for a minute while the bypass is tested, which is skipped.
+ * switched for a minute during a restart, which is skipped.
  */
 export function fillingTrain(ds: Dataset, t: number): Side | undefined {
   const points = ds.io[IO.abSelector];
@@ -952,10 +979,10 @@ export type Room = {
   liters: number | undefined;
   /** Only one train is known, so `liters` is a lower bound */
   partial: boolean;
-  /** The bypass is open, not counting the scheduled test */
+  /** The bypass is open, not counting the scheduled restart */
   bypass: boolean;
-  /** The bypass is open for its scheduled test, which doesn't count as full */
-  bypassTest: boolean;
+  /** The bypass is open for the scheduled restart, which doesn't count as full */
+  restart: boolean;
   /** The train that receives greywater, and starts filth removal next */
   filling: Side | undefined;
   trains: Record<Side, TrainRoom>;
@@ -979,8 +1006,8 @@ export function roomAt(ds: Dataset, t: number): Room {
   const opening = cache.bypass.find((i) => i.start <= t && t < i.end);
   const bypassOpen =
     opening !== undefined || (stepAt(ds.io[IO.bypass], t)?.v ?? 0) > 0;
-  const bypassTest = opening !== undefined && isBypassTest(opening);
-  const bypass = bypassOpen && !bypassTest;
+  const restart = opening !== undefined && isScheduledRestart(ds, opening);
+  const bypass = bypassOpen && !restart;
 
   const train = (side: Side): TrainRoom => {
     const last = stepAt(vented[side], t);
@@ -1036,7 +1063,7 @@ export function roomAt(ds: Dataset, t: number): Room {
     liters,
     partial,
     bypass,
-    bypassTest,
+    restart,
     filling: fillingTrain(ds, t),
     trains,
   };

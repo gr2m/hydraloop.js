@@ -1059,6 +1059,10 @@ tr.is-selected:focus-visible {
   fill: var(--fg);
   font-weight: 500;
 }
+.diagram-label.is-bold {
+  fill: var(--fg);
+  font-weight: 700;
+}
 .diagram-label.is-muted {
   fill: var(--subtle);
 }
@@ -1359,7 +1363,7 @@ tr.is-selected:focus-visible {
   fill: var(--water-grey);
   fill-opacity: 0.25;
 }
-.room-bypass.is-test {
+.room-bypass.is-restart {
   fill-opacity: 0.1;
 }
 .chart-area {

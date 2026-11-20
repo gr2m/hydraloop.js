@@ -250,6 +250,7 @@ function Distributor({
   labelAnchor = "middle",
   labelDx = 0,
   labelDy = 4,
+  strong = false,
 }: {
   x: number;
   y: number;
@@ -266,6 +267,8 @@ function Distributor({
   labelAnchor?: "start" | "middle" | "end";
   labelDx?: number;
   labelDy?: number;
+  /** Bold label, e.g. for a user override */
+  strong?: boolean;
 }) {
   const p = PIPE;
   const w = DISTRIBUTOR;
@@ -355,7 +358,7 @@ function Distributor({
         x={x + labelDx}
         y={y + labelDy}
         textAnchor={labelAnchor}
-        className="diagram-label"
+        className={strong ? "diagram-label is-bold" : "diagram-label"}
       >
         {label}
       </text>
@@ -891,6 +894,10 @@ export function FlowDiagram({
   const ab = io[IO.abSelector];
   const selected: Side | undefined = ab ? (ab.on ? "B" : "A") : undefined;
   const bypass = io[IO.bypass];
+  // Switched on in the app
+  const bypassOverride = state.systemBehaviors.some(
+    (b) => b.name === "bypassByAppBypassValve",
+  );
   const bypassEnds = distributorEnds(500, 24, "left");
   const abEnds = distributorEnds(500, 100, "up");
   // The backup valve lines up with the bottom of T3 and T4
@@ -1297,7 +1304,8 @@ export function FlowDiagram({
         kind="grey"
         io={bypass}
         name={IO.bypass}
-        label="Bypass"
+        label={bypassOverride ? "Bypass (user override)" : "Bypass"}
+        strong={bypassOverride}
         words={["to the sewer", "to the trains"]}
         branches={[
           { open: bypass?.on, active: inlet.bypass === true },

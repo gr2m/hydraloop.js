@@ -352,6 +352,7 @@ function run(now: number) {
     captions: {},
     routines,
     behaviors: [],
+    outages: [],
     warnings: [],
   };
   cache = { minute, data };

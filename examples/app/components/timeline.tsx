@@ -14,7 +14,7 @@ import {
   humanize,
   IO,
   IO_GROUPS,
-  isBypassTest,
+  isScheduledRestart,
   onIntervals,
   OTHER_BEHAVIORS,
   roomSeries,
@@ -514,7 +514,7 @@ export function Timeline({
                   liters, estimate
                 </text>
                 {bypass.map((i) => {
-                  const test = isBypassTest(i);
+                  const restart = isScheduledRestart(dataset, i);
                   return (
                     <rect
                       key={i.start}
@@ -522,9 +522,11 @@ export function Timeline({
                       y={row.y}
                       width={Math.max(1.5, x(i.end) - x(i.start))}
                       height={row.h}
-                      className={test ? "room-bypass is-test" : "room-bypass"}
+                      className={
+                        restart ? "room-bypass is-restart" : "room-bypass"
+                      }
                     >
-                      <title>{`${test ? "Bypass test" : "Bypass open"}: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`}</title>
+                      <title>{`${restart ? "Scheduled restart, bypass open" : "Bypass open"}: ${formatTime(i.start, "datetime")} – ${i.open ? "now" : formatTime(i.end, "datetime")}`}</title>
                     </rect>
                   );
                 })}

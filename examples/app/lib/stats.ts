@@ -15,7 +15,7 @@
 import {
   ACCEPTING_ROUTINES,
   IO,
-  isBypassTest,
+  isScheduledRestart,
   onIntervals,
   routineAt,
   sideIo,
@@ -73,7 +73,7 @@ export type Stats = {
 
 export type StatsInput = Pick<
   Dataset,
-  "from" | "until" | "io" | "routines" | "behaviors"
+  "from" | "until" | "io" | "routines" | "behaviors" | "outages"
 >;
 
 /** Total time two lists of intervals overlap */
@@ -156,7 +156,7 @@ export function computeStats(
   }
 
   const bypassIntervals = onIntervals(io[IO.bypass], from, until).filter(
-    (i) => !isBypassTest(i),
+    (i) => !isScheduledRestart(input, i),
   );
   const total: Record<BypassCause, number> = {
     busy: 0,

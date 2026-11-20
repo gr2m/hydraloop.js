@@ -16,6 +16,7 @@ import {
   type Dataset,
   type DeviceInfo,
   type LevelTable,
+  type Outage,
   type Point,
   type RoutineEvent,
   type Side,
@@ -130,7 +131,7 @@ export async function loadDataset(
   // Look further back to know the routine that runs at `from`, and since when
   const routinesFrom = from - 24 * 3600_000;
 
-  const [levels, config, data, io, routines, lastIo, shallow] =
+  const [levels, config, data, io, routines, lastIo, shallow, outages] =
     await Promise.allSettled([
       remember(entry, "levels", () =>
         hydraloop.local.graph.getDeviceLevels({ deviceId }),
@@ -162,6 +163,7 @@ export async function loadDataset(
       live
         ? hydraloop.root.devices.getDeviceShallow({ id: deviceId })
         : Promise.resolve(device),
+      loadOutages(hydraloop, deviceId, from, until),
     ]);
 
   const warnings: string[] = [];
@@ -302,8 +304,43 @@ export async function loadDataset(
       from,
       until,
     ),
+    outages: outages.status === "fulfilled" ? outages.value : undefined,
     warnings,
   };
+}
+
+/**
+ * Restarts and connection losses, to tell the scheduled restart apart.
+ * Undefined if HDM refuses them, e.g. with a 401 for missing permissions,
+ * which must not end the session like other 401s.
+ */
+async function loadOutages(
+  hydraloop: Hydraloop,
+  deviceId: string,
+  from: number,
+  until: number,
+): Promise<Outage[] | undefined> {
+  let summaries: {
+    startedAt: string;
+    endedAt?: string | null;
+    classification: string;
+  }[];
+  try {
+    summaries = await hydraloop.local.connectivity.getOutageSummaries({
+      deviceId,
+      from: new Date(from),
+      until: new Date(until),
+    });
+  } catch {
+    return undefined;
+  }
+  return summaries
+    .map((o) => ({
+      start: Date.parse(o.startedAt),
+      end: o.endedAt ? Date.parse(o.endedAt) : until,
+      classification: o.classification,
+    }))
+    .filter((o) => Number.isFinite(o.start) && Number.isFinite(o.end));
 }
 
 const statsCache = new Map<string, { at: number; stats: Promise<Stats> }>();
@@ -385,7 +422,7 @@ async function computeStatsFromHdm(
     return { points, behaviors: [...behavior.values()] };
   };
 
-  const [io, routines, recycled] = await Promise.allSettled([
+  const [io, routines, recycled, outages] = await Promise.allSettled([
     loadIo(),
     hydraloop.local.graph.getRoutineData({
       deviceId,
@@ -400,6 +437,7 @@ async function computeStatsFromHdm(
       until: new Date(until).toISOString(),
       zone,
     }),
+    loadOutages(hydraloop, deviceId, from, until),
   ]);
 
   const warnings: string[] = [];
@@ -426,6 +464,7 @@ async function computeStatsFromHdm(
         .filter((r) => Number.isFinite(r.t))
         .sort((a, b) => a.t - b.t),
       behaviors: behaviorIntervals(ioData?.behaviors ?? [], from, until),
+      outages: outages.status === "fulfilled" ? outages.value : undefined,
     },
     recycledData
       ? {

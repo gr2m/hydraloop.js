@@ -38,29 +38,29 @@ The phase of each train is the routine HDM reports for its side (`getRoutineData
 
 The roles of the IO signals were derived by correlating them with each other and with the routines of an H600 (firmware 9.24.4):
 
-| Signal                                   | Role                                                                                                                                          |
-| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `transfer_path`, `transfer_path_b`       | Transfer valve of train A/B, open during `TRANSFER`                                                                                           |
-| `waste_clean_tank`, `waste_clean_tank_b` | Waste valve of T1 A/B                                                                                                                         |
-| `grey_water_bypass`                      | Sends incoming greywater to the sewer while on (`flipped` in the graph config)                                                                |
-| `grey_water_ab_selection_valve`          | Selects the train that receives greywater (0: A, 1: B). Switched when a train starts `FILTH_REMOVAL`, and for a minute during the bypass test |
-| `circulation_pump`                       | A valve (caption `circulation_valve`). With the distribution pump, circulates T3 through UV                                                   |
-| `distribution_pump`                      | Supplies the outlets, and drives the T3 circulation                                                                                           |
-| `backup_water`                           | Outlets are supplied from T4. Stays on for hours at a time                                                                                    |
-| `waste_storage_tank`                     | Drains T3                                                                                                                                     |
-| `toilet`, `wash`                         | Demand sensors of the outlets                                                                                                                 |
-| `tank4`, `tank4_enough_water`            | Max and min float sensors of T4. T4 has no level reading                                                                                      |
+| Signal                                   | Role                                                                                                                                                |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `transfer_path`, `transfer_path_b`       | Transfer valve of train A/B, open during `TRANSFER`                                                                                                 |
+| `waste_clean_tank`, `waste_clean_tank_b` | Waste valve of T1 A/B                                                                                                                               |
+| `grey_water_bypass`                      | Sends incoming greywater to the sewer while on (`flipped` in the graph config)                                                                      |
+| `grey_water_ab_selection_valve`          | Selects the train that receives greywater (0: A, 1: B). Switched when a train starts `FILTH_REMOVAL`, and for a minute during the scheduled restart |
+| `circulation_pump`                       | A valve (caption `circulation_valve`). With the distribution pump, circulates T3 through UV                                                         |
+| `distribution_pump`                      | Supplies the outlets, and drives the T3 circulation                                                                                                 |
+| `backup_water`                           | Outlets are supplied from T4. Stays on for hours at a time                                                                                          |
+| `waste_storage_tank`                     | Drains T3                                                                                                                                           |
+| `toilet`, `wash`                         | Demand sensors of the outlets                                                                                                                       |
+| `tank4`, `tank4_enough_water`            | Max and min float sensors of T4. T4 has no level reading                                                                                            |
 
 Both trains enter `INCOMING_WATER` at the same time, so the diagram shows the inlet to every train in that routine.
 
 ### Room for greywater
 
-The live and history views estimate how much more greywater the H600 can take before it's bypassed to the sewer. In 30 days of an H600's data, the bypass never opened because the tanks were full. It opened when neither train accepted water, plus for a scheduled 1-minute test every 12 hours, while a train was emptied to the drain, and when switched on in the app:
+The live and history views estimate how much more greywater the H600 can take before it's bypassed to the sewer. In 30 days of an H600's data, the bypass never opened because the tanks were full. It opened when neither train accepted water, plus for about a minute during the controller's scheduled restart every 12 hours, while a train was emptied to the drain, and when switched on in the app:
 
 - Greywater only enters the train selected by the A/B valve, and only in `STANDBY` (or `INCOMING_WATER`).
 - A train starts `FILTH_REMOVAL` when it is full (see [Next filth removal](#next-filth-removal)), and takes no water for the ~4.5 h it lasts.
 
-So the estimate is the sum over the trains that accept water of `134 L − T2` ([`TRAIN_FULL_LITERS`](lib/model.ts)). T2 is taken from the last time it was vented (about once an hour), as the H600 checks it vented, too. A train in `FILTH_REMOVAL` or with its waste valve open counts as 0, and so does the whole H600 while the bypass is open. Openings shorter than 2 minutes are the scheduled test, during which both trains accept water, so they don't count ([`isBypassTest`](lib/model.ts)). An opening that is still open counts until it is known to be a test. The history chart shades the times the bypass was open, to compare, and the tests lighter. The live view loads the last 8 hours, so that it includes a venting of both trains. If only one train has a venting, the estimate is shown as a lower bound (`≥ X L`) from that train alone.
+So the estimate is the sum over the trains that accept water of `134 L − T2` ([`TRAIN_FULL_LITERS`](lib/model.ts)). T2 is taken from the last time it was vented (about once an hour), as the H600 checks it vented, too. A train in `FILTH_REMOVAL` or with its waste valve open counts as 0, and so does the whole H600 while the bypass is open. The bypass valve falls open while the controller restarts, which it does every 12 hours. `local.connectivity.getOutageSummaries()` lists these as `scheduled_restart`, together with `battery_power_on` going to 0. Both trains accept water again right after, so openings that overlap a scheduled restart don't count ([`isScheduledRestart`](lib/model.ts)). If the outages can't be loaded, openings shorter than 2 minutes are taken for the restart. The history chart shades the times the bypass was open, to compare, and the restarts lighter. The diagram labels the bypass "Bypass (user override)" while it is switched on in the app (`bypassByAppBypassValve`). The live view loads the last 8 hours, so that it includes a venting of both trains. If only one train has a venting, the estimate is shown as a lower bound (`≥ X L`) from that train alone.
 
 ### Next filth removal
 
@@ -82,12 +82,12 @@ In 30 days of an H600's data, every `FILTH_REMOVAL` that ran to its end took abo
 [`/api/stats`](app/api/stats/route.ts) loads the last 30 days and computes the figures on the server ([`lib/stats.ts`](lib/stats.ts)). The result is cached for 10 minutes.
 
 - **Recycled** is the sum of `local.graph.getWaterRecycledData({ unit: "day" })`, in the browser's time zone. HDM reports about 100 L on each day with a transfer, so it matches the transfers into T3. `unit` only accepts `day` or `month`.
-- **Bypass**: `getIo()` returns about 5 days before `until`, whatever `from` is, so the valves are loaded in windows of 5 days. Bypass openings shorter than 2 minutes are the scheduled test and are skipped. Each episode gets a cause: switched on in the app (`bypassByAppBypassValve`), a train emptied to the drain (waste valve or a `fullT1T2Waste…` behavior), both trains busy (neither in `STANDBY`, `INCOMING_WATER` or `TRANSFER`), or other. The H600 can't measure the water that goes through the bypass, so only the time is shown.
+- **Bypass**: `getIo()` returns about 5 days before `until`, whatever `from` is, so the valves are loaded in windows of 5 days. Bypass openings during a scheduled restart are skipped. Each episode gets a cause: switched on in the app (`bypassByAppBypassValve`), a train emptied to the drain (waste valve or a `fullT1T2Waste…` behavior), both trains busy (neither in `STANDBY`, `INCOMING_WATER` or `TRANSFER`), or other. The H600 can't measure the water that goes through the bypass, so only the time is shown.
 - **Fresh water**: while `backup_water` is on, the distribution pump supplies the outlets from T4, which is filled with fresh water. On recycled water, T3 dropped by about 0.06 L per second of pumping to the outlets ([`PUMP_LITERS_PER_SECOND`](lib/stats.ts)). The estimate is the pump time on backup water times that rate. Circulation and the `distribution…` check behaviors don't count. In 30 days of an H600's data, the outlets ran on backup water 65% of the time, and used about 3,150 L. HDM reported 1,269 L recycled in the same 30 days.
 
 ### Behaviors
 
-Besides the valve values, `getIo()` returns firmware _behaviors_ with an `engaged` and a `disengaged` event, e.g. `fullT1T2WasteSoapBombA` while train A is emptied to the drain because of too much soap, `fullT3WasteCleaning`, `t4OverflowBackflush` or `bypassByAppBypassValve`. A trailing `A` or `B` names the train. The app shows them as events, in a timeline lane per train, and in the status of the train while engaged. `pressingOptButton` is engaged for about 12 hours at a time, nearly always, and switches together with `battery_power_on`. It isn't documented, so the app shows it under Other, with the battery, buzzer and auxiliary signals.
+Besides the valve values, `getIo()` returns firmware _behaviors_ with an `engaged` and a `disengaged` event, e.g. `fullT1T2WasteSoapBombA` while train A is emptied to the drain because of too much soap, `fullT3WasteCleaning`, `t4OverflowBackflush` or `bypassByAppBypassValve`. A trailing `A` or `B` names the train. The app shows them as events, in a timeline lane per train, and in the status of the train while engaged. `pressingOptButton` is engaged for about 12 hours at a time, nearly always, and disengages for about 25 seconds during each scheduled restart. It isn't documented, so the app shows it under Other, with the battery, buzzer and auxiliary signals.
 
 ### Filth removal
 

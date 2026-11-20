@@ -247,8 +247,11 @@ function RoomSummary({ state }: { state: DeviceState }) {
             : room.partial
               ? `≥ ${Math.round(room.liters)} L`
               : `≈ ${Math.round(room.liters)} L`}
-        {room.bypassTest && (
-          <span className="muted"> · bypass open for its 12-hour test</span>
+        {room.restart && (
+          <span className="muted">
+            {" "}
+            · bypass open during the scheduled restart
+          </span>
         )}
       </p>
       <dl className="status-facts">
