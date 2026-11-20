@@ -708,7 +708,7 @@ tr.is-selected:focus-visible {
   stroke-linecap: butt;
 }
 .pipe.kind-air .pipe-base {
-  stroke-width: 3;
+  stroke-width: 5;
 }
 .pipe.is-open .pipe-base {
   stroke: var(--pipe-open);
@@ -731,7 +731,7 @@ tr.is-selected:focus-visible {
   animation: flow 0.9s linear infinite;
 }
 .pipe.kind-air .pipe-flow {
-  stroke-width: 1.5;
+  stroke-width: 2;
 }
 .pipe-arrow {
   fill: var(--pipe-idle);
@@ -938,6 +938,29 @@ tr.is-selected:focus-visible {
   }
 }
 
+/* Air pumped into T2 presses on the water. Same colors and rhythm as the air
+   pipe's .pipe-flow */
+.pressure-fill {
+  fill: var(--bg);
+}
+.pressure-ring {
+  fill: none;
+  stroke: var(--air);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ripple linear infinite;
+}
+@keyframes ripple {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
 .diagram-label {
   font-size: 13px;
   fill: var(--muted);
@@ -1003,6 +1026,7 @@ tr.is-selected:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .pipe-flow,
+  .pressure-ring,
   .pump.is-on .impeller {
     animation: none;
   }

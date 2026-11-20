@@ -452,6 +452,7 @@ function Tank({
   sub,
   side,
   aeration,
+  pressurized,
   small,
 }: {
   x: number;
@@ -465,6 +466,11 @@ function Tank({
   /** The train, named in the tooltip only */
   side?: Side;
   aeration?: boolean;
+  /**
+   * Air is pumped into the space above the water, pressing on its surface:
+   * the length of the air pipe that ends at the top of the tank
+   */
+  pressurized?: number | false;
   /**
    * A tank too narrow for its text: the label and the level in percent go
    * next to it, before (`start`) or after (`end`) it
@@ -491,6 +497,12 @@ function Tank({
             ? `, ${trend >= 0 ? "+" : ""}${trend.toFixed(1)} L/min`
             : ""
         }. ${capacityNote(level!)}`.trimEnd();
+  const clipId = `pressure-${label}-${side ?? sub ?? ""}`;
+  // Enough rings to reach the far corners of the space above the water
+  const rings = Math.ceil(Math.hypot(w / 2, h - fillHeight) / 14) + 1;
+  const phase = pressurized
+    ? (-((14 - (pressurized % 14)) % 14) / 14) * 0.9
+    : 0;
   const textX = small === "end" ? x + w + 10 : small ? x - 10 : x + 12;
   const anchor = small === "start" ? "end" : "start";
   return (
@@ -539,6 +551,71 @@ function Tank({
         />
       ))}
       <Bubbles x={x} y={y} w={w} h={h} active={aeration} />
+      {known && pressurized && h - fillHeight > 4 && (
+        // The air pipe's flow continues into the space above the water, as
+        // half circles spreading from where the pipe enters onto the surface.
+        // They start where the pipe's dashes left off, `pressurized` pixels
+        // down the pipe: a step of 14 px takes 0.9 s, see .pipe-flow
+        <g className="pressure" aria-hidden>
+          <clipPath id={clipId}>
+            <rect
+              x={x + 1}
+              y={y + 1}
+              width={w - 2}
+              height={h - fillHeight - 1}
+              rx={small ? 4 : 7}
+            />
+          </clipPath>
+          {/* Fades from the top of the tank to its bottom */}
+          <linearGradient
+            id={`${clipId}-fade`}
+            gradientUnits="userSpaceOnUse"
+            x1={0}
+            y1={y}
+            x2={0}
+            y2={y + h}
+          >
+            <stop offset={0} stopColor="#fff" />
+            <stop offset={1} stopColor="#000" />
+          </linearGradient>
+          <mask id={`${clipId}-mask`}>
+            <rect
+              x={x}
+              y={y}
+              width={w}
+              height={h}
+              fill={`url(#${clipId}-fade)`}
+            />
+          </mask>
+          <g clipPath={`url(#${clipId})`}>
+            <rect
+              x={x}
+              y={y}
+              width={w}
+              height={h - fillHeight}
+              className="pressure-fill"
+            />
+            <g mask={`url(#${clipId}-mask)`}>
+              {Array.from({ length: rings }, (_, i) => (
+                // Each ring grows from the pipe to the outermost one's
+                // radius, a step of 14 px behind the next
+                <circle
+                  key={i}
+                  cx={x + w / 2}
+                  cy={y}
+                  r={rings * 14}
+                  className="pressure-ring"
+                  style={{
+                    transform: `scale(${i / rings})`,
+                    animationDuration: `${rings * 0.9}s`,
+                    animationDelay: `${phase - i * 0.9}s`,
+                  }}
+                />
+              ))}
+            </g>
+          </g>
+        </g>
+      )}
       <text
         x={textX}
         y={small ? y + h / 2 - 6 : y + 22}
@@ -691,6 +768,7 @@ export function FlowDiagram({
     const transfer = io[sideIo("transfer_path", side)];
     const waste = io[sideIo("waste_clean_tank", side)];
     const air = io[sideIo("air_pump", side)];
+    const airTop = 151;
     const bubbles = io[sideIo("bubbles_block", side)];
     const receiving = inlet.receiving.includes(side);
     const drainX = a ? 30 : 970;
@@ -721,7 +799,7 @@ export function FlowDiagram({
         />
 
         {/* Air pump into T2 */}
-        <Pipe d={`M${t2c} 151 V232`} kind="air" active={air?.on} />
+        <Pipe d={`M${t2c} ${airTop} V232`} kind="air" active={air?.on} />
         <Pump
           x={t2c}
           y={136}
@@ -762,7 +840,7 @@ export function FlowDiagram({
           kind="grey"
           label="T2"
           side={side}
-          aeration={air?.on}
+          pressurized={air?.on && 232 - airTop}
         />
 
         {/* Skim overflow at the top of T1, down the drain line. It has no
