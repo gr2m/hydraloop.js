@@ -78,6 +78,8 @@ The estimate is `TRAIN_FULL_LITERS − T2` of the receiving train, with T2 from 
 
 In 30 days of an H600's data, every `FILTH_REMOVAL` that ran to its end took about 4.5 h. Then `TRANSFER` moved 85–120 L (about 100 L) into T3 in about 1.4 h. So the overview expects about 100 L in T3 about 6 h after filth removal starts. During `TRANSFER`, it subtracts what T3 gained since the transfer started. A train in `SKIM_LEVEL_DETERMINATION` / `FIND_HIGHEST_WATER_POINT` counts as starting filth removal now.
 
+The H600 also reports the time left of filth removal itself: `cleaningTimeLeftA` and `cleaningTimeLeftB` of `local.settings.getTankTreatmentState()`, in milliseconds, with the time it was reported. The HDM web app shows them as the time left while a train is cleaned. The H600 reports them when the routine of the train changes, e.g. 0 when it returns to `STANDBY` after `SKIM_LEVEL_DETERMINATION`. If a train is in filth removal and the time left was reported since its routine started, the overview uses it instead of the 4.5 h estimate and says so. The value it reports during a run has not been observed yet.
+
 ### 30-day statistics
 
 [`/api/stats`](app/api/stats/route.ts) loads the last 30 days and computes the figures on the server ([`lib/stats.ts`](lib/stats.ts)). The result is cached for 10 minutes.
@@ -165,3 +167,4 @@ The SDK methods used:
 - `local.graph.getIo()`, `local.graph.getLastKnownIoState()`: valves and pumps
 - `local.graph.getRoutineData()`: HDM routines per side
 - `local.graph.getWaterRecycledData()`: liters recycled per day
+- `local.settings.getTankTreatmentState()`: time left of filth removal

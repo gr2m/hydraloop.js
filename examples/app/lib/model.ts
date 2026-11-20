@@ -132,6 +132,12 @@ export type Dataset = {
    * levels are only loaded from `from` (see `ventedLevels`)
    */
   ventedBefore?: Partial<Record<Side, Point>>;
+  /**
+   * Time left of filth removal per train, as last reported by the H600
+   * (`cleaningTimeLeftA/B` of `getTankTreatmentState()`), and when it was
+   * reported. Only loaded for the live views.
+   */
+  cleaningTimeLeft?: Partial<Record<Side, { t: number; ms: number }>>;
   /** Data that could not be loaded */
   warnings: string[];
 };
@@ -1137,6 +1143,8 @@ export type Cleaning = {
   transferAt: number;
   /** When the transfer into T3 is done */
   readyAt: number;
+  /** The end of filth removal was reported by the H600, not estimated */
+  reported: boolean;
 };
 
 /** Water in a train that is being cleaned and will be transferred to T3 */
@@ -1151,13 +1159,21 @@ export function cleaningAt(ds: Dataset, t: number): Cleaning[] {
         current.state === "FIND_HIGHEST_WATER_POINT")
     ) {
       const begin = current.name === "FILTH_REMOVAL" ? start : t;
-      const transferAt = Math.max(t, begin + FILTH_REMOVAL_DURATION);
+      // The H600 reports the time left when the routine changes. Only use it
+      // if it was reported for this run.
+      const left = ds.cleaningTimeLeft?.[side];
+      const reported = !!left && left.ms > 0 && left.t >= start - 60_000;
+      const transferAt = Math.max(
+        t,
+        reported ? left.t + left.ms : begin + FILTH_REMOVAL_DURATION,
+      );
       result.push({
         side,
         stage: current.name === "FILTH_REMOVAL" ? "cleaning" : "starting",
         liters: TRANSFER_LITERS,
         transferAt,
         readyAt: transferAt + TRANSFER_DURATION,
+        reported,
       });
     } else if (current.name === "TRANSFER") {
       const before = valueAt(ds.tanks.t3, start);
@@ -1170,6 +1186,7 @@ export function cleaningAt(ds: Dataset, t: number): Cleaning[] {
         liters: Math.max(0, TRANSFER_LITERS - moved),
         transferAt: start,
         readyAt: Math.max(t, start + TRANSFER_DURATION),
+        reported: false,
       });
     }
   }

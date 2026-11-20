@@ -129,7 +129,7 @@ function AvailableTile({ state }: { state: DeviceState }) {
 }
 
 function CleaningLine({ cleaning, now }: { cleaning: Cleaning; now: number }) {
-  const { side, stage, readyAt, transferAt } = cleaning;
+  const { side, stage, readyAt, transferAt, reported } = cleaning;
   const ready = (
     <>
       ready around <Time t={readyAt} /> (in {formatDuration(readyAt - now)})
@@ -144,8 +144,22 @@ function CleaningLine({ cleaning, now }: { cleaning: Cleaning; now: number }) {
   }
   return (
     <>
-      Train {side} {stage === "starting" ? "starts" : "is in"} filth removal,
-      moves it into T3 from about <Time t={transferAt} />, {ready}.
+      Train {side} {stage === "starting" ? "starts" : "is in"} filth removal
+      {reported && (
+        <>
+          {" "}
+          until <Time t={transferAt} /> (as reported by the H600)
+        </>
+      )}
+      , moves it into T3 from{" "}
+      {reported ? (
+        "then"
+      ) : (
+        <>
+          about <Time t={transferAt} />
+        </>
+      )}
+      , {ready}.
     </>
   );
 }

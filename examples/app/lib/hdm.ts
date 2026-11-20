@@ -131,40 +131,52 @@ export async function loadDataset(
   // Look further back to know the routine that runs at `from`, and since when
   const routinesFrom = from - 24 * 3600_000;
 
-  const [levels, config, data, io, routines, lastIo, shallow, outages] =
-    await Promise.allSettled([
-      remember(entry, "levels", () =>
-        hydraloop.local.graph.getDeviceLevels({ deviceId }),
-      ),
-      remember(entry, "config", () =>
-        hydraloop.local.graph.getGraphConfig({ deviceId, debugData: false }),
-      ),
-      hydraloop.local.graph.getData({
-        deviceId,
-        from: new Date(from),
-        until: new Date(until),
-        minutesInView: Math.round((until - from) / 60_000),
-        debugData: false,
-      }),
-      hydraloop.local.graph.getIo({
-        deviceId,
-        from: new Date(from),
-        until: new Date(until),
-      }),
-      hydraloop.local.graph.getRoutineData({
-        deviceId,
-        from: new Date(routinesFrom),
-        until: new Date(until),
-      }),
-      live
-        ? hydraloop.local.graph.getLastKnownIoState({ deviceId })
-        : Promise.resolve([]),
-      // Refresh the online state
-      live
-        ? hydraloop.root.devices.getDeviceShallow({ id: deviceId })
-        : Promise.resolve(device),
-      loadOutages(hydraloop, deviceId, from, until),
-    ]);
+  const [
+    levels,
+    config,
+    data,
+    io,
+    routines,
+    lastIo,
+    shallow,
+    outages,
+    treatment,
+  ] = await Promise.allSettled([
+    remember(entry, "levels", () =>
+      hydraloop.local.graph.getDeviceLevels({ deviceId }),
+    ),
+    remember(entry, "config", () =>
+      hydraloop.local.graph.getGraphConfig({ deviceId, debugData: false }),
+    ),
+    hydraloop.local.graph.getData({
+      deviceId,
+      from: new Date(from),
+      until: new Date(until),
+      minutesInView: Math.round((until - from) / 60_000),
+      debugData: false,
+    }),
+    hydraloop.local.graph.getIo({
+      deviceId,
+      from: new Date(from),
+      until: new Date(until),
+    }),
+    hydraloop.local.graph.getRoutineData({
+      deviceId,
+      from: new Date(routinesFrom),
+      until: new Date(until),
+    }),
+    live
+      ? hydraloop.local.graph.getLastKnownIoState({ deviceId })
+      : Promise.resolve([]),
+    // Refresh the online state
+    live
+      ? hydraloop.root.devices.getDeviceShallow({ id: deviceId })
+      : Promise.resolve(device),
+    loadOutages(hydraloop, deviceId, from, until),
+    live
+      ? hydraloop.local.settings.getTankTreatmentState({ deviceId })
+      : Promise.resolve([]),
+  ]);
 
   const warnings: string[] = [];
   const levelTables = settled(levels, "Tank calibration", warnings);
@@ -320,6 +332,10 @@ export async function loadDataset(
       until,
     ),
     outages: outages.status === "fulfilled" ? outages.value : undefined,
+    cleaningTimeLeft:
+      treatment.status === "fulfilled"
+        ? cleaningTimeLeft(treatment.value)
+        : undefined,
     warnings,
   };
 }
@@ -360,6 +376,31 @@ async function loadOutages(
 
 const statsCache = new Map<string, { at: number; stats: Promise<Stats> }>();
 const STATS_TTL = 10 * 60_000;
+
+/**
+ * `cleaningTimeLeftA/B` of `getTankTreatmentState()`, in milliseconds. The
+ * HDM web app shows them as the time left of filth removal.
+ */
+function cleaningTimeLeft(
+  settings: { name?: string; value?: number; time?: string }[],
+): Dataset["cleaningTimeLeft"] {
+  const result: Dataset["cleaningTimeLeft"] = {};
+  for (const side of ["A", "B"] as const) {
+    const setting = settings.find((s) => s.name === `cleaningTimeLeft${side}`);
+    const t = Date.parse(setting?.time ?? "");
+    if (typeof setting?.value === "number" && Number.isFinite(t)) {
+      result[side] = { t, ms: setting.value };
+    }
+  }
+  return result;
+}
+
+/** A response item of `getOutageSummaries()`, which has no schema in the spec */
+type OutageSummary = {
+  startedAt: string;
+  endedAt?: string | null;
+  classification: string;
+};
 
 /**
  * Statistics of the last `range` milliseconds. `getIo()` returns about 5 days
