@@ -817,7 +817,6 @@ function BackupTank({
         y={y}
         width={w}
         height={h}
-        rx={5}
         className={
           t4.max === undefined && t4.min === undefined
             ? "tank-shell is-unknown"
@@ -831,7 +830,6 @@ function BackupTank({
             y={fillTop}
             width={w - 2}
             height={y + h - fillTop - 1}
-            rx={4}
             className="tank-fill"
           />
           <line
@@ -889,7 +887,9 @@ export function FlowDiagram({
   const bypass = io[IO.bypass];
   const bypassEnds = distributorEnds(500, 24, "left");
   const abEnds = distributorEnds(500, 100, "up");
-  const backupEnds = distributorEnds(260, 680, "down");
+  // The backup valve lines up with the bottom of T3 and T4
+  const backupY = 640 - PIPE;
+  const backupEnds = distributorEnds(260, backupY, "down");
 
   const train = (side: Side) => {
     const a = side === "A";
@@ -1220,6 +1220,7 @@ export function FlowDiagram({
   const recycledToPump = supply.pumping && supply.source !== "backup";
   const backupToPump = supply.pumping && supply.source === "backup";
   const circulatingThroughUv = t3.circulating && supply.pumping;
+  const backFlushing = io[IO.backFlush]?.on && supply.pumping;
   // Water only leaves UV-C for T3 while something feeds the chamber and the
   // UV valve isn't closed.
   const t3ReceivingFromUv =
@@ -1362,6 +1363,7 @@ export function FlowDiagram({
         kind="clean"
         label="T3"
         sub="Recycled water"
+        square
       />
 
       {/* T3 drain */}
@@ -1412,16 +1414,17 @@ export function FlowDiagram({
       />
 
       {/* T4 and T3 join in the backup valve, which feeds the distribution
-          pump from one of them */}
+          pump from one of them. The pipes leave the tanks' sides at their
+          bottom */}
       <Pipe
-        d={`M115 640 V680 H${backupEnds.branches[0]}`}
+        d={`M190 ${backupY} H${backupEnds.branches[0]}`}
         kind="mains"
         active={backupToPump}
         open={backup?.on}
         square
       />
       <Pipe
-        d={`M360 640 V680 H${backupEnds.branches[1]}`}
+        d={`M346 ${backupY} H${backupEnds.branches[1]}`}
         kind="clean"
         active={recycledToPump}
         open={backup?.on === false}
@@ -1436,7 +1439,7 @@ export function FlowDiagram({
       />
       <Distributor
         x={260}
-        y={680}
+        y={backupY}
         tip="down"
         kind={outletKind}
         io={backup}
@@ -1447,9 +1450,7 @@ export function FlowDiagram({
           { open: backup?.on, active: backupToPump === true },
           { open: backup && !backup.on, active: recycledToPump === true },
         ]}
-        labelAnchor="end"
-        labelDx={-26}
-        labelDy={-12}
+        labelDy={-14}
       />
 
       <Pump
@@ -1461,6 +1462,25 @@ export function FlowDiagram({
         name={IO.distributionPump}
         label="Distribution pump"
         labelAnchor="end"
+      />
+
+      {/* Back flush: the distribution pump pushes water back up into the
+          center of T3's bottom */}
+      <Pipe
+        d="M500 740 V640"
+        kind={outletKind}
+        active={backFlushing}
+        open={io[IO.backFlush]?.on}
+      />
+      <Valve
+        x={500}
+        y={690}
+        vertical
+        kind={outletKind}
+        io={io[IO.backFlush]}
+        active={backFlushing}
+        name={IO.backFlush}
+        label="Back flush"
       />
 
       {/* Outlets, active by their demand sensor. The pipes to them are always
@@ -1583,6 +1603,7 @@ export function activeFlows(state: DeviceState) {
     }
   }
   if (t3.circulating && supply.pumping) flows.push("T3 → UV → T3");
+  if (io[IO.backFlush]?.on && supply.pumping) flows.push("Back flush → T3");
   if (t3.draining) flows.push("T3 → drain");
   if (supply.toOutlets) {
     const to = [
