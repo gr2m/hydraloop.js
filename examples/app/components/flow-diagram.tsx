@@ -938,14 +938,15 @@ export function FlowDiagram({
     // Below T1, the air pipe's lower edge lines up with the waste pipe's
     // (5 px air pipe, 7 px waste pipe)
     const airBelowY = wasteY + PIPE - 2.5;
-    // The air pipe into T1, the transfer pipe and the upper exchange pipe run
-    // down between T1 and T2, in that order from T1, evenly spread across the
-    // space between them
+    // The air pipe into T1 and the transfer pipe run down between T1 and T2,
+    // evenly spread across the space between them, the air pipe closer to T1
     const t1Edge = a ? t1x + 21 : t1x;
     const t2Edge = a ? t2x : t2x + 172;
-    const gapX = t1Edge + (t2Edge - t1Edge) / 4;
-    const transferX = t1Edge + (t2Edge - t1Edge) / 2;
-    const exchangeX = t1Edge + ((t2Edge - t1Edge) * 3) / 4;
+    const gapX = t1Edge + (t2Edge - t1Edge) / 3;
+    const transferX = t1Edge + ((t2Edge - t1Edge) * 2) / 3;
+    // The upper exchange pipe runs down past T2's far side
+    const t2FarEdge = a ? t2x + 172 : t2x;
+    const exchangeX = t2FarEdge + (a ? 14 : -14);
     const bubbles = io[sideIo("bubbles_block", side)];
     // The bubbles block valve closes while its signal is on, blocking the air
     // into T1. HDM shows it open while the signal is off
@@ -965,11 +966,11 @@ export function FlowDiagram({
     // The water below it is always there
     const t1Surface =
       t1Fill === undefined ? undefined : 360 - (360 - 232) * t1Fill;
-    // Two pipes connect T1 and T2, both entering T2 at its lower corner
-    // (7 px pipe, 5 px corner radius). The upper one leaves T1 with its upper
-    // edge at T1's 40% water level, so the bubbles circulate water from that
-    // level up. It runs down between T1 and T2 and passes behind the lower
-    // one into T2, as both enter T2 at the same height
+    // Two pipes connect T1 and T2, both entering T2 at the same height, at
+    // its lower corners (7 px pipe, 5 px corner radius). The upper one leaves
+    // T1 with its upper edge at T1's 40% water level, so the bubbles
+    // circulate water from that level up. It passes behind T2, runs down past
+    // its far side and enters it there
     const exchangeYs = [360 - (360 - 232) * 0.4 + PIPE, 360 - 5 - PIPE];
     /** An exchange pipe whose highest part is at `y` holds water */
     const exchangeFilled = (y: number) =>
@@ -1107,17 +1108,10 @@ export function FlowDiagram({
             <g key={y}>
               {/* A gap in the air pipe into T1, which passes behind */}
               <path d={`M${gapX - 4} ${y} H${gapX + 4}`} className="pipe-gap" />
-              {i === 1 && (
-                // A gap in the upper pipe, which passes behind
-                <path
-                  d={`M${exchangeX + (a ? -5 : 5)} ${y} H${t2Edge}`}
-                  className="pipe-gap"
-                />
-              )}
               <Pipe
                 d={
                   i === 0
-                    ? `M${t1Edge} ${y} H${exchangeX} V${exchangeYs[1]} H${t2Edge}`
+                    ? `M${t1Edge} ${y} H${exchangeX} V${exchangeYs[1]} H${t2FarEdge}`
                     : `M${t2Edge} ${y} H${t1Edge}`
                 }
                 kind="grey"
@@ -1136,6 +1130,13 @@ export function FlowDiagram({
                     square
                   />
                 )}
+              {i === 0 && (
+                // Gaps where the upper pipe passes behind T2's walls
+                <path
+                  d={`M${t2Edge + (a ? -3 : 3)} ${y} H${t2Edge} M${t2FarEdge} ${y} H${t2FarEdge + (a ? 3 : -3)}`}
+                  className="pipe-gap"
+                />
+              )}
             </g>
           );
         })}
