@@ -824,6 +824,10 @@ export function FlowDiagram({
     const waste = io[sideIo("waste_clean_tank", side)];
     const air = io[sideIo("air_pump", side)];
     const airTop = 151;
+    const addAir = io[sideIo("add_air_valve", side)];
+    const addAirY = airTop + 3 * 14;
+    // Air only reaches T2 while the add air valve isn't closed
+    const addingAir = air?.on && addAir?.on !== false;
     const bubbles = io[sideIo("bubbles_block", side)];
     const receiving = inlet.receiving.includes(side);
     const drainX = a ? 30 : 970;
@@ -858,8 +862,28 @@ export function FlowDiagram({
           square
         />
 
-        {/* Air pump into T2 */}
-        <Pipe d={`M${t2c} ${airTop} V232`} kind="air" active={air?.on} />
+        {/* Air pump into T2, through the add air valve. The valve sits a
+            multiple of 14 px down the pipe, so the dashes of both parts line
+            up, see .pipe-flow */}
+        <Pipe d={`M${t2c} ${airTop} V${addAirY}`} kind="air" active={air?.on} />
+        <Pipe
+          d={`M${t2c} ${addAirY} V232`}
+          kind="air"
+          active={addingAir}
+          open={addAir?.on}
+        />
+        <Valve
+          x={t2c}
+          y={addAirY}
+          vertical
+          kind="air"
+          io={addAir}
+          active={addingAir}
+          name={sideIo("add_air_valve", side)}
+          label="Add air"
+          labelAnchor={a ? "start" : "end"}
+          labelDx={a ? 16 : -16}
+        />
         <Pump
           x={t2c}
           y={136}
@@ -916,7 +940,7 @@ export function FlowDiagram({
           kind="grey"
           label="T2"
           side={side}
-          pressurized={air?.on && 232 - airTop}
+          pressurized={addingAir && 232 - addAirY}
         />
 
         {/* Skim overflow at the top of T1, down the drain line. It has no
