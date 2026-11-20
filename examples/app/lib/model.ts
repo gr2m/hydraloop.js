@@ -540,7 +540,7 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
       transfer?.on && "Transfer valve open",
       waste?.on && "Waste valve open",
       air?.on && "Air pump running",
-      bubbles?.on && "Bubble block on",
+      bubbles?.on && "Bubbles block closed",
     ].filter((e): e is string => Boolean(e));
     // T2 drains through T1 while T1 is emptied to the drain or into T3
     const t2Trend = tanks[side === "A" ? "t2a" : "t2b"].trend;
@@ -1177,7 +1177,9 @@ function ioEventLabel(
   if (name !== IO.circulation && /pump|power/.test(name)) {
     return `${label} ${on ? "started" : "stopped"}`;
   }
-  return `${label} ${on ? "opened" : "closed"}`;
+  // The bubbles block valve closes while its signal is on
+  const open = /^bubbles_block(_b)?$/.test(name) ? !on : on;
+  return `${label} ${open ? "opened" : "closed"}`;
 }
 
 /** Routine changes and IO edges within the dataset's range, newest first */

@@ -815,10 +815,12 @@ export function FlowDiagram({
 
   const train = (side: Side) => {
     const a = side === "A";
-    // Tank areas are to scale: T1 ~24 L, T2 ~200 L, T3 ~280 L (TANK_CAPACITY)
+    // Tank areas are to scale: T1 ~24 L, T2 ~200 L, T3 ~280 L (TANK_CAPACITY),
+    // except that T1 reaches further down, to fit the air pipe into it
     const t1x = a ? 140 : 839;
     const t2x = a ? 214 : 614;
     const t1c = t1x + 10;
+    const t1Bottom = 384;
     const t2c = t2x + 86;
     const transfer = io[sideIo("transfer_path", side)];
     const waste = io[sideIo("waste_clean_tank", side)];
@@ -828,7 +830,19 @@ export function FlowDiagram({
     const addAirY = airTop + 3 * 14;
     // Air only reaches T2 while the add air valve isn't closed
     const addingAir = air?.on && addAir?.on !== false;
+    // The air pipe into T1 branches off above the add air valve, runs down
+    // between T1 and T2 and enters T1 below the exchange pipes
+    const teeY = 166;
+    const t1AirY = t1Bottom - 12;
+    const gapX = a ? (t1x + 21 + t2x) / 2 : (t2x + 172 + t1x) / 2;
     const bubbles = io[sideIo("bubbles_block", side)];
+    // The bubbles block valve closes while its signal is on, blocking the air
+    // into T1. HDM shows it open while the signal is off
+    const bubblesValve = bubbles && { ...bubbles, on: !bubbles.on };
+    // The valve sits a multiple of 14 px from the tee, as the add air valve
+    // does. Air only reaches T1 while it isn't closed
+    const bubblesX = a ? t2c - 4 * 14 : t2c + 4 * 14;
+    const bubbling = air?.on && bubblesValve?.on !== false;
     const receiving = inlet.receiving.includes(side);
     const drainX = a ? 30 : 970;
     const transferring = transfer?.on;
@@ -836,7 +850,7 @@ export function FlowDiagram({
     const t2Level = tanks[a ? "t2a" : "t2b"];
     const t2Fill = fillOf(t2Level);
     // Two pipes connect T1 and T2: one halfway up, and one whose bottom
-    // edge meets the tanks' lower corners (7 px pipe, 5 px corner radius)
+    // edge meets T2's lower corner (7 px pipe, 5 px corner radius)
     const exchangeYs = [232 + 128 / 2, 360 - 5 - 3.5];
     return (
       <g key={side}>
@@ -865,6 +879,25 @@ export function FlowDiagram({
         {/* Air pump into T2, through the add air valve. The valve sits a
             multiple of 14 px down the pipe, so the dashes of both parts line
             up, see .pipe-flow */}
+        <Pipe d={`M${t2c} ${teeY} H${bubblesX}`} kind="air" active={air?.on} />
+        <Pipe
+          d={`M${bubblesX} ${teeY} H${gapX} V${t1AirY} H${a ? t1x + 21 : t1x}`}
+          kind="air"
+          active={bubbling}
+          open={bubblesValve?.on}
+        />
+        <Valve
+          x={bubblesX}
+          y={teeY}
+          kind="air"
+          io={bubblesValve}
+          active={bubbling}
+          name={sideIo("bubbles_block", side)}
+          label="Bubbles block"
+          labelAnchor={a ? "start" : "end"}
+          labelDx={gapX + (a ? 10 : -10) - bubblesX}
+          labelDy={-14}
+        />
         <Pipe d={`M${t2c} ${airTop} V${addAirY}`} kind="air" active={air?.on} />
         <Pipe
           d={`M${t2c} ${addAirY} V232`}
@@ -905,17 +938,20 @@ export function FlowDiagram({
           const t2End = a ? t2x : t2x + 172;
           const filled = t2Fill !== undefined && 360 - 128 * t2Fill <= y - 3.5;
           return (
-            <Pipe
-              key={y}
-              d={
-                i === 0
-                  ? `M${t1End} ${y} H${t2End}`
-                  : `M${t2End} ${y} H${t1End}`
-              }
-              kind="grey"
-              active={filled && bubbles?.on === true}
-              filled={filled}
-            />
+            <g key={y}>
+              {/* A gap in the air pipe into T1, which passes behind */}
+              <path d={`M${gapX - 4} ${y} H${gapX + 4}`} className="pipe-gap" />
+              <Pipe
+                d={
+                  i === 0
+                    ? `M${t1End} ${y} H${t2End}`
+                    : `M${t2End} ${y} H${t1End}`
+                }
+                kind="grey"
+                active={filled && bubbling === true}
+                filled={filled}
+              />
+            </g>
           );
         })}
 
@@ -923,12 +959,12 @@ export function FlowDiagram({
           x={t1x}
           y={232}
           w={21}
-          h={128}
+          h={t1Bottom - 232}
           level={tanks[a ? "t1a" : "t1b"]}
           kind="grey"
           label="T1"
           side={side}
-          aeration={bubbles?.on}
+          aeration={bubbling}
           small={a ? "start" : "end"}
         />
         <Tank
@@ -946,7 +982,7 @@ export function FlowDiagram({
         {/* Skim overflow at the top of T1, down the drain line. It has no
             valve, so it is shown from the FILTH_REMOVAL routine. */}
         <Pipe
-          d={a ? `M140 237 H${drainX} V410` : `M860 237 H${drainX} V410`}
+          d={a ? `M140 237 H${drainX} V430` : `M860 237 H${drainX} V430`}
           kind="waste"
           active={skimming}
           title={`Skim overflow of T1 ${side}${skimming ? ": filth spilling over to the drain (inferred from the FILTH_REMOVAL routine)" : ""}`}
@@ -962,14 +998,14 @@ export function FlowDiagram({
 
         {/* Waste valve into the drain line */}
         <Pipe
-          d={`M${t1c} 360 V410 H${drainX}`}
+          d={`M${t1c} ${t1Bottom} V430 H${drainX}`}
           kind="waste"
           active={waste?.on}
           open={waste?.on}
         />
         {/* Shared by the skim overflow and the waste valve */}
         <Pipe
-          d={`M${drainX} 410 V470`}
+          d={`M${drainX} 430 V470`}
           kind="waste"
           active={skimming || waste?.on}
           open={waste?.on}
@@ -977,7 +1013,7 @@ export function FlowDiagram({
         />
         <Valve
           x={t1c}
-          y={385}
+          y={407}
           vertical
           kind="waste"
           io={waste}
@@ -1116,7 +1152,7 @@ export function FlowDiagram({
             active: inlet.receiving.includes("B"),
           },
         ]}
-        labelDy={24}
+        labelDy={-14}
       />
 
       {/* UV and into T3 */}

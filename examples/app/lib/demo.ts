@@ -245,10 +245,11 @@ function run(now: number) {
               ? false
               : minuteOfDay % 30 < 3,
       );
+      // The bubbles block closes while on: T1 is aerated while it is off
       set(
         `bubbles_block${sfx}`,
         t,
-        phase === "treating" && cycle < 120 && cycle % 20 < 8,
+        !(phase === "treating" && cycle < 120 && cycle % 20 < 8),
       );
       set(
         `add_air_valve${sfx}`,
