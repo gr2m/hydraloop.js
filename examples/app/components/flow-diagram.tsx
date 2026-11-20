@@ -176,6 +176,12 @@ type Branch = {
   active: boolean;
 };
 
+/**
+ * The pipe between the backwash valves, level with the waste pipes below T1
+ */
+const RUN_Y = 404;
+/** The vertical center of UV-C */
+const UV_Y = 466;
 /** Half the width of a pipe */
 const PIPE = 3.5;
 /** Height of a distributor triangle, from its tip to its base */
@@ -925,7 +931,12 @@ export function FlowDiagram({
     // Below T1, the air pipe's lower edge lines up with the waste pipe's
     // (5 px air pipe, 7 px waste pipe)
     const airBelowY = wasteY + PIPE - 2.5;
-    const gapX = a ? (t1x + 21 + t2x) / 2 : (t2x + 172 + t1x) / 2;
+    // The air pipe into T1 and the transfer pipe run down between T1 and T2,
+    // evenly spread across the space between them, the air pipe closer to T1
+    const t1Edge = a ? t1x + 21 : t1x;
+    const t2Edge = a ? t2x : t2x + 172;
+    const gapX = t1Edge + (t2Edge - t1Edge) / 3;
+    const transferX = t1Edge + ((t2Edge - t1Edge) * 2) / 3;
     const bubbles = io[sideIo("bubbles_block", side)];
     // The bubbles block valve closes while its signal is on, blocking the air
     // into T1. HDM shows it open while the signal is off
@@ -955,11 +966,9 @@ export function FlowDiagram({
       (t2Fill !== undefined && 360 - 128 * t2Fill <= y - PIPE);
     const upperFilled = exchangeFilled(exchangeYs[0]);
     // The transfer pipe leaves T1 towards T2, halfway between the lower
-    // exchange pipe and T1's bottom. It crosses the air pipe, passes below T2
-    // and turns down into UV-C. Its valve is centered between T2's inner edge
-    // and UV-C's center
+    // exchange pipe and T1's bottom. It crosses the air pipe, turns down
+    // between T1 and T2, passes below T2 and enters UV-C from the side
     const transferY = (exchangeYs[1] + PIPE + t1Bottom) / 2;
-    const transferValveX = ((a ? t2x + 172 : t2x) + 500) / 2;
     return (
       <g key={side}>
         <text
@@ -1077,8 +1086,6 @@ export function FlowDiagram({
         flows back through the lower one. A transfer from T2 into T1 is not
         animated */}
         {exchangeYs.map((y, i) => {
-          const t1End = a ? t1x + 21 : t1x;
-          const t2End = a ? t2x : t2x + 172;
           const filled = exchangeFilled(y);
           return (
             <g key={y}>
@@ -1087,8 +1094,8 @@ export function FlowDiagram({
               <Pipe
                 d={
                   i === 0
-                    ? `M${t1End} ${y} H${t2End}`
-                    : `M${t2End} ${y} H${t1End}`
+                    ? `M${t1Edge} ${y} H${t2Edge}`
+                    : `M${t2Edge} ${y} H${t1Edge}`
                 }
                 kind="grey"
                 active={filled && bubbling === true}
@@ -1195,14 +1202,14 @@ export function FlowDiagram({
           className="pipe-gap"
         />
         <Pipe
-          d={`M${a ? t1x + 21 : t1x} ${transferY} H${a ? 488 : 512} V440`}
+          d={`M${t1Edge} ${transferY} H${transferX} V${UV_Y} H${a ? 460 : 540}`}
           kind="clean"
           active={transferring}
           open={transferring}
         />
         <Valve
-          x={transferValveX}
-          y={transferY}
+          x={a ? 380 : 620}
+          y={UV_Y}
           kind="clean"
           io={transfer}
           active={transferring}
@@ -1221,6 +1228,14 @@ export function FlowDiagram({
   const backupToPump = supply.pumping && supply.source === "backup";
   const circulatingThroughUv = t3.circulating && supply.pumping;
   const backFlushing = io[IO.backFlush]?.on && supply.pumping;
+  const backwash = {
+    A: io[sideIo("diffuser_backwash", "A")],
+    B: io[sideIo("diffuser_backwash", "B")],
+  };
+  const backwashing = {
+    A: backwash.A?.on && supply.pumping,
+    B: backwash.B?.on && supply.pumping,
+  };
   // Water only leaves UV-C for T3 while something feeds the chamber and the
   // UV valve isn't closed.
   const t3ReceivingFromUv =
@@ -1324,7 +1339,7 @@ export function FlowDiagram({
 
       {/* UV and into T3 */}
       <Pipe
-        d="M500 474 V540"
+        d={`M500 ${UV_Y + 17} V540`}
         kind="clean"
         active={t3ReceivingFromUv}
         open={io[IO.uvValve]?.on}
@@ -1338,14 +1353,14 @@ export function FlowDiagram({
         <title suppressHydrationWarning>
           {ioTitle("UV-C", IO.uvPower, io[IO.uvPower], ["on", "off"])}
         </title>
-        <rect x={460} y={440} width={80} height={34} rx={6} />
-        <text x={500} y={462} textAnchor="middle">
+        <rect x={460} y={UV_Y - 17} width={80} height={34} rx={6} />
+        <text x={500} y={UV_Y + 5} textAnchor="middle">
           UV-C
         </text>
       </g>
       <Valve
         x={500}
-        y={502}
+        y={(UV_Y + 17 + 540) / 2}
         vertical
         kind="clean"
         io={io[IO.uvValve]}
@@ -1366,17 +1381,19 @@ export function FlowDiagram({
         square
       />
 
-      {/* T3 drain */}
+      {/* T3 drain, out of T3's right side at its bottom, across from the
+          pipe to the backup valve */}
       <Pipe
-        d="M640 640 V680 H970 V735"
+        d={`M655 ${backupY} H970 V735`}
         kind="waste"
         active={t3.draining}
         open={io[IO.wasteStorageTank]?.on}
+        square
         arrow={{ x: 970, y: 735, dir: "down" }}
       />
       <Valve
         x={790}
-        y={680}
+        y={backupY}
         kind="waste"
         io={io[IO.wasteStorageTank]}
         active={t3.draining}
@@ -1394,23 +1411,65 @@ export function FlowDiagram({
       <BackupTank x={60} y={540} w={130} h={100} state={state} />
 
       {/* Circulation: the distribution pump pushes T3 water around the right
-          of T3 through UV. The T3 drain passes behind it */}
-      <path d="M690 676 V684" className="pipe-gap" />
+          of T3 into the top of UV. The T3 drain and train B's transfer pipe
+          pass behind it. At the top corners, the backwash pipes branch off up
+          into the center of each T2's bottom */}
+      <path d={`M700 ${backupY - 4} V${backupY + 4}`} className="pipe-gap" />
+      <path d={`M700 ${UV_Y - 4} V${UV_Y + 4}`} className="pipe-gap" />
       <Pipe
-        d="M560 740 H690 V465 H540"
+        d={`M560 740 H700 V${RUN_Y}`}
+        kind="clean"
+        active={circulatingThroughUv || backwashing.A || backwashing.B}
+        open={t3.circulating || backwash.A?.on || backwash.B?.on}
+      />
+      <Pipe
+        d={`M700 ${RUN_Y} H500`}
+        kind="clean"
+        active={circulatingThroughUv || backwashing.A}
+        open={t3.circulating || backwash.A?.on}
+      />
+      <Pipe
+        d={`M500 ${RUN_Y} V${UV_Y - 17}`}
         kind="clean"
         active={circulatingThroughUv}
         open={t3.circulating}
       />
+      {(["A", "B"] as Side[]).map((side) => {
+        const a = side === "A";
+        return (
+          <g key={side}>
+            <Pipe
+              d={a ? `M500 ${RUN_Y} H300 V360` : `M700 ${RUN_Y} V360`}
+              kind="clean"
+              active={backwashing[side]}
+              open={backwash[side]?.on}
+            />
+            <Valve
+              x={a ? 300 : 700}
+              y={(RUN_Y + 360) / 2}
+              vertical
+              kind="clean"
+              io={backwash[side]}
+              active={backwashing[side]}
+              name={sideIo("diffuser_backwash", side)}
+              label="Backwash"
+              labelAnchor={a ? "end" : "start"}
+              labelDx={a ? -16 : 16}
+            />
+          </g>
+        );
+      })}
       <Valve
-        x={690}
-        y={590}
+        x={500}
+        y={(RUN_Y + UV_Y - 17) / 2}
         vertical
         kind="clean"
         io={io[IO.circulation]}
         active={circulatingThroughUv}
         name={IO.circulation}
         label="Circulation"
+        labelAnchor="end"
+        labelDx={-14}
       />
 
       {/* T4 and T3 join in the backup valve, which feeds the distribution
@@ -1600,6 +1659,9 @@ export function activeFlows(state: DeviceState) {
     }
     if (io[sideIo("transfer_path", side)]?.on) {
       flows.push(`Train ${side} → UV → T3`);
+    }
+    if (io[sideIo("diffuser_backwash", side)]?.on && supply.pumping) {
+      flows.push(`Backwash → T2 ${side}`);
     }
   }
   if (t3.circulating && supply.pumping) flows.push("T3 → UV → T3");
