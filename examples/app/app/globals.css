@@ -760,6 +760,14 @@ tr.is-selected:focus-visible {
 .pressure.is-venting .pressure-ring {
   animation-direction: reverse;
 }
+/* Water circulating through a tank: rings in the water's color, spreading
+   from where it enters and gathering towards where it leaves */
+.water-rings .pressure-ring {
+  stroke: var(--k);
+}
+.water-rings.is-out .pressure-ring {
+  animation-direction: reverse;
+}
 /* Where a pipe passes behind another: 3 px of background on either side of
    the 7 px pipe in front */
 .pipe-gap {

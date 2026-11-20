@@ -545,6 +545,82 @@ function Drips({
   );
 }
 
+/**
+ * The animation delay of a pattern that continues a pipe's flow pattern
+ * `length` px down the pipe: a step of 14 px takes 0.9 s, see .pipe-flow
+ */
+function flowDelay(length: number) {
+  return (-((14 - (length % 14)) % 14) / 14) * 0.9;
+}
+
+/**
+ * Rings in the water around where a pipe enters the tank, each growing from
+ * the pipe a step of 14 px behind the next, or shrinking towards it with
+ * `out`. They fade out towards the tank's center
+ */
+function WaterRings({
+  id,
+  x,
+  y,
+  center,
+  radius,
+  delay,
+  out = false,
+}: {
+  id: string;
+  x: number;
+  y: number;
+  /** The tank's center, where the rings have faded out */
+  center: number;
+  /** How far the rings reach */
+  radius: number;
+  /** See flowDelay */
+  delay: number;
+  out?: boolean;
+}) {
+  const rings = Math.ceil(radius / 14) + 1;
+  return (
+    <g className={`water-rings${out ? " is-out" : ""}`}>
+      <linearGradient
+        id={`${id}-fade`}
+        gradientUnits="userSpaceOnUse"
+        x1={x}
+        y1={0}
+        x2={center}
+        y2={0}
+      >
+        <stop offset={0} stopColor="#fff" />
+        <stop offset={1} stopColor="#000" />
+      </linearGradient>
+      <mask id={`${id}-mask`}>
+        <rect
+          x={Math.min(x, center)}
+          y={y - radius}
+          width={Math.abs(center - x)}
+          height={2 * radius}
+          fill={`url(#${id}-fade)`}
+        />
+      </mask>
+      <g mask={`url(#${id}-mask)`}>
+        {Array.from({ length: rings }, (_, i) => (
+          <circle
+            key={i}
+            cx={x}
+            cy={y}
+            r={rings * 14}
+            className="pressure-ring"
+            style={{
+              transform: `scale(${i / rings})`,
+              animationDuration: `${rings * 0.9}s`,
+              animationDelay: `${delay - i * 0.9}s`,
+            }}
+          />
+        ))}
+      </g>
+    </g>
+  );
+}
+
 /** How full the tank's shell is, 0 to 1, or undefined without a reading */
 function fillOf(level: TankLevel | undefined) {
   if (level?.liters === undefined || level.max <= 0) return undefined;
@@ -565,6 +641,7 @@ function Tank({
   sub,
   side,
   aeration,
+  circulation,
   pressurized,
   pressureHeld = false,
   venting,
@@ -583,6 +660,12 @@ function Tank({
   /** The train, named in the tooltip only */
   side?: Side;
   aeration?: boolean;
+  /**
+   * Water moves through the tank, in through a pipe at the bottom of one side
+   * and out through one on the other: the x where it enters and leaves, the
+   * pipes' y, and the length of the pipe it enters through
+   */
+  circulation?: { from: number; to: number; y: number; length: number };
   /**
    * Air is pumped into the space above the water, pressing on its surface:
    * the length of the air pipe that ends at the top of the tank
@@ -635,9 +718,7 @@ function Tank({
     ) + 1;
   // Venting rings vanish where the pipe's dashes start, at its beginning
   const phase =
-    venting === undefined && pressurized
-      ? (-((14 - (pressurized % 14)) % 14) / 14) * 0.9
-      : 0;
+    venting === undefined && pressurized ? flowDelay(pressurized) : 0;
   const textX = small === "end" ? x + w + 10 : small ? x - 10 : x + 12;
   const anchor = small === "start" ? "end" : "start";
   return (
@@ -674,6 +755,37 @@ function Tank({
             className="tank-surface"
           />
         </>
+      )}
+      {known && circulation && fillHeight > 4 && (
+        // The water spreads into the tank as rings, as the air does when
+        // pressurized, and gathers towards the pipe it leaves through. Rings
+        // start where the entering pipe's dashes leave off, and vanish where
+        // the leaving pipe's dashes start
+        <g className="circulation" aria-hidden>
+          <clipPath id={`${clipId}-water`}>
+            <rect
+              x={x + 1}
+              y={y + h - fillHeight}
+              width={w - 2}
+              height={fillHeight - 1}
+              rx={!square && fillHeight > 8 ? 4 : 0}
+            />
+          </clipPath>
+          <g clipPath={`url(#${clipId}-water)`}>
+            {[circulation.from, circulation.to].map((end, i) => (
+              <WaterRings
+                key={i}
+                id={`${clipId}-${i ? "out" : "in"}`}
+                x={end}
+                y={circulation.y}
+                center={x + w / 2}
+                radius={Math.hypot(w / 2, circulation.y - (y + h - fillHeight))}
+                delay={i ? 0 : flowDelay(circulation.length)}
+                out={i === 1}
+              />
+            ))}
+          </g>
+        </g>
       )}
       {[0.25, 0.5, 0.75].map((f) => (
         <line
@@ -976,6 +1088,9 @@ export function FlowDiagram({
     const exchangeFilled = (y: number) =>
       (t1Surface !== undefined && t1Surface <= y - PIPE + 1e-6) ||
       (t2Fill !== undefined && 360 - 128 * t2Fill <= y - PIPE);
+    // While the bubbles circulate water, it moves through T2 from the upper
+    // pipe into the lower one
+    const circulating = bubbling === true && exchangeFilled(exchangeYs[0]);
     // Otherwise, the upper pipe's way down holds water up to T2's surface, as
     // its lower end is always below it
     const exchangeSurface =
@@ -1166,6 +1281,20 @@ export function FlowDiagram({
           kind="grey"
           label="T2"
           side={side}
+          circulation={
+            circulating
+              ? {
+                  from: t2FarEdge,
+                  to: t2Edge,
+                  y: exchangeYs[1],
+                  length:
+                    Math.abs(exchangeX - t1Edge) +
+                    exchangeYs[1] -
+                    exchangeYs[0] +
+                    Math.abs(exchangeX - t2FarEdge),
+                }
+              : undefined
+          }
           pressurized={(addingAir || holdingAir) && 232 - addAirY}
           pressureHeld={holdingAir}
           venting={release?.on ? releaseX : undefined}
