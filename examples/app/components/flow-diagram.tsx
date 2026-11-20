@@ -511,6 +511,7 @@ function Tank({
   aeration,
   pressurized,
   small,
+  square = false,
 }: {
   x: number;
   y: number;
@@ -533,6 +534,8 @@ function Tank({
    * next to it, before (`start`) or after (`end`) it
    */
   small?: "start" | "end";
+  /** Square corners */
+  square?: boolean;
 }) {
   const known = fillOf(level) !== undefined;
   const size = level?.capacity ?? level?.max ?? 0;
@@ -573,7 +576,7 @@ function Tank({
         y={y}
         width={w}
         height={h}
-        rx={5}
+        rx={square ? 0 : 5}
         className={known ? "tank-shell" : "tank-shell is-unknown"}
       />
       {known && (
@@ -583,7 +586,7 @@ function Tank({
             y={y + h - fillHeight}
             width={w - 2}
             height={Math.max(0, fillHeight - 1)}
-            rx={fillHeight > 8 ? 4 : 0}
+            rx={!square && fillHeight > 8 ? 4 : 0}
             className="tank-fill"
           />
           <line
@@ -618,7 +621,7 @@ function Tank({
               y={y + 1}
               width={w - 2}
               height={h - fillHeight - 1}
-              rx={4}
+              rx={square ? 0 : 4}
             />
           </clipPath>
           {/* Fades from the top of the tank to its bottom */}
@@ -831,9 +834,12 @@ export function FlowDiagram({
     // Air only reaches T2 while the add air valve isn't closed
     const addingAir = air?.on && addAir?.on !== false;
     // The air pipe into T1 branches off above the add air valve, runs down
-    // between T1 and T2 and enters T1 below the exchange pipes
+    // between T1 and T2 and enters T1 below the exchange pipes, across from
+    // the waste pipe
     const teeY = 166;
-    const t1AirY = t1Bottom - 12;
+    // The waste pipe's lower edge meets T1's bottom (7 px pipe)
+    const wasteY = t1Bottom - PIPE;
+    const t1AirY = wasteY;
     const gapX = a ? (t1x + 21 + t2x) / 2 : (t2x + 172 + t1x) / 2;
     const bubbles = io[sideIo("bubbles_block", side)];
     // The bubbles block valve closes while its signal is on, blocking the air
@@ -966,6 +972,7 @@ export function FlowDiagram({
           side={side}
           aeration={bubbling}
           small={a ? "start" : "end"}
+          square
         />
         <Tank
           x={t2x}
@@ -982,7 +989,11 @@ export function FlowDiagram({
         {/* Skim overflow at the top of T1, down the drain line. It has no
             valve, so it is shown from the FILTH_REMOVAL routine. */}
         <Pipe
-          d={a ? `M140 237 H${drainX} V430` : `M860 237 H${drainX} V430`}
+          d={
+            a
+              ? `M140 237 H${drainX} V${wasteY}`
+              : `M860 237 H${drainX} V${wasteY}`
+          }
           kind="waste"
           active={skimming}
           title={`Skim overflow of T1 ${side}${skimming ? ": filth spilling over to the drain (inferred from the FILTH_REMOVAL routine)" : ""}`}
@@ -996,32 +1007,32 @@ export function FlowDiagram({
           Skim
         </text>
 
-        {/* Waste valve into the drain line */}
+        {/* Waste valve into the drain line, out of T1's side at its bottom */}
         <Pipe
-          d={`M${t1c} ${t1Bottom} V430 H${drainX}`}
+          d={`M${a ? t1x : t1x + 21} ${wasteY} H${drainX}`}
           kind="waste"
           active={waste?.on}
           open={waste?.on}
         />
         {/* Shared by the skim overflow and the waste valve */}
         <Pipe
-          d={`M${drainX} 430 V470`}
+          d={`M${drainX} ${wasteY} V470`}
           kind="waste"
           active={skimming || waste?.on}
           open={waste?.on}
           arrow={{ x: drainX, y: 470, dir: "down" }}
         />
         <Valve
-          x={t1c}
-          y={407}
-          vertical
+          x={(t1x + (a ? 0 : 21) + drainX) / 2}
+          y={wasteY}
           kind="waste"
           io={waste}
           active={waste?.on}
           name={sideIo("waste_clean_tank", side)}
           label="Waste"
-          labelAnchor={a ? "end" : "start"}
-          labelDx={a ? -16 : 16}
+          labelAnchor="middle"
+          labelDx={0}
+          labelDy={24}
         />
         <text x={drainX} y={498} textAnchor="middle" className="diagram-label">
           Drain
