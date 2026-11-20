@@ -756,6 +756,9 @@ tr.is-selected:focus-visible {
 .pressure.is-held .pressure-ring {
   animation: none;
 }
+.pressure.is-held .pressure-ring {
+  stroke-opacity: 0.3;
+}
 /* Air leaves through the release air pipe: the rings move in towards it */
 .pressure.is-venting .pressure-ring {
   animation-direction: reverse;
@@ -1020,6 +1023,7 @@ tr.is-selected:focus-visible {
 .pressure-ring {
   fill: none;
   stroke: var(--air);
+  stroke-opacity: 0.5;
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
   transform-box: fill-box;
