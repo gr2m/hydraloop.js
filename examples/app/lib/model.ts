@@ -284,6 +284,59 @@ const IO_LABELS: Record<string, string> = {
   waste_clean_tank_b: "Waste B",
 };
 
+/**
+ * Signal groups of the timeline, in order. Signals that aren't listed, like
+ * the battery, buzzer, auxiliary and washer demand signals, go to "Other".
+ */
+export const IO_GROUPS: { key: string; label: string; names: string[] }[] = [
+  {
+    key: "water-valves",
+    label: "Water valves",
+    names: [
+      IO.bypass,
+      IO.abSelector,
+      "transfer_path",
+      "transfer_path_b",
+      "waste_clean_tank",
+      "waste_clean_tank_b",
+      IO.uvValve,
+      IO.circulation,
+      IO.backupWater,
+      IO.preBackupWater,
+      IO.backFlush,
+      "diffuser_backwash",
+      "diffuser_backwash_b",
+      IO.wasteStorageTank,
+    ],
+  },
+  {
+    key: "air-valves",
+    label: "Air valves",
+    names: [
+      "add_air_valve",
+      "add_air_valve_b",
+      "bubbles_block",
+      "bubbles_block_b",
+      "release_air",
+      "release_air_b",
+    ],
+  },
+  { key: "air-pumps", label: "Air pumps", names: ["air_pump", "air_pump_b"] },
+  { key: "water-pumps", label: "Water pumps", names: [IO.distributionPump] },
+  { key: "lights", label: "Lights", names: [IO.uvPower] },
+  {
+    key: "sensors",
+    label: "Sensors",
+    names: [IO.toilet, IO.t4Min, IO.t4Max],
+  },
+];
+
+/**
+ * Behaviors that explain nothing the app shows. `pressingOptButton` is
+ * engaged for about 12 hours at a time, nearly always.
+ */
+export const OTHER_BEHAVIORS = new Set(["pressingOptButton"]);
+
 export function caption(captions: Record<string, string>, name: string) {
   if (IO_LABELS[name]) return IO_LABELS[name];
   // The graph config captions are often just the IO name
@@ -532,7 +585,10 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
 
   const routine: Partial<Record<RoutineSide, RoutineEvent>> = {};
   const active = (ds.behaviors ?? []).filter(
-    (b) => b.start <= t && (b.open ? t <= b.end : t < b.end),
+    (b) =>
+      !OTHER_BEHAVIORS.has(b.name) &&
+      b.start <= t &&
+      (b.open ? t <= b.end : t < b.end),
   );
 
   const train = (side: Side): TrainState => {
@@ -1298,7 +1354,7 @@ export function deviceEvents(ds: Dataset): DeviceEvent[] {
         label: `${b.label} ${engaged ? "started" : "ended"}`,
         detail: `behavior ${b.name} ${engaged ? "engaged" : "disengaged"}`,
         source: "behavior",
-        key: true,
+        key: !OTHER_BEHAVIORS.has(b.name),
       });
     }
   }

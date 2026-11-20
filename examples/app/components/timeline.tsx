@@ -13,14 +13,16 @@ import {
   caption,
   humanize,
   IO,
+  IO_GROUPS,
   isBypassTest,
   onIntervals,
+  OTHER_BEHAVIORS,
   roomSeries,
-  sideIo,
   TANK_LABELS,
   TRAIN_FULL_LITERS,
   valueAt,
   valveRoutineSegments,
+  type Behavior,
   type Dataset,
   type Point,
   type RoutineSide,
@@ -29,7 +31,7 @@ import {
 
 import { formatTime } from "./time";
 
-const LABEL_W = 120;
+const LABEL_W = 140;
 const RIGHT_PAD = 56;
 const CHART_H = 96;
 const LANE_H = 18;
@@ -68,7 +70,14 @@ type Row =
       h: number;
     }
   | { type: "room"; key: string; y: number; h: number }
-  | { type: "heading"; key: string; label: string; y: number }
+  | {
+      type: "heading";
+      key: string;
+      label: string;
+      count: number;
+      collapsed: boolean;
+      y: number;
+    }
   | { type: "lane"; lane: Lane; y: number };
 
 /** Points further apart than this are a gap in the data, not connected */
@@ -122,7 +131,7 @@ const SIDE_LABEL: Record<RoutineSide, string> = {
   SYSTEM: "System",
 };
 
-function buildLanes(ds: Dataset, showAll: boolean) {
+function buildLanes(ds: Dataset) {
   const { from, until } = ds;
   const ioLane = (name: string, label: string, kind: string): Lane => ({
     key: name,
@@ -137,21 +146,27 @@ function buildLanes(ds: Dataset, showAll: boolean) {
     })),
   });
 
+  const behaviorSegments = (behaviors: Behavior[]) =>
+    behaviors.map((b) => ({
+      start: Math.max(b.start, from),
+      end: b.end,
+      text: b.label,
+      kind: b.name.startsWith("full") ? "cleaning" : "other",
+      title: `${b.label} (${b.name}): ${formatTime(b.start, "datetime")} – ${b.open ? "now" : formatTime(b.end, "datetime")}`,
+    }));
+  const behaviors = ds.behaviors ?? [];
+
   // One lane per side, as there are many kinds of behaviors
   const behaviorLanes: Lane[] = (["A", "B", "SYSTEM"] as RoutineSide[])
     .map((side) => ({
       key: `behavior-${side}`,
       label: SIDE_LABEL[side],
       kind: "behavior",
-      segments: (ds.behaviors ?? [])
-        .filter((b) => b.side === side)
-        .map((b) => ({
-          start: Math.max(b.start, from),
-          end: b.end,
-          text: b.label,
-          kind: b.name.startsWith("full") ? "cleaning" : "other",
-          title: `${b.label} (${b.name}): ${formatTime(b.start, "datetime")} – ${b.open ? "now" : formatTime(b.end, "datetime")}`,
-        })),
+      segments: behaviorSegments(
+        behaviors.filter(
+          (b) => b.side === side && !OTHER_BEHAVIORS.has(b.name),
+        ),
+      ),
     }))
     .filter((lane) => lane.segments.length > 0);
 
@@ -180,35 +195,55 @@ function buildLanes(ds: Dataset, showAll: boolean) {
     );
 
   const label = (name: string) => caption(ds.captions, name);
-  const keyLanes: Lane[] = [
-    ioLane(IO.bypass, label(IO.bypass), "grey"),
-    ioLane(sideIo("transfer_path", "A"), "Transfer A", "clean"),
-    ioLane(sideIo("transfer_path", "B"), "Transfer B", "clean"),
-    ioLane(sideIo("waste_clean_tank", "A"), "Waste A", "waste"),
-    ioLane(sideIo("waste_clean_tank", "B"), "Waste B", "waste"),
-    ioLane(sideIo("air_pump", "A"), "Air pump A", "air"),
-    ioLane(sideIo("air_pump", "B"), "Air pump B", "air"),
-    ioLane(IO.uvPower, label(IO.uvPower), "uv"),
-    ioLane(IO.circulation, "Circulation", "clean"),
-    ioLane(IO.distributionPump, "Distribution", "clean"),
-    ioLane(IO.toilet, label(IO.toilet), "clean"),
-    ioLane(IO.backupWater, label(IO.backupWater), "mains"),
-    ioLane(IO.t4Min, label(IO.t4Min), "mains"),
-    ioLane(IO.wasteStorageTank, label(IO.wasteStorageTank), "waste"),
-  ].filter((lane) => lane.key in ds.io || lane.key.startsWith("t2-pressure"));
-  const shown = new Set(keyLanes.map((l) => l.key));
-  const otherLanes = Object.keys(ds.io)
-    .filter((name) => !shown.has(name))
-    .sort()
-    .map((name) => ioLane(name, label(name), "air"));
+  const ioGroups = IO_GROUPS.map((group) => ({
+    key: group.key,
+    label: group.label,
+    lanes: group.names
+      .filter((name) => name in ds.io)
+      .map((name) => ioLane(name, label(name), ioKind(name))),
+  }));
+  const grouped = new Set(IO_GROUPS.flatMap((group) => group.names));
+  const otherBehaviors = behaviors.filter((b) => OTHER_BEHAVIORS.has(b.name));
+  const otherLanes: Lane[] = [
+    ...Object.keys(ds.io)
+      .filter((name) => !grouped.has(name))
+      .sort()
+      .map((name) => ioLane(name, label(name), "other")),
+    ...(otherBehaviors.length > 0
+      ? [
+          {
+            key: "behavior-other",
+            label: "Behaviors",
+            kind: "behavior",
+            segments: behaviorSegments(otherBehaviors),
+          },
+        ]
+      : []),
+  ];
 
-  return {
-    routineLanes,
-    behaviorLanes,
-    keyLanes,
-    otherLanes: showAll ? otherLanes : [],
-    otherCount: otherLanes.length,
-  };
+  return { routineLanes, behaviorLanes, ioGroups, otherLanes };
+}
+
+/** The color of a signal's lane, after the water or air it moves */
+function ioKind(name: string) {
+  const base = name.replace(/_b$/, "");
+  if (base === IO.bypass || base === IO.abSelector) return "grey";
+  if (base === "waste_clean_tank" || base === IO.wasteStorageTank) {
+    return "waste";
+  }
+  if (
+    base === IO.backupWater ||
+    base === IO.preBackupWater ||
+    base === IO.t4Min ||
+    base === IO.t4Max
+  ) {
+    return "mains";
+  }
+  if (base === IO.uvPower) return "uv";
+  if (/^(air_pump|add_air_valve|bubbles_block|release_air)$/.test(base)) {
+    return "air";
+  }
+  return "clean";
 }
 
 export function Timeline({
@@ -224,7 +259,15 @@ export function Timeline({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(900);
-  const [showAll, setShowAll] = useState(false);
+  const [collapsed, setCollapsed] = useState<ReadonlySet<string>>(
+    () => new Set(["behaviors", "other"]),
+  );
+  const toggleGroup = (key: string) =>
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (!next.delete(key)) next.add(key);
+      return next;
+    });
 
   useEffect(() => {
     const el = ref.current;
@@ -252,8 +295,10 @@ export function Timeline({
     () => onIntervals(dataset.io[IO.bypass], dataset.from, dataset.until),
     [dataset],
   );
-  const { routineLanes, behaviorLanes, keyLanes, otherLanes, otherCount } =
-    useMemo(() => buildLanes(dataset, showAll), [dataset, showAll]);
+  const { routineLanes, behaviorLanes, ioGroups, otherLanes } = useMemo(
+    () => buildLanes(dataset),
+    [dataset],
+  );
 
   // Vertical layout
   const rows: Row[] = [];
@@ -281,18 +326,26 @@ export function Timeline({
   y += GROUP_GAP - 18;
   const addGroup = (key: string, label: string, lanes: Lane[]) => {
     if (!lanes.length) return;
-    rows.push({ type: "heading", key, label, y });
+    const isCollapsed = collapsed.has(key);
+    rows.push({
+      type: "heading",
+      key,
+      label,
+      count: lanes.length,
+      collapsed: isCollapsed,
+      y,
+    });
     y += 18;
-    for (const lane of lanes) {
+    for (const lane of isCollapsed ? [] : lanes) {
       rows.push({ type: "lane", lane, y });
       y += LANE_H + LANE_GAP;
     }
     y += GROUP_GAP - LANE_GAP;
   };
-  addGroup("routines", "HDM routines", routineLanes);
-  addGroup("behaviors", "HDM behaviors", behaviorLanes);
-  addGroup("io", "Valves and pumps", keyLanes);
-  addGroup("other", "Other signals", otherLanes);
+  addGroup("routines", "Routines", routineLanes);
+  for (const group of ioGroups) addGroup(group.key, group.label, group.lanes);
+  addGroup("behaviors", "Behaviors", behaviorLanes);
+  addGroup("other", "Other", otherLanes);
   const height = y + AXIS_H - GROUP_GAP + 8;
 
   // Ticks
@@ -404,9 +457,45 @@ export function Timeline({
         {rows.map((row) => {
           if (row.type === "heading") {
             return (
-              <text key={row.key} x={0} y={row.y + 11} className="group-label">
-                {row.label}
-              </text>
+              <g
+                key={row.key}
+                className="group-heading"
+                role="button"
+                tabIndex={0}
+                aria-expanded={!row.collapsed}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleGroup(row.key);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter" && e.key !== " ") return;
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleGroup(row.key);
+                }}
+              >
+                <rect
+                  x={0}
+                  y={row.y - 2}
+                  width={LABEL_W - 8}
+                  height={18}
+                  className="group-hit"
+                />
+                <path
+                  d={
+                    row.collapsed
+                      ? `M3 ${row.y + 3} l4 4 l-4 4`
+                      : `M1 ${row.y + 5} l4 4 l4 -4`
+                  }
+                  className="group-chevron"
+                />
+                <text x={14} y={row.y + 11} className="group-label">
+                  {row.label}
+                  {row.collapsed && (
+                    <tspan className="group-count"> {row.count}</tspan>
+                  )}
+                </text>
+              </g>
             );
           }
           if (row.type === "room") {
@@ -697,16 +786,6 @@ export function Timeline({
             ? "Pinned. Click the timeline or press Escape to release."
             : "Click the timeline to pin a moment."}
         </p>
-        {otherCount > 0 && (
-          <label className="checkbox">
-            <input
-              type="checkbox"
-              checked={showAll}
-              onChange={(e) => setShowAll(e.target.checked)}
-            />
-            Show {otherCount} other signals
-          </label>
-        )}
       </div>
     </div>
   );

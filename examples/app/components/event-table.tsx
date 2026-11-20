@@ -26,11 +26,7 @@ export function EventTable({
   selected?: string;
   onSelect?: (event: DeviceEvent, id: string) => void;
 }) {
-  // A selected event that isn't a key event, e.g. from a shared link, shows
-  // all of them
-  const [showAll, setShowAll] = useState(
-    () => !!selected && events.some((e) => !e.key && e.id === selected),
-  );
+  const [showAll, setShowAll] = useState(true);
   const [expanded, setExpanded] = useState(false);
   const [focusSelected, setFocusSelected] = useState(false);
   const body = useRef<HTMLTableSectionElement>(null);

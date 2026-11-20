@@ -87,7 +87,7 @@ In 30 days of an H600's data, every `FILTH_REMOVAL` that ran to its end took abo
 
 ### Behaviors
 
-Besides the valve values, `getIo()` returns firmware _behaviors_ with an `engaged` and a `disengaged` event, e.g. `fullT1T2WasteSoapBombA` while train A is emptied to the drain because of too much soap, `fullT3WasteCleaning`, `t4OverflowBackflush` or `bypassByAppBypassValve`. A trailing `A` or `B` names the train. The app shows them as events, in a timeline lane per train, and in the status of the train while engaged.
+Besides the valve values, `getIo()` returns firmware _behaviors_ with an `engaged` and a `disengaged` event, e.g. `fullT1T2WasteSoapBombA` while train A is emptied to the drain because of too much soap, `fullT3WasteCleaning`, `t4OverflowBackflush` or `bypassByAppBypassValve`. A trailing `A` or `B` names the train. The app shows them as events, in a timeline lane per train, and in the status of the train while engaged. `pressingOptButton` is engaged for about 12 hours at a time, nearly always, and switches together with `battery_power_on`. It isn't documented, so the app shows it under Other, with the battery, buzzer and auxiliary signals.
 
 ### Filth removal
 
