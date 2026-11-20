@@ -551,6 +551,7 @@ function Tank({
   venting,
   small,
   square = false,
+  base = 0,
 }: {
   x: number;
   y: number;
@@ -582,6 +583,11 @@ function Tank({
   small?: "start" | "end";
   /** Square corners */
   square?: boolean;
+  /**
+   * Water at the bottom of the tank, in px, that is always there: 0% starts
+   * on top of it
+   */
+  base?: number;
 }) {
   const known = fillOf(level) !== undefined;
   const size = level?.capacity ?? level?.max ?? 0;
@@ -590,7 +596,7 @@ function Tank({
   const trend = level?.trend;
   const arrow =
     trend === undefined || Math.abs(trend) < 0.3 ? "" : trend > 0 ? "↑" : "↓";
-  const fillHeight = h * fill;
+  const fillHeight = base + (h - base) * fill;
   const name = [label, side ?? sub].filter(Boolean).join(" ");
   const title = !known
     ? `${name}: no level data`
@@ -655,8 +661,8 @@ function Tank({
           key={f}
           x1={x + w - (small ? 5 : 8)}
           x2={x + w}
-          y1={y + h - h * f}
-          y2={y + h - h * f}
+          y1={y + h - base - (h - base) * f}
+          y2={y + h - base - (h - base) * f}
           className="tank-tick"
         />
       ))}
@@ -924,17 +930,20 @@ export function FlowDiagram({
     const t2Level = tanks[a ? "t2a" : "t2b"];
     const t2Fill = fillOf(t2Level);
     const t1Fill = fillOf(tanks[a ? "t1a" : "t1b"]);
-    // Two pipes connect T1 and T2: one whose upper edge is at 40% of T1's
-    // height, so the bubbles circulate water from that level up, and one whose
+    // T1's percentage starts at T2's bottom, so equal percentages line up.
+    // The water below it is always there
+    const t1Surface =
+      t1Fill === undefined ? undefined : 360 - (360 - 232) * t1Fill;
+    // Two pipes connect T1 and T2: one whose upper edge is at T1's 40% water
+    // level, so the bubbles circulate water from that level up, and one whose
     // bottom edge meets T2's lower corner (7 px pipe, 5 px corner radius)
     const exchangeYs = [
-      t1Bottom - (t1Bottom - 232) * 0.4 + PIPE,
+      360 - (360 - 232) * 0.4 + PIPE,
       360 - 5 - PIPE,
     ];
     /** An exchange pipe at `y` holds water */
     const exchangeFilled = (y: number) =>
-      (t1Fill !== undefined &&
-        t1Bottom - (t1Bottom - 232) * t1Fill <= y - PIPE + 1e-6) ||
+      (t1Surface !== undefined && t1Surface <= y - PIPE + 1e-6) ||
       (t2Fill !== undefined && 360 - 128 * t2Fill <= y - PIPE);
     const upperFilled = exchangeFilled(exchangeYs[0]);
     // The transfer pipe leaves T1 towards T2, halfway between the lower
@@ -1093,16 +1102,13 @@ export function FlowDiagram({
           aeration={bubbling}
           small={a ? "start" : "end"}
           square
+          base={t1Bottom - 360}
         />
         {/* Incoming greywater drips from the inlet's end onto T1's surface */}
         <Drips
           x={t1c}
           y={232}
-          bottom={
-            t1Fill === undefined
-              ? undefined
-              : t1Bottom - (t1Bottom - 232) * t1Fill
-          }
+          bottom={t1Surface}
           active={receiving}
         />
         <Tank
