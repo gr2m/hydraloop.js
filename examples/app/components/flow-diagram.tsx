@@ -169,10 +169,10 @@ function Valve({
   );
 }
 
-type Outlet = {
+type Branch = {
   /** undefined while the valve state is unknown */
   open: boolean | undefined;
-  /** Water is moving through this outlet */
+  /** Water is moving through this branch */
   active: boolean;
 };
 
@@ -215,67 +215,75 @@ function inset(points: [number, number][], d: number): [number, number][] {
  * Where the pipes of a distributor at (x, y) end: the pipes cross at (x, y)
  * and end where the triangle is as wide as a pipe
  */
-function distributorEnds(x: number, y: number, inlet: "up" | "left") {
+function distributorEnds(x: number, y: number, tip: "up" | "down" | "left") {
   const d = DISTRIBUTOR - 2 * PIPE;
-  return inlet === "up"
-    ? { inlet: y - d, outlets: [x - d, x + d] }
-    : { inlet: x - d, outlets: [y + d, y - d] };
+  return tip === "left"
+    ? { common: x - d, branches: [y + d, y - d] }
+    : { common: tip === "up" ? y - d : y + d, branches: [x - d, x + d] };
 }
 
 /**
- * A valve with one inlet and two outlets, drawn as a triangle with its tip
- * at the inlet and its other tips at the outlets. Its pipes cross at (x, y),
- * the inlet comes from above or from the left. The water flows through the
- * part of the triangle between the outer borders of the inlet pipe and the
- * open outlet's pipe, so it lines up with both. The rest is an outline.
+ * A valve that connects one common pipe to one of two branches, drawn as a
+ * triangle with its tip at the common pipe and its other tips at the
+ * branches. Its pipes cross at (x, y). The common pipe is an inlet from above
+ * or from the left, or an outlet below that the branches join into. The
+ * water flows through the part of the triangle between the outer borders of
+ * the common pipe and the open branch's pipe, so it lines up with both. The
+ * rest is an outline.
  */
 function Distributor({
   x,
   y,
-  inlet = "up",
+  tip = "up",
   kind,
   io,
   name,
   label,
   words,
-  outlets,
+  branches,
   labelAnchor = "middle",
   labelDx = 0,
   labelDy = 4,
 }: {
   x: number;
   y: number;
-  inlet?: "up" | "left";
+  /** Where the common pipe is */
+  tip?: "up" | "down" | "left";
   kind: Kind;
   io: IoValue | undefined;
   name: string;
   label: string;
   /** What the valve does while on and off */
   words: [string, string];
-  /** Left and right, or top and bottom with the inlet on the left */
-  outlets: [Outlet, Outlet];
+  /** Left and right, or bottom and top with the tip on the left */
+  branches: [Branch, Branch];
   labelAnchor?: "start" | "middle" | "end";
   labelDx?: number;
   labelDy?: number;
 }) {
   const p = PIPE;
   const w = DISTRIBUTOR;
-  // Drawn with the inlet above, then turned for an inlet on the left
-  const up = inlet === "up";
+  // Drawn with the tip above, then turned for a tip on the left or flipped
+  // for a tip below
+  const up = tip !== "left";
   const at = ([dx, dy]: [number, number]) =>
-    up ? `${x + dx},${y + dy}` : `${x + dy},${y - dx}`;
+    tip === "up"
+      ? `${x + dx},${y + dy}`
+      : tip === "down"
+        ? `${x + dx},${y - dy}`
+        : `${x + dy},${y - dx}`;
   const shape = (points: [number, number][]) => points.map(at).join(" ");
   // Outlined parts, with the outline inside so it lines up with the pipes
   const outline = (points: [number, number][], width = OUTLINE) =>
     shape(inset(points, width / 2));
-  // With the inlet on the left, the left outlet turns to the bottom
-  const [left, right] = up ? outlets : [outlets[1], outlets[0]];
-  const state = (outlet: Outlet) =>
-    outlet.open === undefined
+  // With the tip on the left, the left branch turns to the bottom
+  const [left, right] = up ? branches : [branches[1], branches[0]];
+  const state = (branch: Branch) =>
+    branch.open === undefined
       ? "unknown"
-      : !outlet.open
+      : !branch.open
         ? "closed"
-        : outlet.active
+        : branch.active
           ? "flowing"
           : "open";
   const open = left.open ? -1 : right.open ? 1 : 0;
@@ -290,7 +298,9 @@ function Distributor({
       <title suppressHydrationWarning>{title}</title>
       <rect
         x={up ? x - w - 4 : x + p - w - 4}
-        y={up ? y + p - w - 4 : y - w - 4}
+        y={
+          tip === "up" ? y + p - w - 4 : tip === "down" ? y - p - 4 : y - w - 4
+        }
         width={up ? 2 * w + 8 : w + 8}
         height={up ? w + 8 : 2 * w + 8}
         className="hit"
@@ -310,7 +320,7 @@ function Distributor({
           />
         ) : (
           <>
-            {/* The open side, from the far border of the inlet pipe */}
+            {/* The open side, from the far border of the common pipe */}
             <polygon
               points={shape([
                 [open * w, p],
@@ -879,6 +889,7 @@ export function FlowDiagram({
   const bypass = io[IO.bypass];
   const bypassEnds = distributorEnds(500, 24, "left");
   const abEnds = distributorEnds(500, 100, "up");
+  const backupEnds = distributorEnds(260, 680, "down");
 
   const train = (side: Side) => {
     const a = side === "A";
@@ -937,10 +948,7 @@ export function FlowDiagram({
     // Two pipes connect T1 and T2: one whose upper edge is at T1's 40% water
     // level, so the bubbles circulate water from that level up, and one whose
     // bottom edge meets T2's lower corner (7 px pipe, 5 px corner radius)
-    const exchangeYs = [
-      360 - (360 - 232) * 0.4 + PIPE,
-      360 - 5 - PIPE,
-    ];
+    const exchangeYs = [360 - (360 - 232) * 0.4 + PIPE, 360 - 5 - PIPE];
     /** An exchange pipe at `y` holds water */
     const exchangeFilled = (y: number) =>
       (t1Surface !== undefined && t1Surface <= y - PIPE + 1e-6) ||
@@ -967,8 +975,8 @@ export function FlowDiagram({
         <Pipe
           d={
             a
-              ? `M${abEnds.outlets[0]} 100 H${t1c} V232`
-              : `M${abEnds.outlets[1]} 100 H${t1c} V232`
+              ? `M${abEnds.branches[0]} 100 H${t1c} V232`
+              : `M${abEnds.branches[1]} 100 H${t1c} V232`
           }
           kind="grey"
           active={receiving}
@@ -1105,12 +1113,7 @@ export function FlowDiagram({
           base={t1Bottom - 360}
         />
         {/* Incoming greywater drips from the inlet's end onto T1's surface */}
-        <Drips
-          x={t1c}
-          y={232}
-          bottom={t1Surface}
-          active={receiving}
-        />
+        <Drips x={t1c} y={232} bottom={t1Surface} active={receiving} />
         <Tank
           x={t2x}
           y={232}
@@ -1228,7 +1231,7 @@ export function FlowDiagram({
 
   return (
     <svg
-      viewBox="0 -38 1000 853"
+      viewBox="0 -38 1000 863"
       className="flow-diagram"
       role="group"
       aria-label="Water flow through the H600"
@@ -1250,21 +1253,21 @@ export function FlowDiagram({
         Greywater from showers and baths
       </text>
       <Pipe
-        d={`M60 24 H${bypassEnds.inlet}`}
+        d={`M60 24 H${bypassEnds.common}`}
         kind="grey"
         active={inlet.receiving.length > 0 || inlet.bypass}
         open={bypass?.on || (bypass?.on === false && selected !== undefined)}
         square
       />
       <Pipe
-        d={`M500 ${bypassEnds.outlets[0]} V${abEnds.inlet}`}
+        d={`M500 ${bypassEnds.branches[0]} V${abEnds.common}`}
         kind="grey"
         active={inlet.receiving.length > 0}
         open={bypass?.on === false && selected !== undefined}
         square
       />
       <Pipe
-        d={`M500 ${bypassEnds.outlets[1]} V-22 H935`}
+        d={`M500 ${bypassEnds.branches[1]} V-22 H935`}
         kind="grey"
         active={inlet.bypass}
         open={bypass?.on}
@@ -1274,13 +1277,13 @@ export function FlowDiagram({
       <Distributor
         x={500}
         y={24}
-        inlet="left"
+        tip="left"
         kind="grey"
         io={bypass}
         name={IO.bypass}
         label="Bypass"
         words={["to the sewer", "to the trains"]}
-        outlets={[
+        branches={[
           { open: bypass?.on, active: inlet.bypass === true },
           {
             open: bypass && !bypass.on,
@@ -1305,7 +1308,7 @@ export function FlowDiagram({
         name={IO.abSelector}
         label="A/B valve"
         words={["to train B", "to train A"]}
-        outlets={[
+        branches={[
           {
             open: selected && selected === "A",
             active: inlet.receiving.includes("A"),
@@ -1387,137 +1390,146 @@ export function FlowDiagram({
 
       {/* T4 backup */}
       <BackupTank x={60} y={540} w={130} h={100} state={state} />
-      <Pipe
-        d="M115 640 V680 H244"
-        kind="mains"
-        active={backupToPump}
-        open={backup?.on}
-      />
-      <Valve
-        x={185}
-        y={680}
-        kind="mains"
-        io={backup}
-        active={backupToPump}
-        name={IO.backupWater}
-        label="Backup"
-        labelAnchor="middle"
-        labelDx={0}
-        labelDy={-16}
-      />
 
-      {/* T3 to the distribution pump, unless the outlets get backup water */}
+      {/* Circulation: the distribution pump pushes T3 water around the right
+          of T3 through UV. The T3 drain passes behind it */}
+      <path d="M690 676 V684" className="pipe-gap" />
       <Pipe
-        d="M360 640 V680 H276"
-        kind="clean"
-        active={recycledToPump}
-        open={backup?.on === false}
-      />
-
-      {/* Circulation: the distribution pump pushes T3 water through UV */}
-      <Pipe
-        d="M260 664 V465 H460"
+        d="M560 740 H690 V465 H540"
         kind="clean"
         active={circulatingThroughUv}
         open={t3.circulating}
       />
       <Valve
-        x={260}
-        y={500}
+        x={690}
+        y={590}
         vertical
         kind="clean"
         io={io[IO.circulation]}
         active={circulatingThroughUv}
         name={IO.circulation}
         label="Circulation"
+      />
+
+      {/* T4 and T3 join in the backup valve, which feeds the distribution
+          pump from one of them */}
+      <Pipe
+        d={`M115 640 V680 H${backupEnds.branches[0]}`}
+        kind="mains"
+        active={backupToPump}
+        open={backup?.on}
+        square
+      />
+      <Pipe
+        d={`M360 640 V680 H${backupEnds.branches[1]}`}
+        kind="clean"
+        active={recycledToPump}
+        open={backup?.on === false}
+        square
+      />
+      <Pipe
+        d={`M260 ${backupEnds.common} V724`}
+        kind={outletKind}
+        active={supply.pumping}
+        open={backup !== undefined}
+        square
+      />
+      <Distributor
+        x={260}
+        y={680}
+        tip="down"
+        kind={outletKind}
+        io={backup}
+        name={IO.backupWater}
+        label="Backup valve"
+        words={["from T4", "from T3"]}
+        branches={[
+          { open: backup?.on, active: backupToPump === true },
+          { open: backup && !backup.on, active: recycledToPump === true },
+        ]}
         labelAnchor="end"
-        labelDx={-14}
+        labelDx={-26}
+        labelDy={-12}
       />
 
       <Pump
         x={260}
-        y={680}
+        y={740}
         r={16}
         kind={outletKind}
         io={io[IO.distributionPump]}
         name={IO.distributionPump}
-        label="Distribution"
-        labelDx={20}
-        labelDy={26}
+        label="Distribution pump"
+        labelAnchor="end"
       />
 
       {/* Outlets, active by their demand sensor. The pipes to them are always
           pressurized, from T3 or T4, so they are open even without a reading */}
       <Pipe
-        d="M260 696 V760"
-        kind={outletKind}
-        active={supply.toOutlets ?? false}
-        open
-      />
-      <Pipe
-        d="M150 760 H360"
+        d="M276 740 H560"
         kind={outletKind}
         active={supply.toOutlets ?? false}
         open
       />
       <g className={`outlet${off(device.outlets.toilet)}`}>
         <Pipe
-          d="M150 760 V782"
+          d="M360 740 V790"
           kind={outletKind}
           active={supply.toilet ?? false}
           open
-          arrow={{ x: 150, y: 782, dir: "down" }}
+          arrow={{ x: 360, y: 790, dir: "down" }}
         />
         <Sensor
-          x={150}
-          y={771}
+          x={360}
+          y={765}
           kind={outletKind}
           io={io[IO.toilet]}
           name={IO.toilet}
           label=""
         />
-        <text x={150} y={807} textAnchor="middle" className="diagram-label">
+        <text x={360} y={815} textAnchor="middle" className="diagram-label">
           Toilets
         </text>
       </g>
       <g className={`outlet${off(device.outlets.washingMachine)}`}>
         <Pipe
-          d="M260 760 V782"
+          d="M460 740 V790"
           kind={outletKind}
           active={supply.wash ?? false}
           open
-          arrow={{ x: 260, y: 782, dir: "down" }}
+          arrow={{ x: 460, y: 790, dir: "down" }}
         />
         <Sensor
-          x={260}
-          y={771}
+          x={460}
+          y={765}
           kind={outletKind}
           io={io[IO.wash]}
           name={IO.wash}
           label=""
         />
-        <text x={260} y={807} textAnchor="middle" className="diagram-label">
+        <text x={460} y={815} textAnchor="middle" className="diagram-label">
           Washer
         </text>
       </g>
       <g className={`outlet${off(device.outlets.auxiliary)}`}>
         <Pipe
-          d="M360 760 H440 V782"
+          d="M560 740 V790"
           kind={outletKind}
           active={supply.auxiliary}
           open={io[IO.auxiliary]?.on}
-          arrow={{ x: 440, y: 782, dir: "down" }}
+          arrow={{ x: 560, y: 790, dir: "down" }}
         />
         <Valve
-          x={395}
-          y={760}
+          x={560}
+          y={765}
+          vertical
           kind={outletKind}
           io={io[IO.auxiliary]}
           active={supply.auxiliary}
           name={IO.auxiliary}
           label=""
         />
-        <text x={440} y={807} textAnchor="middle" className="diagram-label">
+        <text x={560} y={815} textAnchor="middle" className="diagram-label">
           Auxiliary
         </text>
       </g>
