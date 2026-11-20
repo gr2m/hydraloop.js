@@ -819,7 +819,7 @@ export function FlowDiagram({
   const train = (side: Side) => {
     const a = side === "A";
     // Tank areas are to scale: T1 ~24 L, T2 ~200 L, T3 ~280 L (TANK_CAPACITY),
-    // except that T1 reaches further down, to fit the air pipe into it
+    // except that T1 reaches further down, to fit the transfer pipe on its side
     const t1x = a ? 140 : 839;
     const t2x = a ? 214 : 614;
     const t1c = t1x + 10;
@@ -834,12 +834,15 @@ export function FlowDiagram({
     // Air only reaches T2 while the add air valve isn't closed
     const addingAir = air?.on && addAir?.on !== false;
     // The air pipe into T1 branches off above the add air valve, runs down
-    // between T1 and T2 and enters T1 below the exchange pipes, across from
-    // the waste pipe
+    // between T1 and T2, and enters T1's bottom from below, next to the waste
+    // pipe. The waste pipe leaves T1's bottom on the outer side
     const teeY = 166;
-    // The waste pipe's lower edge meets T1's bottom (7 px pipe)
-    const wasteY = t1Bottom - PIPE;
-    const t1AirY = wasteY;
+    const airX = a ? t1x + 21 - 5 : t1x + 5;
+    const wasteX = a ? t1x + 5.5 : t1x + 21 - 5.5;
+    const wasteY = t1Bottom + 20;
+    // Below T1, the air pipe's lower edge lines up with the waste pipe's
+    // (5 px air pipe, 7 px waste pipe)
+    const airBelowY = wasteY + PIPE - 2.5;
     const gapX = a ? (t1x + 21 + t2x) / 2 : (t2x + 172 + t1x) / 2;
     const bubbles = io[sideIo("bubbles_block", side)];
     // The bubbles block valve closes while its signal is on, blocking the air
@@ -858,6 +861,12 @@ export function FlowDiagram({
     // Two pipes connect T1 and T2: one halfway up, and one whose bottom
     // edge meets T2's lower corner (7 px pipe, 5 px corner radius)
     const exchangeYs = [232 + 128 / 2, 360 - 5 - 3.5];
+    // The transfer pipe leaves T1 towards T2, halfway between the lower
+    // exchange pipe and T1's bottom. It crosses the air pipe, passes below T2
+    // and turns down into UV-C. Its valve is centered between T2's inner edge
+    // and UV-C's center
+    const transferY = (exchangeYs[1] + PIPE + t1Bottom) / 2;
+    const transferValveX = ((a ? t2x + 172 : t2x) + 500) / 2;
     return (
       <g key={side}>
         <text
@@ -887,7 +896,7 @@ export function FlowDiagram({
             up, see .pipe-flow */}
         <Pipe d={`M${t2c} ${teeY} H${bubblesX}`} kind="air" active={air?.on} />
         <Pipe
-          d={`M${bubblesX} ${teeY} H${gapX} V${t1AirY} H${a ? t1x + 21 : t1x}`}
+          d={`M${bubblesX} ${teeY} H${gapX} V${airBelowY} H${airX} V${t1Bottom}`}
           kind="air"
           active={bubbling}
           open={bubblesValve?.on}
@@ -1007,9 +1016,9 @@ export function FlowDiagram({
           Skim
         </text>
 
-        {/* Waste valve into the drain line, out of T1's side at its bottom */}
+        {/* Waste valve into the drain line, out of T1's bottom */}
         <Pipe
-          d={`M${a ? t1x : t1x + 21} ${wasteY} H${drainX}`}
+          d={`M${wasteX} ${t1Bottom} V${wasteY} H${drainX}`}
           kind="waste"
           active={waste?.on}
           open={waste?.on}
@@ -1023,7 +1032,7 @@ export function FlowDiagram({
           arrow={{ x: drainX, y: 470, dir: "down" }}
         />
         <Valve
-          x={(t1x + (a ? 0 : 21) + drainX) / 2}
+          x={(wasteX + drainX) / 2}
           y={wasteY}
           kind="waste"
           io={waste}
@@ -1038,24 +1047,29 @@ export function FlowDiagram({
           Drain
         </text>
 
-        {/* Transfer through UV into T3 */}
+        {/* Transfer from T1 through UV into T3. The air pipe into T1 passes
+            behind it */}
+        <path
+          d={`M${gapX - 4} ${transferY} H${gapX + 4}`}
+          className="pipe-gap"
+        />
         <Pipe
-          d={a ? `M${t2c} 360 V420 H488 V440` : `M${t2c} 360 V420 H512 V440`}
+          d={`M${a ? t1x + 21 : t1x} ${transferY} H${a ? 488 : 512} V440`}
           kind="clean"
           active={transferring}
           open={transferring}
         />
         <Valve
-          x={t2c}
-          y={390}
-          vertical
+          x={transferValveX}
+          y={transferY}
           kind="clean"
           io={transfer}
           active={transferring}
           name={sideIo("transfer_path", side)}
           label="Transfer"
-          labelAnchor={a ? "start" : "end"}
-          labelDx={a ? 16 : -16}
+          labelAnchor="middle"
+          labelDx={0}
+          labelDy={24}
         />
       </g>
     );
