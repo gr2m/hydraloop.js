@@ -516,6 +516,7 @@ function Tank({
   aeration,
   pressurized,
   pressureHeld = false,
+  venting,
   small,
   square = false,
 }: {
@@ -537,6 +538,11 @@ function Tank({
   pressurized?: number | false;
   /** The air is no longer pumped in, but holds its pressure: the rings stand still */
   pressureHeld?: boolean;
+  /**
+   * Air leaves through a pipe at this x on the top of the tank: the rings
+   * move in towards it, the reverse of `pressurized`
+   */
+  venting?: number;
   /**
    * A tank too narrow for its text: the label and the level in percent go
    * next to it, before (`start`) or after (`end`) it
@@ -564,11 +570,17 @@ function Tank({
             : ""
         }. ${capacityNote(level!)}`.trimEnd();
   const clipId = `pressure-${label}-${side ?? sub ?? ""}`;
+  const ringX = venting ?? x + w / 2;
   // Enough rings to reach the far corners of the space above the water
-  const rings = Math.ceil(Math.hypot(w / 2, h - fillHeight) / 14) + 1;
-  const phase = pressurized
-    ? (-((14 - (pressurized % 14)) % 14) / 14) * 0.9
-    : 0;
+  const rings =
+    Math.ceil(
+      Math.hypot(Math.max(ringX - x, x + w - ringX), h - fillHeight) / 14,
+    ) + 1;
+  // Venting rings vanish where the pipe's dashes start, at its beginning
+  const phase =
+    venting === undefined && pressurized
+      ? (-((14 - (pressurized % 14)) % 14) / 14) * 0.9
+      : 0;
   const textX = small === "end" ? x + w + 10 : small ? x - 10 : x + 12;
   const anchor = small === "start" ? "end" : "start";
   return (
@@ -617,71 +629,77 @@ function Tank({
         />
       ))}
       <Bubbles x={x} y={y} w={w} h={h} active={aeration} />
-      {known && pressurized && h - fillHeight > 4 && (
-        // The air pipe's flow continues into the space above the water, as
-        // half circles spreading from where the pipe enters onto the surface.
-        // They start where the pipe's dashes left off, `pressurized` pixels
-        // down the pipe: a step of 14 px takes 0.9 s, see .pipe-flow
-        <g className={`pressure${pressureHeld ? " is-held" : ""}`} aria-hidden>
-          <clipPath id={clipId}>
-            <rect
-              x={x + 1}
-              y={y + 1}
-              width={w - 2}
-              height={h - fillHeight - 1}
-              rx={square ? 0 : 4}
-            />
-          </clipPath>
-          {/* Fades from the top of the tank to its bottom */}
-          <linearGradient
-            id={`${clipId}-fade`}
-            gradientUnits="userSpaceOnUse"
-            x1={0}
-            y1={y}
-            x2={0}
-            y2={y + h}
+      {known &&
+        (pressurized || venting !== undefined) &&
+        h - fillHeight > 4 && (
+          // The air pipe's flow continues into the space above the water, as
+          // half circles spreading from where the pipe enters onto the surface.
+          // They start where the pipe's dashes left off, `pressurized` pixels
+          // down the pipe: a step of 14 px takes 0.9 s, see .pipe-flow. While
+          // venting, they move in towards the release air pipe instead
+          <g
+            className={`pressure${venting !== undefined ? " is-venting" : pressureHeld ? " is-held" : ""}`}
+            aria-hidden
           >
-            <stop offset={0} stopColor="#fff" />
-            <stop offset={1} stopColor="#000" />
-          </linearGradient>
-          <mask id={`${clipId}-mask`}>
-            <rect
-              x={x}
-              y={y}
-              width={w}
-              height={h}
-              fill={`url(#${clipId}-fade)`}
-            />
-          </mask>
-          <g clipPath={`url(#${clipId})`}>
-            <rect
-              x={x}
-              y={y}
-              width={w}
-              height={h - fillHeight}
-              className="pressure-fill"
-            />
-            <g mask={`url(#${clipId}-mask)`}>
-              {Array.from({ length: rings }, (_, i) => (
-                // Each ring grows from the pipe to the outermost one's
-                // radius, a step of 14 px behind the next
-                <circle
-                  key={i}
-                  cx={x + w / 2}
-                  cy={y}
-                  r={rings * 14}
-                  className="pressure-ring"
-                  style={{
-                    transform: `scale(${i / rings})`,
-                    animationDuration: `${rings * 0.9}s`,
-                    animationDelay: `${phase - i * 0.9}s`,
-                  }}
-                />
-              ))}
+            <clipPath id={clipId}>
+              <rect
+                x={x + 1}
+                y={y + 1}
+                width={w - 2}
+                height={h - fillHeight - 1}
+                rx={square ? 0 : 4}
+              />
+            </clipPath>
+            {/* Fades from the top of the tank to its bottom */}
+            <linearGradient
+              id={`${clipId}-fade`}
+              gradientUnits="userSpaceOnUse"
+              x1={0}
+              y1={y}
+              x2={0}
+              y2={y + h}
+            >
+              <stop offset={0} stopColor="#fff" />
+              <stop offset={1} stopColor="#000" />
+            </linearGradient>
+            <mask id={`${clipId}-mask`}>
+              <rect
+                x={x}
+                y={y}
+                width={w}
+                height={h}
+                fill={`url(#${clipId}-fade)`}
+              />
+            </mask>
+            <g clipPath={`url(#${clipId})`}>
+              <rect
+                x={x}
+                y={y}
+                width={w}
+                height={h - fillHeight}
+                className="pressure-fill"
+              />
+              <g mask={`url(#${clipId}-mask)`}>
+                {Array.from({ length: rings }, (_, i) => (
+                  // Each ring grows from the pipe to the outermost one's
+                  // radius, a step of 14 px behind the next
+                  <circle
+                    key={i}
+                    cx={ringX}
+                    cy={y}
+                    r={rings * 14}
+                    className="pressure-ring"
+                    style={{
+                      transform: `scale(${i / rings})`,
+                      animationDuration: `${rings * 0.9}s`,
+                      animationDelay: `${phase - i * 0.9}s`,
+                    }}
+                  />
+                ))}
+              </g>
             </g>
           </g>
-        </g>
-      )}
+        )}
       <text
         x={textX}
         y={small ? y + h / 2 - 6 : y + 22}
@@ -959,6 +977,21 @@ export function FlowDiagram({
           labelAnchor={a ? "start" : "end"}
           labelDx={20}
         />
+        {release?.on && (
+          // The air leaves the pipe's open end as circles that fade out at
+          // the size of the air pump. A circle starts where the pipe's dashes
+          // leave off, 96 px up the pipe, see the rings in Tank
+          <circle
+            cx={releaseX}
+            cy={136}
+            r={14}
+            className="vent-ring"
+            style={{
+              animationDelay: `${(-((14 - (96 % 14)) % 14) / 14) * 0.9}s`,
+            }}
+            aria-hidden
+          />
+        )}
         <Pipe
           d={`M${releaseX} 232 V136`}
           kind="air"
@@ -1028,6 +1061,7 @@ export function FlowDiagram({
           side={side}
           pressurized={(addingAir || holdingAir) && 232 - addAirY}
           pressureHeld={holdingAir}
+          venting={release?.on ? releaseX : undefined}
         />
 
         {/* Skim overflow at the top of T1, down the drain line. It has no

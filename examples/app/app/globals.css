@@ -756,6 +756,10 @@ tr.is-selected:focus-visible {
 .pressure.is-held .pressure-ring {
   animation: none;
 }
+/* Air leaves through the release air pipe: the rings move in towards it */
+.pressure.is-venting .pressure-ring {
+  animation-direction: reverse;
+}
 /* Where a pipe passes behind another: 3 px of background on either side of
    the 7 px pipe in front */
 .pipe-gap {
@@ -1001,6 +1005,30 @@ tr.is-selected:focus-visible {
     transform: scale(1);
   }
 }
+/* Air leaving the release air pipe's open end, at the rings' pace. It fades
+   out by the air pump's radius, 13 of the circle's 14 px */
+.vent-ring {
+  fill: none;
+  stroke: var(--air);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: vent 0.9s linear infinite;
+}
+@keyframes vent {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
+  92.857% {
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
 
 .diagram-label {
   font-size: 13px;
@@ -1075,7 +1103,8 @@ tr.is-selected:focus-visible {
   .valve-body {
     transition: none;
   }
-  .bubbles {
+  .bubbles,
+  .vent-ring {
     display: none;
   }
   .level-fill {
