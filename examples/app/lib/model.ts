@@ -415,6 +415,11 @@ export type TrainState = {
    * from the `FILTH_REMOVAL` routine (the overflow has no valve signal)
    */
   skimming: boolean;
+  /**
+   * T2 holds air pressure: air was last added to it after its release air
+   * valve was last opened. Also while air is being added
+   */
+  pressurized: boolean;
 };
 
 export type T3State = {
@@ -564,6 +569,7 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
       t2ToT1,
       skimming,
       behaviors,
+      pressurized: holdsPressure(ds, side, t),
     };
 
     const routineText = current
@@ -788,6 +794,29 @@ export function fillingTrain(ds: Dataset, t: number): Side | undefined {
   while (i > 0 && (stepAt(ds.io[IO.bypass], points[i].t)?.v ?? 0) > 0) i--;
   if (i === -1) return undefined;
   return points[i].v > 0 ? "B" : "A";
+}
+
+/**
+ * Whether T2 holds air pressure at `t`: the air pump last ran with the add air
+ * valve open after the release air valve was last open
+ */
+function holdsPressure(ds: Dataset, side: Side, t: number) {
+  const pump = onIntervals(ds.io[sideIo("air_pump", side)], -Infinity, t);
+  const add = onIntervals(ds.io[sideIo("add_air_valve", side)], -Infinity, t);
+  let added = -Infinity;
+  for (const p of pump) {
+    for (const a of add) {
+      if (Math.max(p.start, a.start) < Math.min(p.end, a.end)) {
+        added = Math.max(added, Math.min(p.end, a.end));
+      }
+    }
+  }
+  const released = onIntervals(
+    ds.io[sideIo("release_air", side)],
+    -Infinity,
+    t,
+  ).at(-1)?.end;
+  return added > (released ?? -Infinity);
 }
 
 /** Vent openings shorter than this don't settle the levels */

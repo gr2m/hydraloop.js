@@ -751,6 +751,11 @@ tr.is-selected:focus-visible {
   stroke-dasharray: 7 7;
   animation-name: flow-air;
 }
+/* Air held under pressure: the pattern stays, standing still */
+.pipe.is-still .pipe-flow,
+.pressure.is-held .pressure-ring {
+  animation: none;
+}
 /* Where a pipe passes behind another: 3 px of background on either side of
    the 7 px pipe in front */
 .pipe-gap {

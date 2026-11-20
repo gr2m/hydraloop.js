@@ -31,6 +31,7 @@ function Pipe({
   active,
   open = false,
   filled = false,
+  still = false,
   square = false,
   arrow,
   title,
@@ -45,6 +46,8 @@ function Pipe({
    * active, the water moves in the same subtle color
    */
   filled?: boolean;
+  /** An active pipe's pattern stands still, for air held under pressure */
+  still?: boolean;
   /** Square ends, for pipes that end at a distributor */
   square?: boolean;
   /** Draw an outlet arrow at this point, pointing in this direction */
@@ -63,7 +66,9 @@ function Pipe({
             ? "open"
             : "idle";
   return (
-    <g className={`pipe kind-${kind} is-${state}${square ? " is-square" : ""}`}>
+    <g
+      className={`pipe kind-${kind} is-${state}${still ? " is-still" : ""}${square ? " is-square" : ""}`}
+    >
       {title && <title>{title}</title>}
       <path d={d} className="pipe-base" />
       {state === "filled" && <path d={d} className="pipe-water" />}
@@ -510,6 +515,7 @@ function Tank({
   side,
   aeration,
   pressurized,
+  pressureHeld = false,
   small,
   square = false,
 }: {
@@ -529,6 +535,8 @@ function Tank({
    * the length of the air pipe that ends at the top of the tank
    */
   pressurized?: number | false;
+  /** The air is no longer pumped in, but holds its pressure: the rings stand still */
+  pressureHeld?: boolean;
   /**
    * A tank too narrow for its text: the label and the level in percent go
    * next to it, before (`start`) or after (`end`) it
@@ -614,7 +622,7 @@ function Tank({
         // half circles spreading from where the pipe enters onto the surface.
         // They start where the pipe's dashes left off, `pressurized` pixels
         // down the pipe: a step of 14 px takes 0.9 s, see .pipe-flow
-        <g className="pressure" aria-hidden>
+        <g className={`pressure${pressureHeld ? " is-held" : ""}`} aria-hidden>
           <clipPath id={clipId}>
             <rect
               x={x + 1}
@@ -833,6 +841,13 @@ export function FlowDiagram({
     const addAirY = airTop + 3 * 14;
     // Air only reaches T2 while the add air valve isn't closed
     const addingAir = air?.on && addAir?.on !== false;
+    // After air was added, T2 holds the pressure until the release air valve
+    // opens. Its pattern stays, standing still
+    const holdingAir = !addingAir && state.trains[side].pressurized;
+    // The release air pipe leaves T2's top on the inner side and ends level
+    // with the air pump's center, open to the room
+    const release = io[sideIo("release_air", side)];
+    const releaseX = a ? t2x + 172 - 14 : t2x + 14;
     // The air pipe into T1 branches off above the add air valve, runs down
     // between T1 and T2, and enters T1's bottom from below, next to the waste
     // pipe. The waste pipe leaves T1's bottom on the outer side
@@ -917,7 +932,8 @@ export function FlowDiagram({
         <Pipe
           d={`M${t2c} ${addAirY} V232`}
           kind="air"
-          active={addingAir}
+          active={addingAir || holdingAir}
+          still={holdingAir}
           open={addAir?.on}
         />
         <Valve
@@ -942,6 +958,24 @@ export function FlowDiagram({
           label="Air"
           labelAnchor={a ? "start" : "end"}
           labelDx={20}
+        />
+        <Pipe
+          d={`M${releaseX} 232 V136`}
+          kind="air"
+          active={release?.on}
+          open={release?.on}
+        />
+        <Valve
+          x={releaseX}
+          y={162}
+          vertical
+          kind="air"
+          io={release}
+          active={release?.on}
+          name={sideIo("release_air", side)}
+          label="Release air"
+          labelAnchor={a ? "start" : "end"}
+          labelDx={a ? 16 : -16}
         />
 
         {/* Exchange between T1 and T2, open connections: each holds water
@@ -992,7 +1026,8 @@ export function FlowDiagram({
           kind="grey"
           label="T2"
           side={side}
-          pressurized={addingAir && 232 - addAirY}
+          pressurized={(addingAir || holdingAir) && 232 - addAirY}
+          pressureHeld={holdingAir}
         />
 
         {/* Skim overflow at the top of T1, down the drain line. It has no
