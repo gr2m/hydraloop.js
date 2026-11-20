@@ -713,6 +713,16 @@ tr.is-selected:focus-visible {
 .pipe.is-open .pipe-base {
   stroke: var(--pipe-open);
 }
+.pipe.is-filled .pipe-base {
+  stroke: var(--border-strong);
+}
+/* The same color as .tank-fill over the tank's background */
+.pipe-water {
+  fill: none;
+  stroke: color-mix(in srgb, var(--k) 16%, var(--bg));
+  stroke-width: 4;
+  stroke-linecap: round;
+}
 .pipe.is-active .pipe-base {
   stroke: var(--k);
 }
@@ -729,6 +739,10 @@ tr.is-selected:focus-visible {
   stroke-linecap: round;
   stroke-dasharray: 3 11;
   animation: flow 0.9s linear infinite;
+}
+.pipe.is-filled .pipe-flow {
+  stroke: var(--k);
+  stroke-opacity: 0.45;
 }
 /* Inverted: the pipe is dark inside, with light gaps moving down. The gaps
    keep the dashes' place, where T2's pressure rings pick them up */

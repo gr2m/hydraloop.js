@@ -30,6 +30,7 @@ function Pipe({
   kind,
   active,
   open = false,
+  filled = false,
   square = false,
   arrow,
   title,
@@ -39,6 +40,11 @@ function Pipe({
   active: boolean | undefined;
   /** The valves on this pipe are open, so water can move through it */
   open?: boolean;
+  /**
+   * Water fills the pipe, drawn like the water in a tank. If it is also
+   * active, the water moves in the same subtle color
+   */
+  filled?: boolean;
   /** Square ends, for pipes that end at a distributor */
   square?: boolean;
   /** Draw an outlet arrow at this point, pointing in this direction */
@@ -49,16 +55,19 @@ function Pipe({
   const state =
     active === undefined
       ? "unknown"
-      : active
-        ? "active"
-        : open
-          ? "open"
-          : "idle";
+      : filled
+        ? "filled"
+        : active
+          ? "active"
+          : open
+            ? "open"
+            : "idle";
   return (
     <g className={`pipe kind-${kind} is-${state}${square ? " is-square" : ""}`}>
       {title && <title>{title}</title>}
       <path d={d} className="pipe-base" />
-      {state === "active" && <path d={d} className="pipe-flow" />}
+      {state === "filled" && <path d={d} className="pipe-water" />}
+      {active && <path d={d} className="pipe-flow" />}
       {arrow && (
         <path
           className="pipe-arrow"
@@ -480,6 +489,15 @@ function Bubbles({
   );
 }
 
+/** How full the tank's shell is, 0 to 1, or undefined without a reading */
+function fillOf(level: TankLevel | undefined) {
+  if (level?.liters === undefined || level.max <= 0) return undefined;
+  // The shell stands for the tank's capacity, which can be more than the
+  // sensor's range
+  const size = level.capacity ?? level.max;
+  return Math.max(0, Math.min(1, level.liters / size));
+}
+
 function Tank({
   x,
   y,
@@ -516,11 +534,9 @@ function Tank({
    */
   small?: "start" | "end";
 }) {
-  const known = level?.liters !== undefined && level.max > 0;
-  // The shell stands for the tank's capacity, which can be more than the
-  // sensor's range
+  const known = fillOf(level) !== undefined;
   const size = level?.capacity ?? level?.max ?? 0;
-  const fill = known ? Math.max(0, Math.min(1, level!.liters! / size)) : 0;
+  const fill = fillOf(level) ?? 0;
   const percent = `${Math.round(fill * 100)}%`;
   const trend = level?.trend;
   const arrow =
@@ -557,7 +573,7 @@ function Tank({
         y={y}
         width={w}
         height={h}
-        rx={small ? 5 : 8}
+        rx={5}
         className={known ? "tank-shell" : "tank-shell is-unknown"}
       />
       {known && (
@@ -567,7 +583,7 @@ function Tank({
             y={y + h - fillHeight}
             width={w - 2}
             height={Math.max(0, fillHeight - 1)}
-            rx={fillHeight > 8 ? (small ? 4 : 7) : 0}
+            rx={fillHeight > 8 ? 4 : 0}
             className="tank-fill"
           />
           <line
@@ -602,7 +618,7 @@ function Tank({
               y={y + 1}
               width={w - 2}
               height={h - fillHeight - 1}
-              rx={small ? 4 : 7}
+              rx={4}
             />
           </clipPath>
           {/* Fades from the top of the tank to its bottom */}
@@ -724,7 +740,7 @@ function BackupTank({
         y={y}
         width={w}
         height={h}
-        rx={8}
+        rx={5}
         className={
           t4.max === undefined && t4.min === undefined
             ? "tank-shell is-unknown"
@@ -738,7 +754,7 @@ function BackupTank({
             y={fillTop}
             width={w - 2}
             height={y + h - fillTop - 1}
-            rx={7}
+            rx={4}
             className="tank-fill"
           />
           <line
@@ -813,6 +829,11 @@ export function FlowDiagram({
     const drainX = a ? 30 : 970;
     const transferring = transfer?.on;
     const skimming = state.trains[side].skimming;
+    const t2Level = tanks[a ? "t2a" : "t2b"];
+    const t2Fill = fillOf(t2Level);
+    // Two pipes connect T1 and T2: one halfway up, and one whose bottom
+    // edge meets the tanks' lower corners (7 px pipe, 5 px corner radius)
+    const exchangeYs = [232 + 128 / 2, 360 - 5 - 3.5];
     return (
       <g key={side}>
         <text
@@ -851,12 +872,28 @@ export function FlowDiagram({
           labelDx={20}
         />
 
-        {/* Exchange from T2 into T1 */}
-        <Pipe
-          d={a ? "M214 340 H161" : "M786 340 H839"}
-          kind="grey"
-          active={state.trains[side].t2ToT1}
-        />
+        {/* Exchange between T1 and T2, open connections: each holds water
+        while T2's surface is above the pipe's upper edge. The bubbles in T1
+        lift its water through the upper pipe into T2, which flows back
+        through the lower one. A transfer from T2 into T1 is not animated */}
+        {exchangeYs.map((y, i) => {
+          const t1End = a ? t1x + 21 : t1x;
+          const t2End = a ? t2x : t2x + 172;
+          const filled = t2Fill !== undefined && 360 - 128 * t2Fill <= y - 3.5;
+          return (
+            <Pipe
+              key={y}
+              d={
+                i === 0
+                  ? `M${t1End} ${y} H${t2End}`
+                  : `M${t2End} ${y} H${t1End}`
+              }
+              kind="grey"
+              active={filled && bubbles?.on === true}
+              filled={filled}
+            />
+          );
+        })}
 
         <Tank
           x={t1x}
@@ -875,7 +912,7 @@ export function FlowDiagram({
           y={232}
           w={172}
           h={128}
-          level={tanks[a ? "t2a" : "t2b"]}
+          level={t2Level}
           kind="grey"
           label="T2"
           side={side}
