@@ -781,13 +781,17 @@ tr.is-selected:focus-visible {
   stroke-dasharray: 2 2;
 }
 
-/* A distributor is filled like its pipe where the water flows through it,
-   the rest is a low-contrast outline */
+/* A distributor is filled like its pipe where the water can flow through it,
+   the closed side is outlined like the idle pipe it would lead to */
 .distributor polygon {
   fill: var(--bg);
   stroke: var(--border-strong);
   stroke-width: 1.5;
   stroke-linejoin: round;
+}
+.distributor polygon.is-closed {
+  stroke: var(--pipe-idle);
+  stroke-width: 3;
 }
 .distributor polygon.is-open {
   fill: var(--pipe-open);

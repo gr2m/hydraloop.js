@@ -166,6 +166,36 @@ type Outlet = {
 const PIPE = 3.5;
 /** Height of a distributor triangle, from its tip to its base */
 const DISTRIBUTOR = 24;
+/** Stroke width of a distributor's outline, as in .distributor polygon */
+const OUTLINE = 1.5;
+/** Stroke width of a closed side's outline, as in its .is-closed polygon */
+const CLOSED_OUTLINE = 3;
+
+/**
+ * Moves each edge of a convex polygon inwards by d, so a stroke of width 2d
+ * stays inside the original shape
+ */
+function inset(points: [number, number][], d: number): [number, number][] {
+  const n = points.length;
+  const area = points.reduce((sum, [x1, y1], i) => {
+    const [x2, y2] = points[(i + 1) % n];
+    return sum + x1 * y2 - x2 * y1;
+  }, 0);
+  const sign = area > 0 ? 1 : -1;
+  // Each edge as a point on its moved line and its direction
+  const edges = points.map(([x1, y1], i) => {
+    const [x2, y2] = points[(i + 1) % n];
+    const len = Math.hypot(x2 - x1, y2 - y1);
+    const [dx, dy] = [(x2 - x1) / len, (y2 - y1) / len];
+    return { x: x1 - sign * dy * d, y: y1 + sign * dx * d, dx, dy };
+  });
+  return edges.map((b, i) => {
+    const a = edges[(i + n - 1) % n];
+    const t =
+      ((b.x - a.x) * b.dy - (b.y - a.y) * b.dx) / (a.dx * b.dy - a.dy * b.dx);
+    return [a.x + t * a.dx, a.y + t * a.dy];
+  });
+}
 
 /**
  * Where the pipes of a distributor at (x, y) end: the pipes cross at (x, y)
@@ -221,6 +251,9 @@ function Distributor({
   const at = ([dx, dy]: [number, number]) =>
     up ? `${x + dx},${y + dy}` : `${x + dy},${y - dx}`;
   const shape = (points: [number, number][]) => points.map(at).join(" ");
+  // Outlined parts, with the outline inside so it lines up with the pipes
+  const outline = (points: [number, number][], width = OUTLINE) =>
+    shape(inset(points, width / 2));
   // With the inlet on the left, the left outlet turns to the bottom
   const [left, right] = up ? outlets : [outlets[1], outlets[0]];
   const state = (outlet: Outlet) =>
@@ -251,11 +284,14 @@ function Distributor({
       <g className="valve-body">
         {open === 0 || left.open === undefined ? (
           <polygon
-            points={shape([
-              [0, p - w],
-              [-w, p],
-              [w, p],
-            ])}
+            points={outline(
+              [
+                [0, p - w],
+                [-w, p],
+                [w, p],
+              ],
+              state(left) === "closed" ? CLOSED_OUTLINE : OUTLINE,
+            )}
             className={`is-${state(left)}`}
           />
         ) : (
@@ -272,11 +308,14 @@ function Distributor({
             />
             {/* What is left on the closed side */}
             <polygon
-              points={shape([
-                [-open * p, 2 * p - w],
-                [-open * w, p],
-                [-open * p, p],
-              ])}
+              points={outline(
+                [
+                  [-open * p, 2 * p - w],
+                  [-open * w, p],
+                  [-open * p, p],
+                ],
+                CLOSED_OUTLINE,
+              )}
               className="is-closed"
             />
           </>
