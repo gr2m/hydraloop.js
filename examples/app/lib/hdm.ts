@@ -6,15 +6,19 @@ import {
   behaviorIntervals,
   routineSide,
   pressureToLiters,
+  sideIo,
   t1PointsToLiters,
   TANK_CAPACITY,
   TANK_IDS,
   TANK_LINES,
+  ventedLevel,
+  ventings,
   type Dataset,
   type DeviceInfo,
   type LevelTable,
   type Point,
   type RoutineEvent,
+  type Side,
   type TankId,
 } from "./model";
 import { computeStats, type Stats } from "./stats";
@@ -175,6 +179,13 @@ export async function loadDataset(
         []),
     ].sort((a, b) => a.p - b.p);
 
+  // Without calibration, show the raw pressure points
+  const toLiters = (id: TankId) => {
+    const table = tableFor(id);
+    return (y: number) =>
+      table.length ? Math.round(pressureToLiters(y, table) * 10) / 10 : y;
+  };
+
   const tanks = {} as Record<TankId, Point[]>;
   const tankMax = {} as Record<TankId, number>;
   for (const id of TANK_IDS) {
@@ -189,10 +200,7 @@ export async function loadDataset(
     }
     const table = tableFor(id);
     tankMax[id] = table.length ? table[table.length - 1].l : 0;
-    tanks[id] = toPoints(graphData[TANK_LINES[id]], (y) =>
-      // Without calibration, show the raw pressure points
-      table.length ? Math.round(pressureToLiters(y, table) * 10) / 10 : y,
-    );
+    tanks[id] = toPoints(graphData[TANK_LINES[id]], toLiters(id));
     if (!table.length && tanks[id].length) {
       tankMax[id] = Math.max(...tanks[id].map((p) => p.v));
     }
@@ -215,8 +223,40 @@ export async function loadDataset(
     if (!Number.isFinite(t)) continue;
     if (!last || t > last.t) points.push({ t, v: state.value });
   }
-  for (const [name, points] of Object.entries(ioPoints)) {
+  for (const points of Object.values(ioPoints)) {
     points.sort((a, b) => a.t - b.t);
+  }
+
+  // T2 at the last venting before `from`. Without it, the room for greywater
+  // is unknown until both trains vent again, which can take hours.
+  const ventedBefore: Partial<Record<Side, Point>> = {};
+  await Promise.all(
+    (["A", "B"] as const).map(async (side) => {
+      const vent = ventings(ioPoints[sideIo("release_air", side)], from)
+        .filter((i) => !i.open)
+        .at(-1);
+      if (!vent) return;
+      const id = side === "A" ? "t2a" : "t2b";
+      try {
+        const data = await hydraloop.local.graph.getData({
+          deviceId,
+          from: new Date(vent.start),
+          until: new Date(vent.end),
+          minutesInView: Math.ceil((vent.end - vent.start) / 60_000),
+          debugData: false,
+        });
+        const level = ventedLevel(
+          toPoints(data[TANK_LINES[id]], toLiters(id)),
+          vent,
+        );
+        if (level) ventedBefore[side] = level;
+      } catch {
+        // The room is then unknown until the next venting
+      }
+    }),
+  );
+
+  for (const [name, points] of Object.entries(ioPoints)) {
     // `getIo()` returns days of changes regardless of `from`. Keep the range,
     // plus the last change before it for the state at `from`.
     const first = points.findIndex((p) => p.t >= from);
@@ -251,6 +291,7 @@ export async function loadDataset(
     io: ioPoints,
     captions,
     routines: routineEvents,
+    ventedBefore,
     behaviors: behaviorIntervals(
       (ioData?.behavior ?? []).map((b) => ({
         t: Date.parse(b.time),

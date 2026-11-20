@@ -116,6 +116,11 @@ export type Dataset = {
   routines: RoutineEvent[];
   /** Firmware behaviors (e.g. `fullT1T2WasteSoapBombA`) overlapping the range */
   behaviors: Behavior[];
+  /**
+   * T2 in liters at the last venting of each train before `from`, as tank
+   * levels are only loaded from `from` (see `ventedLevels`)
+   */
+  ventedBefore?: Partial<Record<Side, Point>>;
   /** Data that could not be loaded */
   warnings: string[];
 };
@@ -838,27 +843,39 @@ function holdsPressure(ds: Dataset, side: Side, t: number) {
 /** Vent openings shorter than this don't settle the levels */
 const MIN_VENT = 60_000;
 
-/** T2 in liters, measured while it was vented, one point per venting */
+/** Openings of a release air valve that are long enough to settle T2 */
+export function ventings(points: Point[] | undefined, until: number) {
+  return onIntervals(points, -Infinity, until).filter(
+    (i) => i.end - i.start >= MIN_VENT,
+  );
+}
+
+/** T2 in liters at the end of a venting: the median of its second half */
+export function ventedLevel(t2: Point[], vent: Interval): Point | undefined {
+  // The second half of the vent, after the water settled
+  const from = (vent.start + vent.end) / 2;
+  const levels: number[] = [];
+  for (let i = Math.max(0, indexAt(t2, from)); i < t2.length; i++) {
+    const p = t2[i];
+    if (p.t > vent.end) break;
+    if (p.t >= from) levels.push(p.v);
+  }
+  if (levels.length === 0) return undefined;
+  levels.sort((a, b) => a - b);
+  return { t: vent.end, v: levels[levels.length >> 1] };
+}
+
+/**
+ * T2 in liters, measured while it was vented, one point per venting.
+ * Starts with the last venting before the range, if it was loaded.
+ */
 export function ventedLevels(ds: Dataset, side: Side): Point[] {
   const t2 = ds.tanks[side === "A" ? "t2a" : "t2b"];
-  const vents = onIntervals(
-    ds.io[sideIo("release_air", side)],
-    -Infinity,
-    ds.until,
-  ).filter((i) => i.end - i.start >= MIN_VENT);
-  const result: Point[] = [];
-  for (const vent of vents) {
-    // The second half of the vent, after the water settled
-    const from = (vent.start + vent.end) / 2;
-    const levels: number[] = [];
-    for (let i = Math.max(0, indexAt(t2, from)); i < t2.length; i++) {
-      const p = t2[i];
-      if (p.t > vent.end) break;
-      if (p.t >= from) levels.push(p.v);
-    }
-    if (levels.length === 0) continue;
-    levels.sort((a, b) => a - b);
-    result.push({ t: vent.end, v: levels[levels.length >> 1] });
+  const before = ds.ventedBefore?.[side];
+  const result: Point[] = before ? [before] : [];
+  for (const vent of ventings(ds.io[sideIo("release_air", side)], ds.until)) {
+    const level = ventedLevel(t2, vent);
+    if (level && level.t > (before?.t ?? -Infinity)) result.push(level);
   }
   return result;
 }
