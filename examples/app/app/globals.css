@@ -730,8 +730,12 @@ tr.is-selected:focus-visible {
   stroke-dasharray: 3 11;
   animation: flow 0.9s linear infinite;
 }
+/* Inverted: the pipe is dark inside, with light gaps moving down. The gaps
+   keep the dashes' place, where T2's pressure rings pick them up */
 .pipe.kind-air .pipe-flow {
   stroke-width: 2;
+  stroke-dasharray: 7 7;
+  animation-name: flow-air;
 }
 .pipe-arrow {
   fill: var(--pipe-idle);
@@ -749,6 +753,14 @@ tr.is-selected:focus-visible {
 @keyframes flow {
   to {
     stroke-dashoffset: -14;
+  }
+}
+@keyframes flow-air {
+  from {
+    stroke-dashoffset: -5;
+  }
+  to {
+    stroke-dashoffset: -19;
   }
 }
 
@@ -1030,6 +1042,7 @@ tr.is-selected:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .pipe-flow,
+  .pipe.kind-air .pipe-flow,
   .pressure-ring,
   .pump.is-on .impeller {
     animation: none;
