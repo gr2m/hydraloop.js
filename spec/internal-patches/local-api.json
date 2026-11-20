@@ -310,6 +310,45 @@
           }
         }
       },
+      "StatusLogEntry": {
+        "properties": {
+          "fsmInstanceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "fsmParentInstanceId": {
+            "type": "string",
+            "nullable": true
+          },
+          "errorId": {
+            "type": "number",
+            "nullable": true,
+            "description": "Set for device signals, e.g. 23 for `deviceSignals.soapBomb.description`"
+          },
+          "information": {
+            "type": "string",
+            "description": "A text, or a translation key such as `deviceSignals.soapBomb.description` or `deviceSignals.soapBomb.fixed`"
+          },
+          "loginUserId": {
+            "type": "string",
+            "nullable": true
+          },
+          "side": {
+            "type": "string",
+            "nullable": true,
+            "description": "The train of a device signal, `A` or `B`, else empty or null"
+          }
+        },
+        "required": [
+          "fsmInstanceId",
+          "fsmParentInstanceId",
+          "time",
+          "errorId",
+          "information",
+          "loginUserId",
+          "side"
+        ]
+      },
       "StateSettings": {
         "properties": {
           "settings": {

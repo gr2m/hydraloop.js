@@ -544,14 +544,17 @@ export interface RequestWifiRssiCommand {
 }
 
 export interface StatusLogEntry {
-  fsmInstanceId: string;
-  fsmParentInstanceId: string;
+  fsmInstanceId: string | null;
+  fsmParentInstanceId: string | null;
   time: string;
-  errorId: number;
+  /** Set for device signals, e.g. 23 for `deviceSignals.soapBomb.description` */
+  errorId: number | null;
+  /** A text, or a translation key such as `deviceSignals.soapBomb.description` or `deviceSignals.soapBomb.fixed` */
   information: string;
-  verbose: boolean;
-  loginUserId: string;
-  side: Record<string, unknown>;
+  verbose?: boolean;
+  loginUserId: string | null;
+  /** The train of a device signal, `A` or `B`, else empty or null */
+  side: string | null;
 }
 
 export interface User {
