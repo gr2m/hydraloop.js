@@ -14,6 +14,15 @@ const formats = {
     minute: "2-digit",
   },
   date: { weekday: "short", day: "numeric", month: "short" },
+  // With the year, for dates that can be months or years away
+  day: { day: "numeric", month: "short", year: "numeric" },
+  dayTime: {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  },
   // 24 hour clock times, down to the precision of a timestamp
   clockMinutes: { hour: "2-digit", minute: "2-digit", hourCycle: "h23" },
   clockSeconds: {

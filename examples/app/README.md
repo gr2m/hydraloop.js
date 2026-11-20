@@ -33,6 +33,14 @@ And for the last 30 days (see [30-day statistics](#30-day-statistics)):
 - Transfers to T3 with their duration and the change of T3, filth removal runs, and all events.
 - Valves and pumps that were switched manually, e.g. by a technician or a maintenance procedure in the HDM web app, are hatched, with an event when they were switched manually and back to automatic (see [Manual overrides](#manual-overrides)).
 
+**Maintenance** (`/maintenance`) shows the health of the H600 and its service history (see [Maintenance](#maintenance)):
+
+- **Health**: the issues HDM lists for the device, the alerts of the last 30 days, the next maintenance and the warranty. Outputs that are switched manually or stuck powered are listed, too.
+- **Alerts**: the problems the firmware diagnosed itself over the last 12 months, e.g. a leaking toilet or a soap bomb, with HDM's description, and when they were reported fixed.
+- **Connectivity**: the outages of the last 30 days on a chart, by where the cause was (HDM server, network, power, device, scheduled restart), with the restarts and their reasons.
+- **Device vitals**: UV-C lamp temperature, supply and battery voltage, and the current of the device and the distribution pump, over the last 30 days.
+- **Service**: commissioning, warranty, firmware, the linked professionals, the tickets with their cause and solution, and the service log.
+
 ## Phases and signals
 
 The phase of each train is the routine HDM reports for its side (`getRoutineData()`), e.g. `STANDBY`, `INCOMING_WATER`, `SKIM_LEVEL_DETERMINATION`, `FILTH_REMOVAL` or `TRANSFER`, with its sub-state (e.g. `PASSIVE_CIRCULATE`). Valve signals are shown next to it as evidence. Without a routine, the phase falls back to the transfer and waste valves.
@@ -96,6 +104,19 @@ Besides the valve values, `getIo()` returns firmware _behaviors_ with an `engage
 
 Besides the value of each valve and pump, `getIo()` returns `manual`: 1 while it is switched manually instead of by the firmware, `getLastKnownIoState()` the current `manual` and `stuckPower`. In the data of an H600, outputs were switched manually during a technician's maintenance procedures (e.g. "Fill T3 with backup water"), which the service log lists at the same time. The history marks these times, so they aren't taken for the firmware's behavior, and the diagram's hover text and the signal table say so.
 
+### Maintenance
+
+[`/maintenance`](app/maintenance/page.tsx) loads its data on the server ([`loadMaintenance()`](lib/hdm.ts), [`lib/maintenance.ts`](lib/maintenance.ts)):
+
+- `root.devices.getDevice()`: commissioning date, warranty, maintenance period and dates, firmware, time zone, and `deviceStatus` with the issues HDM lists for the device (blocking, major, minor, attention required, notice).
+- `local.graph.getStatusLogData()` over 12 months: besides the steps of maintenance procedures, it has the device signals the firmware diagnosed, as `deviceSignals.<signal>.description` when reported and `deviceSignals.<signal>.fixed` when fixed, with an `errorId` and the train in `side`. Over a short range, it is often empty. Reports less than a day apart are merged. Many signals are never reported fixed, e.g. `soapBomb`, so a signal only counts as active while `deviceStatus` lists it.
+- `root.ticket.listTickets()` and `root.devices.getServiceLogEntries()`. The service log returns the 20 entries before `from`, so it is loaded page by page.
+- `root.devices.listLinkedProfessionals()`: e.g. the installer.
+- `local.connectivity.getOutageSummaries()` over 30 days, with a classification for each outage, e.g. `scheduled_restart`, `server_restart`, `server_response_timeout` or `wifi_access_point_unavailable`.
+- `local.graph.getData()` over 30 days, the most it allows (22 minutes per point): the vitals, and `restart` with `restartReasonChip` and `restartReasonSoftware` for each restart. The values are scaled like the HDM web app does: `power_voltage` × 0.1 V (less than 19 V is a power loss), `battery_voltage` × 0.01 V, `device_amperage` and `dist_pump_amperage` × 0.001 A. `wifi_rssi` is always 0 for an H600 on Ethernet, so it isn't shown.
+
+The titles and descriptions of device signals, outage causes, restart reasons, and ticket causes and solutions are keys. [`lib/hdm-texts.ts`](lib/hdm-texts.ts) looks them up in the English texts of the HDM web app (`https://hdm.hydraloop.com/hdm/assets/i18n/en.json`), cached for a day. Without them, the keys are shown as words.
+
 ### Filth removal
 
 A normal `FILTH_REMOVAL` run lasts about 4.5 hours, mostly in `REMOVE_FILTH_ON_HEIGHT`. The air pump runs the whole time, and T1 stays at the top of its range, so filth and foam spill over the skim overflow of T1 into the drain. The overflow has no valve signal, so the diagram shows it as inferred from the routine. The waste valve (`waste_clean_tank`) stayed closed in 16 of 17 runs over 30 days. In the other one, the routine ended after 5 minutes and the waste valve emptied T1 to the drain.
@@ -148,11 +169,14 @@ To skip the login form, set `HYDRALOOP_TOKEN` to a token from a previous login, 
 | [`lib/model.ts`](lib/model.ts)                                                         | State at a point in time, phases, events, transfers  |
 | [`lib/stats.ts`](lib/stats.ts)                                                         | 30-day statistics                                    |
 | [`lib/demo.ts`](lib/demo.ts)                                                           | Simulated data                                       |
+| [`lib/maintenance.ts`](lib/maintenance.ts)                                             | Maintenance data: alerts, outages, vitals            |
+| [`lib/hdm-texts.ts`](lib/hdm-texts.ts)                                                 | Texts of the HDM web app, e.g. alert titles          |
 | [`app/api/live`](app/api/live/route.ts), [`app/api/history`](app/api/history/route.ts) | JSON for the live and history views                  |
 | [`app/api/stats`](app/api/stats/route.ts)                                              | JSON for the 30-day statistics                       |
 | [`components/overview.tsx`](components/overview.tsx)                                   | The overview                                         |
 | [`components/flow-diagram.tsx`](components/flow-diagram.tsx)                           | The flow diagram                                     |
 | [`components/timeline.tsx`](components/timeline.tsx)                                   | The history tracks                                   |
+| [`components/maintenance-view.tsx`](components/maintenance-view.tsx)                   | The maintenance view                                 |
 
 The SDK is linked from the repository root (`"hydraloop": "file:../.."`).
 
@@ -168,3 +192,5 @@ The SDK methods used:
 - `local.graph.getRoutineData()`: HDM routines per side
 - `local.graph.getWaterRecycledData()`: liters recycled per day
 - `local.settings.getTankTreatmentState()`: time left of filth removal
+- `local.connectivity.getOutageSummaries()`: outages and their causes
+- For the maintenance view: `root.devices.getDevice()`, `local.graph.getStatusLogData()`, `root.ticket.listTickets()`, `root.devices.getServiceLogEntries()`, `root.devices.listLinkedProfessionals()`

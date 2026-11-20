@@ -10,7 +10,7 @@ export function SiteHeader({
   device,
   demo,
 }: {
-  device: DeviceInfo;
+  device: Pick<DeviceInfo, "name" | "type" | "serial" | "firmware">;
   demo: boolean;
 }) {
   const pathname = usePathname();
@@ -51,6 +51,12 @@ export function SiteHeader({
           aria-current={pathname === "/history" ? "page" : undefined}
         >
           History
+        </Link>
+        <Link
+          href="/maintenance"
+          aria-current={pathname === "/maintenance" ? "page" : undefined}
+        >
+          Maintenance
         </Link>
         <form action={signOut}>
           <button type="submit" className="link-button">

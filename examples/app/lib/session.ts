@@ -2,12 +2,14 @@ import "server-only";
 
 import { cookies } from "next/headers";
 
-import { simulate, simulateStats } from "./demo";
+import { simulate, simulateMaintenance, simulateStats } from "./demo";
 import {
   loadDataset,
+  loadMaintenance as loadHdmMaintenance,
   loadStats as loadHdmStats,
   type LoadOptions,
 } from "./hdm";
+import type { Maintenance } from "./maintenance";
 import type { Dataset } from "./model";
 import type { Stats } from "./stats";
 import { DEMO_COOKIE, TOKEN_COOKIE } from "./token";
@@ -36,6 +38,11 @@ export function loadStats(
 ): Promise<Stats> {
   if (session.kind === "demo") return Promise.resolve(simulateStats(options));
   return loadHdmStats(session.token, options);
+}
+
+export function loadMaintenance(session: Session): Promise<Maintenance> {
+  if (session.kind === "demo") return Promise.resolve(simulateMaintenance());
+  return loadHdmMaintenance(session.token);
 }
 
 export function isUnauthorized(error: unknown) {

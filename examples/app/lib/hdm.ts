@@ -4,6 +4,7 @@ import { Hydraloop, type Local, type Root } from "hydraloop/internal";
 
 import {
   behaviorIntervals,
+  caption,
   routineSide,
   pressureToLiters,
   sideIo,
@@ -22,6 +23,19 @@ import {
   type Side,
   type TankId,
 } from "./model";
+import { hdmTexts, readable, type Lookup } from "./hdm-texts";
+import {
+  addMonths,
+  CONNECTIVITY_RANGE,
+  outageGroup,
+  plainText,
+  signalEpisodes,
+  SIGNALS_RANGE,
+  type Issue,
+  type IssueLevel,
+  type Maintenance,
+  type VitalSeries,
+} from "./maintenance";
 import { computeStats, type Stats } from "./stats";
 
 // Clients are cached per token. The SDK caches the device's local API URL and
@@ -105,7 +119,14 @@ function settled<T>(
 ): T | undefined {
   if (result.status === "fulfilled") return result.value;
   const reason = result.reason as { response?: { status?: number } } | Error;
-  if ("response" in reason && reason.response?.status === 401) throw reason;
+  // A 401 ends the session, unless the account lacks the permission
+  if (
+    "response" in reason &&
+    reason.response?.status === 401 &&
+    !/Insufficient permissions/.test(String((reason as Error).message))
+  ) {
+    throw reason;
+  }
   warnings.push(
     `${what} could not be loaded: ${reason instanceof Error ? reason.message : String(reason)}`,
   );
@@ -341,43 +362,6 @@ export async function loadDataset(
 }
 
 /**
- * Restarts and connection losses, to tell the scheduled restart apart.
- * Undefined if HDM refuses them, e.g. with a 401 for missing permissions,
- * which must not end the session like other 401s.
- */
-async function loadOutages(
-  hydraloop: Hydraloop,
-  deviceId: string,
-  from: number,
-  until: number,
-): Promise<Outage[] | undefined> {
-  let summaries: {
-    startedAt: string;
-    endedAt?: string | null;
-    classification: string;
-  }[];
-  try {
-    summaries = await hydraloop.local.connectivity.getOutageSummaries({
-      deviceId,
-      from: new Date(from),
-      until: new Date(until),
-    });
-  } catch {
-    return undefined;
-  }
-  return summaries
-    .map((o) => ({
-      start: Date.parse(o.startedAt),
-      end: o.endedAt ? Date.parse(o.endedAt) : until,
-      classification: o.classification,
-    }))
-    .filter((o) => Number.isFinite(o.start) && Number.isFinite(o.end));
-}
-
-const statsCache = new Map<string, { at: number; stats: Promise<Stats> }>();
-const STATS_TTL = 10 * 60_000;
-
-/**
  * `cleaningTimeLeftA/B` of `getTankTreatmentState()`, in milliseconds. The
  * HDM web app shows them as the time left of filth removal.
  */
@@ -401,6 +385,39 @@ type OutageSummary = {
   endedAt?: string | null;
   classification: string;
 };
+
+/**
+ * Restarts and connection losses, to tell the scheduled restart apart.
+ * Undefined if HDM refuses them, e.g. with a 401 for missing permissions,
+ * which must not end the session like other 401s.
+ */
+async function loadOutages(
+  hydraloop: Hydraloop,
+  deviceId: string,
+  from: number,
+  until: number,
+): Promise<Outage[] | undefined> {
+  let summaries: OutageSummary[];
+  try {
+    summaries = await hydraloop.local.connectivity.getOutageSummaries({
+      deviceId,
+      from: new Date(from),
+      until: new Date(until),
+    });
+  } catch {
+    return undefined;
+  }
+  return summaries
+    .map((o) => ({
+      start: Date.parse(o.startedAt),
+      end: o.endedAt ? Date.parse(o.endedAt) : until,
+      classification: o.classification,
+    }))
+    .filter((o) => Number.isFinite(o.start) && Number.isFinite(o.end));
+}
+
+const statsCache = new Map<string, { at: number; stats: Promise<Stats> }>();
+const STATS_TTL = 10 * 60_000;
 
 /**
  * Statistics of the last `range` milliseconds. `getIo()` returns about 5 days
@@ -540,4 +557,362 @@ export async function login(options: {
 }) {
   const hydraloop = new Hydraloop();
   return hydraloop.login(options);
+}
+
+// ── Maintenance ────────────────────────────────────────────────────────────
+
+/** Series of `getData()` shown as device vitals, scaled like the HDM web app does */
+const VITALS: (Omit<VitalSeries, "points"> & { scale: number })[] = [
+  {
+    key: "uv_temperature",
+    label: "UV-C lamp temperature",
+    unit: "°C",
+    digits: 1,
+    scale: 1,
+  },
+  {
+    key: "power_voltage",
+    label: "Supply voltage",
+    unit: "V",
+    digits: 1,
+    scale: 0.1,
+    // The HDM web app takes less than 19 V as a power loss
+    low: { below: 19, label: "Power lost" },
+    note: "From the power supply inside the H600, not the mains voltage.",
+  },
+  {
+    key: "battery_voltage",
+    label: "Battery voltage",
+    unit: "V",
+    digits: 2,
+    scale: 0.01,
+    note: "The rechargeable AA batteries that keep the controller running during a power cut.",
+  },
+  {
+    key: "device_amperage",
+    label: "Device current",
+    unit: "A",
+    digits: 2,
+    scale: 0.001,
+  },
+  {
+    key: "dist_pump_amperage",
+    label: "Distribution pump current",
+    unit: "A",
+    digits: 2,
+    scale: 0.001,
+    note: "Peaks while the pump supplies an outlet or circulates T3.",
+  },
+];
+
+const ISSUE_FIELDS: [IssueLevel, keyof Root.DeviceStatus][] = [
+  ["blocking", "blockingInfo"],
+  ["major", "majorIssueInfo"],
+  ["minor", "minorIssueInfo"],
+  ["attention", "attentionRequiredInfo"],
+  ["notice", "noticeInfo"],
+];
+
+function time(value: string | null | undefined) {
+  const t = Date.parse(value ?? "");
+  return Number.isFinite(t) ? t : null;
+}
+
+/** The service log returns 20 entries before `from`, so it is loaded page by page */
+async function loadServiceLog(hydraloop: Hydraloop, deviceId: string) {
+  const entries: Root.ServiceLogEntry[] = [];
+  let from = new Date();
+  for (let page = 0; page < 10; page++) {
+    const batch = await hydraloop.root.devices.getServiceLogEntries({
+      deviceId,
+      from,
+    });
+    entries.push(...batch);
+    const last = time(batch.at(-1)?.time);
+    if (batch.length < 20 || last === null) break;
+    from = new Date(last);
+  }
+  // Pages may overlap at the time they are split at
+  return [...new Map(entries.map((e) => [e.id, e])).values()];
+}
+
+/**
+ * Fills in the `{{name}}` placeholders of an HDM text. Without a value, a
+ * placeholder is left out, together with a `(Side …)` around it.
+ */
+function fill(text: string, data: Record<string, unknown> = {}) {
+  return text
+    .replace(/\(side \{\{(\w+)\}\}\)\s*/gi, (match, name: string) =>
+      data[name] == null || data[name] === "" ? "" : match,
+    )
+    .replace(/\{\{(\w+)\}\}/g, (_, name: string) =>
+      data[name] == null ? "" : String(data[name]),
+    )
+    .trim();
+}
+
+function issueText(text: Lookup, issue: Root.DeviceIssue | string) {
+  const key = typeof issue === "string" ? issue : issue.info;
+  const data = typeof issue === "string" ? {} : issue.data;
+  const found = key.startsWith("deviceSignals.")
+    ? text(`${key}.title`)
+    : text(key);
+  return fill(found ?? readable(key.split(".").at(-1) ?? key), data);
+}
+
+function restartReason(text: Lookup, chip?: number, software?: number) {
+  if (software) {
+    return (
+      text(`graph.restartReasons.software.${software}`) ??
+      `Software reason ${software}`
+    );
+  }
+  if (chip) {
+    return (
+      text(`graph.restartReasons.chip.${chip}`) ?? `Hardware reason ${chip}`
+    );
+  }
+  return "Unknown reason";
+}
+
+export async function loadMaintenance(token: string): Promise<Maintenance> {
+  const entry = cached(token);
+  const { hydraloop } = entry;
+  const device = await remember(entry, "device", () => firstDevice(hydraloop));
+  const deviceId = device.id;
+  const until = Date.now();
+  const from = until - CONNECTIVITY_RANGE;
+
+  const [
+    details,
+    statusLog,
+    tickets,
+    serviceLog,
+    professionals,
+    outages,
+    data,
+    lastIo,
+    config,
+  ] = await Promise.allSettled([
+    hydraloop.root.devices.getDevice({ id: deviceId }),
+    hydraloop.local.graph.getStatusLogData({
+      deviceId,
+      from: new Date(until - SIGNALS_RANGE),
+      until: new Date(until),
+    }),
+    hydraloop.root.ticket.listTickets({ event: { first: 0, rows: 100 } }),
+    loadServiceLog(hydraloop, deviceId),
+    hydraloop.root.devices.listLinkedProfessionals({
+      deviceId,
+      event: { first: 0, rows: 50 },
+    }),
+    hydraloop.local.connectivity.getOutageSummaries({
+      deviceId,
+      from: new Date(from),
+      until: new Date(until),
+    }) as Promise<OutageSummary[]>,
+    hydraloop.local.graph.getData({
+      deviceId,
+      from: new Date(from),
+      until: new Date(until),
+      minutesInView: Math.round(CONNECTIVITY_RANGE / 60_000),
+      debugData: false,
+    }),
+    hydraloop.local.graph.getLastKnownIoState({ deviceId }),
+    remember(entry, "config", () =>
+      hydraloop.local.graph.getGraphConfig({ deviceId, debugData: false }),
+    ),
+  ]);
+  const text = await hdmTexts();
+
+  const warnings: string[] = [];
+  const info = settled(details, "Device details", warnings) ?? device;
+  const logData = settled(statusLog, "Device signals", warnings);
+  const ticketData = settled(tickets, "Tickets", warnings);
+  const serviceData = settled(serviceLog, "Service log", warnings) ?? [];
+  const professionalData = settled(professionals, "Professionals", warnings);
+  const outageData = settled(outages, "Outages", warnings);
+  const graphData = settled(data, "Device vitals", warnings);
+  const lastIoData = settled(lastIo, "Current valve state", warnings) ?? [];
+  const graphConfig = settled(config, "Graph config", warnings);
+
+  const captions: Record<string, string> = {};
+  for (const io of graphConfig?.ios ?? []) {
+    if (io.caption) captions[io.name] = io.caption;
+  }
+
+  const issues: Issue[] = [];
+  // Device signals among the issues, e.g. `releaseAirStuckClosed`
+  const activeSignals = new Set<string>();
+  for (const [level, field] of ISSUE_FIELDS) {
+    const list = info.deviceStatus?.[field];
+    if (!Array.isArray(list)) continue;
+    for (const issue of list as (Root.DeviceIssue | string)[]) {
+      issues.push({ level, text: issueText(text, issue) });
+      const key = typeof issue === "string" ? issue : issue.info;
+      if (key?.startsWith("deviceSignals.")) {
+        activeSignals.add(key.split(".")[1]);
+      }
+    }
+  }
+
+  const commissioned = time(info.commissionDate);
+  const lastMaintenance = time(info.lastMaintenanceDate);
+  const months = info.maintenancePeriod || null;
+  const scheduled =
+    time(info.maintenancePlannedDate) ?? time(info.nextMaintenanceDate);
+  const since = lastMaintenance ?? commissioned;
+  const nextMaintenance =
+    scheduled !== null
+      ? { t: scheduled, estimated: false }
+      : since !== null && months
+        ? { t: addMonths(since, months), estimated: true }
+        : null;
+
+  const restarts = (
+    (graphData?.restart ?? []) as unknown as {
+      x: string;
+      restartReasonChip?: number;
+      restartReasonSoftware?: number;
+    }[]
+  )
+    .map((r) => ({
+      t: Date.parse(r.x),
+      reason: restartReason(text, r.restartReasonChip, r.restartReasonSoftware),
+    }))
+    .filter((r) => Number.isFinite(r.t))
+    .sort((a, b) => a.t - b.t);
+
+  return {
+    demo: false,
+    fetchedAt: Date.now(),
+    device: {
+      name: info.alias || info.deviceName || info.serial,
+      serial: info.serial ?? null,
+      type: [info.type, info.subType].filter(Boolean).join(" ") || null,
+      firmware: info.firmwareVersion ?? null,
+      firmwareCore: info.firmwareCoreVersion ?? null,
+      hardware: info.hardwareVersion ?? null,
+      online: typeof info.online === "boolean" ? info.online : null,
+      lastOnline: time(info.lastOnline),
+      timeZone: info.timezones?.[0] ?? null,
+      commissioned,
+      warrantyUntil: time(info.endOfWarranty),
+      maintenanceMonths: months,
+      lastMaintenance,
+      nextMaintenance,
+    },
+    issues,
+    stuck: lastIoData
+      .filter((io) => io.stuckPower)
+      .map((io) => caption(captions, io.type)),
+    manual: lastIoData
+      .filter((io) => io.manual > 0)
+      .map((io) => ({
+        name: io.type,
+        label: caption(captions, io.type),
+        since: Date.parse(io.time),
+      })),
+    signals: signalEpisodes(
+      (logData?.statusLogEntries ?? []).map((e) => ({
+        t: Date.parse(e.time),
+        errorId: e.errorId ?? null,
+        information: e.information ?? "",
+        side: e.side || null,
+      })),
+      (key, side) => {
+        const description = text(`deviceSignals.${key}.description`);
+        return {
+          title: fill(text(`deviceSignals.${key}.title`) ?? readable(key), {
+            side,
+          }),
+          description: description ? fill(description, { side }) : null,
+        };
+      },
+      activeSignals,
+    ),
+    signalsFrom: until - SIGNALS_RANGE,
+    tickets: (ticketData?.records ?? [])
+      .filter((t) => t.deviceId === deviceId)
+      .map((t) => ({
+        id: t.id,
+        title: t.title,
+        status: text(`ticket.status.${t.statusKey}`) ?? readable(t.statusKey),
+        closed: Boolean(t.statusClosed),
+        priority: t.priorityKey
+          ? (text(`ticket.priority.${t.priorityKey}`) ??
+            readable(t.priorityKey))
+          : null,
+        subject: t.subjectTypeKey
+          ? (text(`ticket.subjectType.${t.subjectTypeKey}`) ??
+            readable(t.subjectTypeKey))
+          : null,
+        cause: t.causeKey
+          ? (text(`ticket.cause.${t.causeKey}`) ?? readable(t.causeKey))
+          : null,
+        solution: t.solutionKey
+          ? (text(`ticket.solution.${t.solutionKey}`) ??
+            readable(t.solutionKey))
+          : null,
+        note: plainText(t.contextInformation),
+        automatic:
+          Boolean(t.deviceSignalIssue) || t.creatorPersonName === "HDM",
+        created: Date.parse(t.created),
+        closedAt: time(t.closed),
+      }))
+      .sort(
+        (a, b) => Number(a.closed) - Number(b.closed) || b.created - a.created,
+      ),
+    serviceLog: serviceData
+      .map((e) => {
+        const [title = "", ...rest] = (e.text ?? "").split("\n");
+        return {
+          id: e.id,
+          t: Date.parse(e.time),
+          type: text(e.typeKey) ?? readable(e.typeKey.split(".").at(-1) ?? ""),
+          person: e.person || null,
+          title: title.trim(),
+          text: rest.join("\n").trim(),
+        };
+      })
+      .sort((a, b) => b.t - a.t),
+    professionals: (professionalData?.records ?? []).map((p) => ({
+      role: p.type,
+      organisation: p.person?.organisationName || null,
+      note: p.description,
+      since: time(p.start),
+    })),
+    connectivity: outageData && {
+      from,
+      until,
+      outages: outageData
+        .map((o) => ({
+          start: Date.parse(o.startedAt),
+          end: o.endedAt ? Date.parse(o.endedAt) : until,
+          cause: o.classification,
+          title:
+            text(`connectivityTrace.causes.${o.classification}.title`) ??
+            readable(o.classification),
+          description:
+            text(`connectivityTrace.causes.${o.classification}.description`) ??
+            null,
+          group: outageGroup(o.classification),
+        }))
+        .filter((o) => Number.isFinite(o.start) && Number.isFinite(o.end)),
+      restarts,
+    },
+    vitals: graphData && {
+      from,
+      until,
+      series: VITALS.map(({ scale, ...series }) => ({
+        ...series,
+        points: toPoints(
+          graphData[series.key],
+          (y) =>
+            Math.round(y * scale * 10 ** series.digits) / 10 ** series.digits,
+        ),
+      })).filter((series) => series.points.length > 0),
+    },
+    warnings,
+  };
 }

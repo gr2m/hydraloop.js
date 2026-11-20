@@ -8,6 +8,14 @@ import "server-only";
 
 import type { LoadOptions } from "./hdm";
 import {
+  CONNECTIVITY_RANGE,
+  SIGNALS_RANGE,
+  type Maintenance,
+  type OutageItem,
+  type RestartItem,
+  type VitalSeries,
+} from "./maintenance";
+import {
   IO,
   TANK_CAPACITY,
   transfers,
@@ -415,6 +423,231 @@ export function simulateStats({ range }: { range: number }): Stats {
     }),
     demo: true,
     fetchedAt: until,
+    warnings: [],
+  };
+}
+
+/** Simulated maintenance data. The signals, tickets and outages are examples, not from a device. */
+export function simulateMaintenance(): Maintenance {
+  const until = Date.now();
+  const from = until - CONNECTIVITY_RANGE;
+  const noise = random(42);
+  const ago = (days: number) => until - days * DAY;
+
+  const outages: OutageItem[] = [];
+  const restarts: RestartItem[] = [];
+  // A restart every 12 hours, plus a few connection losses
+  for (
+    let t = Math.ceil(from / (12 * 60 * MINUTE)) * 12 * 60 * MINUTE;
+    t < until;
+    t += 12 * 60 * MINUTE
+  ) {
+    outages.push({
+      start: t,
+      end: t + 34_000,
+      cause: "scheduled_restart",
+      title: "Scheduled device restart",
+      description: "The device performed its routine scheduled restart.",
+      group: "scheduled",
+    });
+    restarts.push({ t: t + 35_000, reason: "Scheduled restart" });
+  }
+  for (const [days, minutes, cause, title, group] of [
+    [26.3, 95, "server_restart", "Server restarted", "server"],
+    [
+      19.7,
+      12,
+      "server_response_timeout",
+      "Server stopped responding",
+      "server",
+    ],
+    [
+      8.2,
+      70,
+      "wifi_access_point_unavailable",
+      "Wi-Fi network could not be found",
+      "network",
+    ],
+    [
+      3.4,
+      1,
+      "power_restored_restart",
+      "Restart after mains power returned",
+      "power",
+    ],
+  ] as const) {
+    outages.push({
+      start: ago(days),
+      end: ago(days) + minutes * MINUTE,
+      cause,
+      title,
+      description: null,
+      group,
+    });
+  }
+  outages.sort((a, b) => a.start - b.start);
+
+  const step = 22 * MINUTE;
+  const series = (f: (t: number) => number) => {
+    const points: Point[] = [];
+    for (let t = from; t <= until; t += step) points.push({ t, v: f(t) });
+    return points;
+  };
+  const daily = (t: number) => Math.sin(((t % DAY) / DAY) * 2 * Math.PI);
+  const vitals: VitalSeries[] = [
+    {
+      key: "uv_temperature",
+      label: "UV-C lamp temperature",
+      unit: "°C",
+      digits: 1,
+      points: series(
+        (t) => 24 + 2 * daily(t) + (noise() < 0.08 ? 12 * noise() : 0),
+      ),
+    },
+    {
+      key: "power_voltage",
+      label: "Supply voltage",
+      unit: "V",
+      digits: 1,
+      low: { below: 19, label: "Power lost" },
+      points: series((t) =>
+        Math.abs(t - ago(3.4)) < step ? 0 : 23 + noise() * 0.2,
+      ),
+    },
+    {
+      key: "battery_voltage",
+      label: "Battery voltage",
+      unit: "V",
+      digits: 2,
+      points: series(
+        (t) => 5.6 - ((t - from) / CONNECTIVITY_RANGE) * 0.08 + noise() * 0.03,
+      ),
+    },
+    {
+      key: "device_amperage",
+      label: "Device current",
+      unit: "A",
+      digits: 2,
+      points: series(() =>
+        noise() < 0.1 ? 1 + noise() * 0.8 : 0.03 + noise() * 0.02,
+      ),
+    },
+    {
+      key: "dist_pump_amperage",
+      label: "Distribution pump current",
+      unit: "A",
+      digits: 2,
+      points: series(() => (noise() < 0.12 ? 1.6 + noise() * 0.6 : 0.005)),
+    },
+  ];
+
+  return {
+    demo: true,
+    fetchedAt: until,
+    device: {
+      name: "Demo H600",
+      serial: "SIMULATED",
+      type: "H600",
+      firmware: null,
+      firmwareCore: null,
+      hardware: null,
+      online: true,
+      lastOnline: until,
+      timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      commissioned: ago(300),
+      warrantyUntil: ago(300) + 2 * 365 * DAY,
+      maintenanceMonths: 24,
+      lastMaintenance: null,
+      nextMaintenance: { t: ago(300) + 2 * 365 * DAY, estimated: true },
+    },
+    issues: [{ level: "minor", text: "Leaking toilet" }],
+    stuck: [],
+    manual: [],
+    signals: [
+      {
+        key: "toiletPipeLeak",
+        side: null,
+        errorId: 20,
+        title: "Leaking toilet",
+        description:
+          "The distribution pump starts too often, as if a toilet or its pipe leaks.",
+        start: ago(0.1),
+        last: ago(0.05),
+        end: null,
+        count: 2,
+        active: true,
+      },
+      {
+        key: "soapBomb",
+        side: "A",
+        errorId: 23,
+        title: "Soap bomb detected",
+        description: "Too much foam. The train was emptied to the drain.",
+        start: ago(12),
+        last: ago(12),
+        end: null,
+        count: 1,
+        active: false,
+      },
+      {
+        key: "cloggedT1T2BottomOrAirIntake",
+        side: null,
+        errorId: 29,
+        title: "Clogged T1/T2 bottom or air intake",
+        description: null,
+        start: ago(45),
+        last: ago(44.5),
+        end: ago(44),
+        count: 3,
+        active: false,
+      },
+    ],
+    signalsFrom: until - SIGNALS_RANGE,
+    tickets: [
+      {
+        id: "demo-1",
+        title: "Unable to release water out of T3 properly",
+        status: "Closed",
+        closed: true,
+        priority: "Low",
+        subject: "Malfunction / Error",
+        cause: "Improper plumbing",
+        solution: "No intervention needed",
+        note: null,
+        automatic: true,
+        created: ago(60),
+        closedAt: ago(58),
+      },
+    ],
+    serviceLog: [
+      {
+        id: "demo-s1",
+        t: ago(58),
+        type: "Ticket cause",
+        person: "Support",
+        title:
+          "Cause has been set for ticket Unable to release water out of T3 properly:",
+        text: "Improper plumbing",
+      },
+      {
+        id: "demo-s2",
+        t: ago(300),
+        type: "Maintenance report",
+        person: "Installer",
+        title: "Maintenance report - Fill T3 with backup water",
+        text: "Successfully filled T3.",
+      },
+    ],
+    professionals: [
+      {
+        role: "Installer",
+        organisation: "Demo installer",
+        note: null,
+        since: ago(300),
+      },
+    ],
+    connectivity: { from, until, outages, restarts },
+    vitals: { from, until, series: vitals },
     warnings: [],
   };
 }
