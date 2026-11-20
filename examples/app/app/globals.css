@@ -704,7 +704,7 @@ tr.is-selected:focus-visible {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-.pipe.is-square :is(.pipe-base, .pipe-flow) {
+.pipe.is-square :is(.pipe-base, .pipe-water, .pipe-flow) {
   stroke-linecap: butt;
 }
 .pipe.kind-air .pipe-base {
