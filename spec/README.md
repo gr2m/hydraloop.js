@@ -40,6 +40,17 @@ The internal specs are incomplete in places. Many root API operations have no su
 
 Corrections found that way are kept in [`internal-patches/`](internal-patches/) as [JSON merge patches](https://www.rfc-editor.org/rfc/rfc7386). They are applied to the internal specs when generating the [`hydraloop/internal`](../readme.internal.md) SDK. The update script doesn't touch them.
 
+## Socket API
+
+Besides the REST APIs, HDM pushes real-time messages over [socket.io](https://socket.io/): graph values every few seconds, and every change of a valve, routine or setting. The HDM web app uses them for its live views. Hydraloop publishes no spec for them, so [`socket/asyncapi.json`](socket/asyncapi.json) is written by hand, as an [AsyncAPI 3.1](https://www.asyncapi.com/docs/reference/specification/v3.1.0) document. It is based on:
+
+- The HDM web app's JavaScript (`https://hdm.hydraloop.com/hdm/main-*.js`): the socket URLs, the authentication, the rooms it registers, and how it uses the payload of each message.
+- Listening to an H600 with an owner account. Messages seen that way are marked with `"x-observed": true`.
+
+There are three sockets, each with its own rooms: one per device on the local API (`/api-local/socket.io`, with the device token), and two on the root API for notifications (`/api-root/person-notifications-socket.io`, with the device token) and for the logged-in person (`/api-root/root-socket.io`, with the user token).
+
+The [`hydraloop/internal`](../readme.internal.md) SDK generates the types of the messages from it, and connects to the device socket with `hydraloop.local.subscribe()`. The update script doesn't touch it.
+
 ## Stability
 
 The **external API** is the one Hydraloop provides for integrations. The main `hydraloop` export only uses the external API. Hydraloop has made no explicit promise of stability or versioning for it. So far it has changed by gaining endpoints and parameters (e.g. the `zone` parameter in February 2026).

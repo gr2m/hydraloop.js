@@ -1,0 +1,1383 @@
+{
+  "asyncapi": "3.1.0",
+  "info": {
+    "title": "HDM Socket API",
+    "version": "9.0.1",
+    "description": "Real-time messages of the Hydraloop Device Manager (HDM), served by socket.io (Engine.IO v4, Socket.IO v5). Not documented by Hydraloop: written from the HDM web app's JavaScript and from listening with an owner account to an H600 (firmware 9.24.4).\n\nConnecting:\n\n1. Connect to one of the servers below with the token as socket.io auth: `{ token }`.\n2. The server emits `loggedIn`.\n3. Emit `register` with `[{ type: <room> }]` for each room (see the `register` channel).\n4. The server emits the event `message` with two arguments: the message name (e.g. `graph:io`) and its payload. The channels below are the rooms, and their messages are named `<room>:<event>`.\n\nRooms the account has no permission for are accepted, but send nothing. Messages with `x-observed: false` were not seen with an owner account, their payloads are taken from how the HDM web app uses them.\n\nThe connection is not closed when the token expires. A reconnect needs a new token."
+  },
+  "defaultContentType": "application/json",
+  "servers": {
+    "device": {
+      "host": "hdm.hydraloop.com",
+      "pathname": "/api-local/socket.io",
+      "protocol": "wss",
+      "title": "Device socket",
+      "description": "One connection per device. The host and path follow from the device's `localApiUrl` (here `https://hdm.hydraloop.com/api-local`): its host, and its path plus `/socket.io`. Authenticates with the device token from `POST /api-root/auth/token-for-device`.",
+      "security": [
+        {
+          "$ref": "#/components/securitySchemes/deviceToken"
+        }
+      ]
+    },
+    "notifications": {
+      "host": "hdm.hydraloop.com",
+      "pathname": "/api-root/person-notifications-socket.io",
+      "protocol": "wss",
+      "title": "Notifications socket",
+      "description": "Notifications for the owner of a device. Authenticates with the device token.",
+      "security": [
+        {
+          "$ref": "#/components/securitySchemes/deviceToken"
+        }
+      ]
+    },
+    "person": {
+      "host": "hdm.hydraloop.com",
+      "pathname": "/api-root/root-socket.io",
+      "protocol": "wss",
+      "title": "Person socket",
+      "description": "Messages for the logged in person, e.g. time logs and calls. Authenticates with the user token.",
+      "security": [
+        {
+          "$ref": "#/components/securitySchemes/userToken"
+        }
+      ]
+    }
+  },
+  "channels": {
+    "graph": {
+      "address": "graph",
+      "title": "graph",
+      "description": "Live graph values, valves and routines, used by the graph of the HDM web app",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "graphGraph": {
+          "$ref": "#/components/messages/graphGraph"
+        },
+        "graphIo": {
+          "$ref": "#/components/messages/graphIo"
+        },
+        "graphRoutine": {
+          "$ref": "#/components/messages/graphRoutine"
+        },
+        "graphRestart": {
+          "$ref": "#/components/messages/graphRestart"
+        },
+        "graphDynamicGraph": {
+          "$ref": "#/components/messages/graphDynamicGraph"
+        }
+      }
+    },
+    "deviceState": {
+      "address": "device-state",
+      "title": "device-state",
+      "description": "Settings the device reports, e.g. the time left of filth removal",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "deviceStateSettingValue": {
+          "$ref": "#/components/messages/deviceStateSettingValue"
+        }
+      }
+    },
+    "deviceStatus": {
+      "address": "device-status",
+      "title": "device-status",
+      "description": "Whether the device is connected to HDM",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "deviceStatusOnline": {
+          "$ref": "#/components/messages/deviceStatusOnline"
+        },
+        "deviceStatusOffline": {
+          "$ref": "#/components/messages/deviceStatusOffline"
+        }
+      }
+    },
+    "maintenance": {
+      "address": "maintenance",
+      "title": "maintenance",
+      "description": "The status log",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "maintenanceStatusLogEntry": {
+          "$ref": "#/components/messages/maintenanceStatusLogEntry"
+        }
+      }
+    },
+    "outputPriorities": {
+      "address": "output-priorities",
+      "title": "output-priorities",
+      "description": "The priorities of the outlets",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "outputPrioritiesSettingValue": {
+          "$ref": "#/components/messages/outputPrioritiesSettingValue"
+        }
+      }
+    },
+    "settings": {
+      "address": "settings",
+      "title": "settings",
+      "description": "Device settings, for the settings page of the HDM web app",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "settingsSettingValue": {
+          "$ref": "#/components/messages/settingsSettingValue"
+        }
+      }
+    },
+    "fsm": {
+      "address": "fsm",
+      "title": "fsm",
+      "description": "State machines of the device, e.g. maintenance procedures",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "fsmTransition": {
+          "$ref": "#/components/messages/fsmTransition"
+        }
+      }
+    },
+    "deviceProgress": {
+      "address": "device-progress",
+      "title": "device-progress",
+      "description": "Firmware uploads",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "deviceProgressProgress": {
+          "$ref": "#/components/messages/deviceProgressProgress"
+        }
+      }
+    },
+    "logging": {
+      "address": "logging",
+      "title": "logging",
+      "description": "The device log",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "loggingEntry": {
+          "$ref": "#/components/messages/loggingEntry"
+        }
+      }
+    },
+    "dashboard": {
+      "address": "dashboard",
+      "title": "dashboard",
+      "description": "The device dashboard of the HDM web app. Needs permissions owners don't have.",
+      "servers": [
+        {
+          "$ref": "#/servers/device"
+        }
+      ],
+      "messages": {
+        "dashboardGraphData": {
+          "$ref": "#/components/messages/dashboardGraphData"
+        },
+        "dashboardIoData": {
+          "$ref": "#/components/messages/dashboardIoData"
+        },
+        "dashboardRoutine": {
+          "$ref": "#/components/messages/dashboardRoutine"
+        },
+        "dashboardSettingValue": {
+          "$ref": "#/components/messages/dashboardSettingValue"
+        },
+        "dashboardTimeLeftRecycling": {
+          "$ref": "#/components/messages/dashboardTimeLeftRecycling"
+        },
+        "dashboardLatestDeviceTask": {
+          "$ref": "#/components/messages/dashboardLatestDeviceTask"
+        },
+        "dashboardRecycleStatistics": {
+          "$ref": "#/components/messages/dashboardRecycleStatistics"
+        },
+        "dashboardFirmwareUploadData": {
+          "$ref": "#/components/messages/dashboardFirmwareUploadData"
+        }
+      }
+    },
+    "notifications": {
+      "address": "notifications",
+      "title": "notifications",
+      "description": "Notifications for the owner, e.g. of a leaking toilet",
+      "servers": [
+        {
+          "$ref": "#/servers/notifications"
+        }
+      ],
+      "messages": {
+        "notificationsNew": {
+          "$ref": "#/components/messages/notificationsNew"
+        },
+        "notificationsList": {
+          "$ref": "#/components/messages/notificationsList"
+        }
+      }
+    },
+    "timeLog": {
+      "address": "time-log",
+      "title": "time-log",
+      "description": "Time logs of Hydraloop employees",
+      "servers": [
+        {
+          "$ref": "#/servers/person"
+        }
+      ],
+      "messages": {
+        "timeLogUpdate": {
+          "$ref": "#/components/messages/timeLogUpdate"
+        }
+      }
+    },
+    "communication": {
+      "address": "communication",
+      "title": "communication",
+      "description": "Video calls of the HDM web app",
+      "servers": [
+        {
+          "$ref": "#/servers/person"
+        }
+      ],
+      "messages": {
+        "communicationInCall": {
+          "$ref": "#/components/messages/communicationInCall"
+        },
+        "communicationOutCall": {
+          "$ref": "#/components/messages/communicationOutCall"
+        },
+        "communicationRefreshCall": {
+          "$ref": "#/components/messages/communicationRefreshCall"
+        }
+      }
+    },
+    "register": {
+      "address": "register",
+      "title": "register",
+      "description": "Sent by the client after the server emitted `loggedIn`, once per room. Sent as the socket.io event `register` with one argument, an array with one object.",
+      "messages": {
+        "register": {
+          "$ref": "#/components/messages/register"
+        }
+      }
+    }
+  },
+  "operations": {
+    "receiveGraph": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/graph"
+      },
+      "summary": "Messages of the `graph` room"
+    },
+    "receiveDeviceState": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/deviceState"
+      },
+      "summary": "Messages of the `device-state` room"
+    },
+    "receiveDeviceStatus": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/deviceStatus"
+      },
+      "summary": "Messages of the `device-status` room"
+    },
+    "receiveMaintenance": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/maintenance"
+      },
+      "summary": "Messages of the `maintenance` room"
+    },
+    "receiveOutputPriorities": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/outputPriorities"
+      },
+      "summary": "Messages of the `output-priorities` room"
+    },
+    "receiveSettings": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/settings"
+      },
+      "summary": "Messages of the `settings` room"
+    },
+    "receiveFsm": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/fsm"
+      },
+      "summary": "Messages of the `fsm` room"
+    },
+    "receiveDeviceProgress": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/deviceProgress"
+      },
+      "summary": "Messages of the `device-progress` room"
+    },
+    "receiveLogging": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/logging"
+      },
+      "summary": "Messages of the `logging` room"
+    },
+    "receiveDashboard": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/dashboard"
+      },
+      "summary": "Messages of the `dashboard` room"
+    },
+    "receiveNotifications": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/notifications"
+      },
+      "summary": "Messages of the `notifications` room"
+    },
+    "receiveTimeLog": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/timeLog"
+      },
+      "summary": "Messages of the `time-log` room"
+    },
+    "receiveCommunication": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/communication"
+      },
+      "summary": "Messages of the `communication` room"
+    },
+    "register": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/register"
+      },
+      "summary": "Subscribe to a room"
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "deviceToken": {
+        "type": "httpApiKey",
+        "name": "token",
+        "in": "query",
+        "description": "The device token from `POST /api-root/auth/token-for-device`, sent as `token` in the socket.io auth payload of the CONNECT packet, not as a query parameter."
+      },
+      "userToken": {
+        "type": "httpApiKey",
+        "name": "token",
+        "in": "query",
+        "description": "The user token from `POST /api-root/auth/login`, sent as `token` in the socket.io auth payload of the CONNECT packet, not as a query parameter."
+      }
+    },
+    "messages": {
+      "graphGraph": {
+        "name": "graph:graph",
+        "title": "graph:graph",
+        "summary": "The latest value of each graph line, about every 3 seconds",
+        "payload": {
+          "$ref": "#/components/schemas/GraphMessage"
+        },
+        "x-observed": true
+      },
+      "graphIo": {
+        "name": "graph:io",
+        "title": "graph:io",
+        "summary": "A valve, pump or sensor changed, within about 0.1 seconds",
+        "payload": {
+          "$ref": "#/components/schemas/IoMessage"
+        },
+        "x-observed": true
+      },
+      "graphRoutine": {
+        "name": "graph:routine",
+        "title": "graph:routine",
+        "summary": "A routine or sub-state of a train changed",
+        "payload": {
+          "$ref": "#/components/schemas/RoutineMessage"
+        },
+        "x-observed": true
+      },
+      "graphRestart": {
+        "name": "graph:restart",
+        "title": "graph:restart",
+        "summary": "The device controller restarted",
+        "payload": {
+          "$ref": "#/components/schemas/RestartPoint"
+        },
+        "x-observed": true
+      },
+      "graphDynamicGraph": {
+        "name": "graph:dynamic-graph",
+        "title": "graph:dynamic-graph",
+        "summary": "New values of dynamic graph lines",
+        "payload": {
+          "$ref": "#/components/schemas/DynamicGraphMessage"
+        },
+        "x-observed": false
+      },
+      "deviceStateSettingValue": {
+        "name": "device-state:setting-value",
+        "title": "device-state:setting-value",
+        "summary": "The device reported a setting",
+        "payload": {
+          "$ref": "#/components/schemas/SettingValue"
+        },
+        "x-observed": true
+      },
+      "deviceStatusOnline": {
+        "name": "device-status:online",
+        "title": "device-status:online",
+        "summary": "The device connected to HDM",
+        "payload": {
+          "$ref": "#/components/schemas/EmptyObject"
+        },
+        "x-observed": true
+      },
+      "deviceStatusOffline": {
+        "name": "device-status:offline",
+        "title": "device-status:offline",
+        "summary": "The device disconnected from HDM, e.g. for its scheduled restart",
+        "payload": {
+          "$ref": "#/components/schemas/EmptyObject"
+        },
+        "x-observed": true
+      },
+      "maintenanceStatusLogEntry": {
+        "name": "maintenance:status-log-entry",
+        "title": "maintenance:status-log-entry",
+        "summary": "A new entry of the status log, e.g. a device signal or a step of a maintenance procedure",
+        "payload": {
+          "$ref": "#/components/schemas/StatusLogEntry"
+        },
+        "x-observed": false
+      },
+      "outputPrioritiesSettingValue": {
+        "name": "output-priorities:setting-value",
+        "title": "output-priorities:setting-value",
+        "summary": "The `prioritySettings` setting (group 100, id 53) changed",
+        "payload": {
+          "$ref": "#/components/schemas/SettingValue"
+        },
+        "x-observed": false
+      },
+      "settingsSettingValue": {
+        "name": "settings:setting-value",
+        "title": "settings:setting-value",
+        "summary": "A device setting changed",
+        "payload": {
+          "$ref": "#/components/schemas/SettingValue"
+        },
+        "x-observed": false
+      },
+      "fsmTransition": {
+        "name": "fsm:transition",
+        "title": "fsm:transition",
+        "summary": "A state machine changed its state",
+        "payload": {
+          "$ref": "#/components/schemas/FsmTransition"
+        },
+        "x-observed": false
+      },
+      "deviceProgressProgress": {
+        "name": "device-progress:progress",
+        "title": "device-progress:progress",
+        "summary": "Progress of a firmware upload. Also sent with percentage -1 when the device comes back online",
+        "payload": {
+          "$ref": "#/components/schemas/DeviceProgress"
+        },
+        "x-observed": true
+      },
+      "loggingEntry": {
+        "name": "logging:entry",
+        "title": "logging:entry",
+        "summary": "A new line of the device log",
+        "payload": {
+          "$ref": "#/components/schemas/LoggingEntry"
+        },
+        "x-observed": false
+      },
+      "dashboardGraphData": {
+        "name": "dashboard:graph-data",
+        "title": "dashboard:graph-data",
+        "summary": "Same as `graph:graph`",
+        "payload": {
+          "$ref": "#/components/schemas/GraphMessage"
+        },
+        "x-observed": false
+      },
+      "dashboardIoData": {
+        "name": "dashboard:io-data",
+        "title": "dashboard:io-data",
+        "summary": "Same as `graph:io`",
+        "payload": {
+          "$ref": "#/components/schemas/IoMessage"
+        },
+        "x-observed": false
+      },
+      "dashboardRoutine": {
+        "name": "dashboard:routine",
+        "title": "dashboard:routine",
+        "summary": "Same as `graph:routine`",
+        "payload": {
+          "$ref": "#/components/schemas/RoutineMessage"
+        },
+        "x-observed": false
+      },
+      "dashboardSettingValue": {
+        "name": "dashboard:setting-value",
+        "title": "dashboard:setting-value",
+        "summary": "A setting the device reported",
+        "payload": {
+          "$ref": "#/components/schemas/SettingValue"
+        },
+        "x-observed": false
+      },
+      "dashboardTimeLeftRecycling": {
+        "name": "dashboard:time-left-recycling",
+        "title": "dashboard:time-left-recycling",
+        "summary": "Minutes of cleaning left per train",
+        "payload": {
+          "$ref": "#/components/schemas/TimeLeftRecyclingList"
+        },
+        "x-observed": false
+      },
+      "dashboardLatestDeviceTask": {
+        "name": "dashboard:latest-device-task",
+        "title": "dashboard:latest-device-task",
+        "summary": "What each train does",
+        "payload": {
+          "$ref": "#/components/schemas/DeviceTaskList"
+        },
+        "x-observed": false
+      },
+      "dashboardRecycleStatistics": {
+        "name": "dashboard:recycle-statistics",
+        "title": "dashboard:recycle-statistics",
+        "summary": "Recycled water totals",
+        "payload": {
+          "$ref": "#/components/schemas/RecycleStatistics"
+        },
+        "x-observed": false
+      },
+      "dashboardFirmwareUploadData": {
+        "name": "dashboard:firmware-upload-data",
+        "title": "dashboard:firmware-upload-data",
+        "summary": "Progress of a firmware upload",
+        "payload": {
+          "$ref": "#/components/schemas/DeviceProgress"
+        },
+        "x-observed": false
+      },
+      "notificationsNew": {
+        "name": "notifications:new",
+        "title": "notifications:new",
+        "summary": "A new notification",
+        "payload": {
+          "$ref": "#/components/schemas/Notification"
+        },
+        "x-observed": false
+      },
+      "notificationsList": {
+        "name": "notifications:list",
+        "title": "notifications:list",
+        "summary": "The current notifications, sent after registering",
+        "payload": {
+          "$ref": "#/components/schemas/NotificationList"
+        },
+        "x-observed": false
+      },
+      "timeLogUpdate": {
+        "name": "time-log:update",
+        "title": "time-log:update",
+        "summary": "A time log started or ended",
+        "payload": {
+          "$ref": "#/components/schemas/TimeLog"
+        },
+        "x-observed": false
+      },
+      "communicationInCall": {
+        "name": "communication:in-call",
+        "title": "communication:in-call",
+        "summary": "Someone joined a call",
+        "payload": {
+          "$ref": "#/components/schemas/CallParticipant"
+        },
+        "x-observed": false
+      },
+      "communicationOutCall": {
+        "name": "communication:out-call",
+        "title": "communication:out-call",
+        "summary": "Someone left a call",
+        "payload": {
+          "$ref": "#/components/schemas/CallParticipant"
+        },
+        "x-observed": false
+      },
+      "communicationRefreshCall": {
+        "name": "communication:refresh-call",
+        "title": "communication:refresh-call",
+        "summary": "The participants of calls should be sent again. Sent every few minutes while someone has the HDM web app open",
+        "payload": {
+          "$ref": "#/components/schemas/CallRefresh"
+        },
+        "x-observed": true
+      },
+      "register": {
+        "name": "register",
+        "title": "register",
+        "payload": {
+          "$ref": "#/components/schemas/RegisterPayload"
+        }
+      }
+    },
+    "schemas": {
+      "GraphPoint": {
+        "type": "object",
+        "description": "A value of a graph line at a time, as in `GET /graph/data`",
+        "properties": {
+          "x": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Raw value, see `GraphMessage` for the units"
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "TankPoint": {
+        "type": "object",
+        "description": "A tank level in pressure points (`y`), plus HDM's conversion to liters for each device version. `liters_<version>` is the level, `minLiters_<version>` and `maxLiters_<version>` the range of the calibration table. Sent for T2 (`V1_5`, `V2_0`) and T3 (`H300_V1_5`, `H300_V2_0`, `H600_V2_0`, `Concealed_V2_0`), not for T1.",
+        "properties": {
+          "x": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Pressure points"
+          }
+        },
+        "required": ["x", "y"],
+        "additionalProperties": {
+          "type": "number"
+        }
+      },
+      "RestartPoint": {
+        "type": "object",
+        "description": "A restart of the device controller",
+        "properties": {
+          "x": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Always 1"
+          },
+          "restartReasonChip": {
+            "type": "number",
+            "description": "Hardware reset reason of the chip, e.g. 12 (software reset of the CPU). Texts: `graph.restartReasons.chip.<n>` of the HDM web app's translations"
+          },
+          "restartReasonSoftware": {
+            "type": "number",
+            "description": "Reason of the firmware, e.g. 1 (scheduled restart) or 3 (power removed and restored). Texts: `graph.restartReasons.software.<n>`"
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "GraphMessage": {
+        "type": "object",
+        "description": "The latest value of each graph line, about every 3 seconds. The lines are those of `GET /graph/config`; lines without a new value are empty. Units of `y`: tank levels in pressure points, `power_voltage` × 0.1 V, `battery_voltage` × 0.01 V, `dist_pump_amperage`, `device_amperage`, `toilet_bar` and `wash_bar` × 0.001, `uv_temperature` in °C.",
+        "properties": {
+          "tank1": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankPoint"
+            }
+          },
+          "tank2": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankPoint"
+            }
+          },
+          "tank1_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankPoint"
+            }
+          },
+          "tank2_b": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankPoint"
+            }
+          },
+          "tank3": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TankPoint"
+            }
+          },
+          "uv_voltage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "dist_pump_amperage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "device_amperage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "toilet_bar": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "wash_bar": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "power_voltage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "battery_voltage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "uv_temperature": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "uv_intensity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "leak_sensor": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "tank2_leveled": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "tank2_b_leveled": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "wifi_rssi": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "power_wattage": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "restart": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RestartPoint"
+            }
+          },
+          "online": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          },
+          "firmware_update": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GraphPoint"
+            }
+          }
+        },
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/GraphPoint"
+          }
+        }
+      },
+      "IoPoint": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "y": {
+            "type": "number",
+            "description": "Value, e.g. 1 for on and 0 for off"
+          }
+        },
+        "required": ["x", "y"]
+      },
+      "IoBehavior": {
+        "type": "object",
+        "description": "A firmware behavior, as in `GET /graph/io`",
+        "properties": {
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "typeId": {
+            "type": "number"
+          },
+          "typeName": {
+            "type": "string",
+            "description": "e.g. `bypassByAppBypassValve` or `pressingOptButton` (typeId 54, engaged and disengaged around a restart)"
+          },
+          "subTypeId": {
+            "type": "number",
+            "description": "1: engaged, 2: disengaged"
+          },
+          "subTypeName": {
+            "type": "string",
+            "description": "`engaged` or `disengaged`"
+          }
+        },
+        "required": ["time", "typeId", "typeName", "subTypeId", "subTypeName"]
+      },
+      "IoMessage": {
+        "type": "object",
+        "description": "A change of valves, pumps or sensors, as in `GET /graph/io`. Every IO is listed, only the changed ones have points.",
+        "properties": {
+          "lastGroupItems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "value": {
+            "type": "object",
+            "description": "New values by IO name",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/IoPoint"
+              }
+            }
+          },
+          "manual": {
+            "type": "object",
+            "description": "1 while the IO is switched manually instead of by the firmware",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/IoPoint"
+              }
+            }
+          },
+          "stuckPower": {
+            "type": "object",
+            "description": "1 while the IO is stuck powered",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/IoPoint"
+              }
+            }
+          },
+          "behavior": {
+            "type": "array",
+            "description": "Behaviors that engaged or disengaged, e.g. `pressingOptButton` around a restart. Empty in most messages, also while `bypassByAppBypassValve` engaged",
+            "items": {
+              "$ref": "#/components/schemas/IoBehavior"
+            }
+          }
+        },
+        "required": [
+          "lastGroupItems",
+          "value",
+          "manual",
+          "stuckPower",
+          "behavior"
+        ]
+      },
+      "Routine": {
+        "type": "object",
+        "description": "A routine or sub-state change of a train, as in `GET /graph/routines`",
+        "properties": {
+          "x": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "routine": {
+            "type": "number",
+            "description": "Routine number, e.g. 1 for `STANDBY`"
+          },
+          "name": {
+            "type": "string",
+            "description": "e.g. `STANDBY`, `INCOMING_WATER`, `SKIM_LEVEL_DETERMINATION`, `FILTH_REMOVAL`, `TRANSFER`"
+          },
+          "state": {
+            "type": "string",
+            "description": "Sub-state, e.g. `ENTRY`, `PRESSURE_RESET`, `PASSIVE_CIRCULATE`"
+          },
+          "side": {
+            "type": "string",
+            "description": "`A`, `B` or `SYSTEM`"
+          },
+          "origin": {
+            "type": "number"
+          }
+        },
+        "required": ["x", "routine", "name", "state", "side", "origin"]
+      },
+      "RoutineMessage": {
+        "type": "object",
+        "properties": {
+          "routines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Routine"
+            }
+          }
+        },
+        "required": ["routines"]
+      },
+      "SettingValue": {
+        "type": "object",
+        "description": "A setting the device reported, as in `GET /settings/last`. E.g. `cleaningTimeLeftA`/`B` (group 3, milliseconds of filth removal left, 16200000 when the train starts `SKIM_LEVEL_DETERMINATION`, then the time left again when `FILTH_REMOVAL` starts, e.g. 16198974, and 0 when it returns to `STANDBY`), `incomingWaterCount` (group 100, id 10), `uvCirculationTime` (group 9) or `prioritySettings` (group 100, id 53).",
+        "properties": {
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "group": {
+            "type": "number"
+          },
+          "id": {
+            "type": "number"
+          },
+          "value": {
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": ["time", "group", "id", "value", "name"]
+      },
+      "StatusLogEntry": {
+        "type": "object",
+        "description": "An entry of the status log, as in `GET /graph/status-log`: a step of a maintenance procedure, or a device signal such as `deviceSignals.soapBomb.description`",
+        "properties": {
+          "fsmInstanceId": {
+            "type": ["string", "null"]
+          },
+          "fsmParentInstanceId": {
+            "type": ["string", "null"]
+          },
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "errorId": {
+            "type": ["number", "null"]
+          },
+          "information": {
+            "type": "string",
+            "description": "A text, or a translation key such as `deviceSignals.soapBomb.description` or `deviceSignals.soapBomb.fixed`"
+          },
+          "verbose": {
+            "type": "boolean"
+          },
+          "loginUserId": {
+            "type": ["string", "null"]
+          },
+          "side": {
+            "type": ["string", "null"],
+            "description": "The train of a device signal, `A` or `B`, else empty or null"
+          }
+        },
+        "required": ["time", "information"]
+      },
+      "FsmTransition": {
+        "type": "object",
+        "description": "A step of a finite state machine of the device, e.g. a maintenance procedure or the factory test",
+        "properties": {
+          "fsm": {
+            "type": "string",
+            "description": "Name of the state machine, e.g. `factory_test` or `change_location`"
+          },
+          "state": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string",
+                "description": "The state, e.g. `stepAborted`"
+              },
+              "done": {
+                "type": "boolean"
+              },
+              "context": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        },
+        "required": ["fsm", "state"]
+      },
+      "DeviceProgress": {
+        "type": "object",
+        "description": "Progress of a firmware upload, as in the local API's `DeviceProgress` schema",
+        "properties": {
+          "streamIdentifier": {
+            "type": ["string", "null"]
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "percentage": {
+            "type": "number",
+            "description": "-1 when no upload is in progress"
+          },
+          "type": {
+            "type": "string",
+            "description": "e.g. `Firmware upload`"
+          },
+          "info": {
+            "type": "string",
+            "description": "e.g. ` / ` when no upload is in progress"
+          },
+          "created": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "updated": {
+            "type": ["string", "null"],
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          }
+        },
+        "required": [
+          "streamIdentifier",
+          "deviceId",
+          "percentage",
+          "type",
+          "info",
+          "created",
+          "updated"
+        ]
+      },
+      "LoggingEntry": {
+        "type": "object",
+        "description": "A line of the device log, as in `GET /logging/log`",
+        "properties": {
+          "time": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp"
+          },
+          "deviceId": {
+            "type": "string"
+          },
+          "line": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string"
+          }
+        },
+        "required": ["time", "deviceId", "line", "level"]
+      },
+      "DynamicGraphLine": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "measurement_kind": {
+            "type": "string"
+          },
+          "max_decimal_places": {
+            "type": "number"
+          },
+          "graph_min": {
+            "type": "number"
+          },
+          "graph_max": {
+            "type": "number"
+          }
+        },
+        "required": ["name"],
+        "additionalProperties": true
+      },
+      "DynamicGraphMessage": {
+        "type": "object",
+        "description": "Values of dynamic graph lines, as in `GET /graph/dynamic-data`",
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DynamicGraphLine"
+            }
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/GraphPoint"
+              }
+            }
+          }
+        },
+        "required": ["lines", "data"]
+      },
+      "DeviceTask": {
+        "type": "object",
+        "description": "What a train does, in the terms of the device dashboard",
+        "properties": {
+          "side": {
+            "type": "string",
+            "description": "`A` or `B`"
+          },
+          "name": {
+            "type": "string",
+            "description": "e.g. `standby`, `recyclingWater`, `transfer`, `selfCleaning`, `buildingBioReactor`, `underService`"
+          },
+          "routine": {
+            "type": "string"
+          }
+        },
+        "required": ["name"]
+      },
+      "TimeLeftRecycling": {
+        "type": "object",
+        "properties": {
+          "side": {
+            "type": "string",
+            "description": "`A` or `B`"
+          },
+          "timeRemaining": {
+            "type": "number",
+            "description": "Minutes of cleaning left"
+          }
+        },
+        "required": ["side", "timeRemaining"]
+      },
+      "RecycleStatistics": {
+        "type": "object",
+        "properties": {
+          "totalWaterRecycled": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number",
+                "description": "Liters"
+              }
+            }
+          },
+          "recycledYesterday": {
+            "type": "number",
+            "description": "Liters"
+          }
+        },
+        "additionalProperties": true
+      },
+      "Notification": {
+        "type": "object",
+        "description": "A notification of the device for its owner",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "e.g. `device-major`, `device-minor` or `device-notice`"
+          },
+          "notification": {
+            "type": "string",
+            "description": "Translation key, e.g. `deviceSignals.bigLeakingToilet`, with `.title` and `.description` texts"
+          },
+          "data": {
+            "type": "object",
+            "description": "Values for the placeholders of the texts",
+            "additionalProperties": true
+          }
+        },
+        "required": ["type", "notification"],
+        "additionalProperties": true
+      },
+      "NotificationList": {
+        "type": "object",
+        "properties": {
+          "records": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Notification"
+            }
+          }
+        },
+        "required": ["records"]
+      },
+      "TimeLog": {
+        "type": "object",
+        "description": "A time log of a Hydraloop employee working on a device. Ended when `endTime` is set.",
+        "properties": {
+          "deviceId": {
+            "type": ["string", "null"]
+          },
+          "serialAlias": {
+            "type": "string"
+          },
+          "endTime": {
+            "type": ["string", "null"]
+          }
+        },
+        "additionalProperties": true
+      },
+      "CallParticipant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": ["id"],
+        "additionalProperties": true
+      },
+      "Empty": {
+        "description": "No payload is known. The HDM web app ignores it."
+      },
+      "RegisterPayload": {
+        "type": "array",
+        "description": "Subscribes to a room",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "description": "The room, e.g. `graph`"
+            }
+          },
+          "required": ["type"]
+        },
+        "minItems": 1,
+        "maxItems": 1
+      },
+      "TimeLeftRecyclingList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/TimeLeftRecycling"
+        }
+      },
+      "DeviceTaskList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/DeviceTask"
+        }
+      },
+      "EmptyObject": {
+        "type": "object",
+        "description": "Always an empty object",
+        "properties": {},
+        "additionalProperties": false
+      },
+      "CallRefresh": {
+        "type": "object",
+        "description": "Who asked for the call participants to be sent again",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Full name of the person, e.g. a user with the HDM web app open"
+          }
+        },
+        "required": ["name"]
+      }
+    }
+  }
+}
