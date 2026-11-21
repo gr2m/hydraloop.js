@@ -11,10 +11,15 @@
 //
 // Environment variables:
 //
-// - HYDRALOOP_OP_ITEM: the 1Password item with the username, password and
-//   one-time password of the HDM account, read with the 1Password CLI (`op`).
-//   Default: "Hydraloop HDM". Only used when the token can't be refreshed,
-//   e.g. after the computer slept for more than 30 minutes.
+// - HYDRALOOP_USERNAME, HYDRALOOP_PASSWORD, HYDRALOOP_TOTP_SECRET: the
+//   username, password and base32 one-time password secret of the HDM
+//   account. Used to sign in when all three are set.
+// - HYDRALOOP_OP_ITEM: otherwise, the 1Password item with the username,
+//   password and one-time password of the HDM account, read with the
+//   1Password CLI (`op`). Default: "Hydraloop HDM".
+//
+//   Signing in is only needed at the start and when the token can't be
+//   refreshed, e.g. after the computer slept for more than 30 minutes.
 // - HYDRALOOP_TOKEN: a token to start with instead of signing in, unless it
 //   expired
 // - HYDRALOOP_DEVICE_ID: the device, default: the first H600 of the account
@@ -30,6 +35,7 @@
 //   while someone has the graph open in the HDM web app.
 
 import { execFileSync } from "node:child_process";
+import { createHmac } from "node:crypto";
 import { appendFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -83,6 +89,20 @@ function validToken(token) {
 }
 
 async function signIn() {
+  const { HYDRALOOP_USERNAME, HYDRALOOP_PASSWORD, HYDRALOOP_TOTP_SECRET } =
+    process.env;
+  if (HYDRALOOP_USERNAME && HYDRALOOP_PASSWORD && HYDRALOOP_TOTP_SECRET) {
+    log(
+      "Signing in with HYDRALOOP_USERNAME, HYDRALOOP_PASSWORD and HYDRALOOP_TOTP_SECRET",
+    );
+    const auth = await new Hydraloop().login({
+      username: HYDRALOOP_USERNAME,
+      password: HYDRALOOP_PASSWORD,
+      totpCode: async () => totp(HYDRALOOP_TOTP_SECRET),
+    });
+    return auth.token;
+  }
+
   log(`Signing in with the 1Password item "${OP_ITEM}"`);
   const fields = JSON.parse(
     op(
@@ -105,6 +125,31 @@ async function signIn() {
     totpCode: async () => op("item", "get", OP_ITEM, "--otp"),
   });
   return auth.token;
+}
+
+/**
+ * The current one-time password (RFC 6238: SHA-1, 6 digits, 30 seconds)
+ *
+ * @param {string} secret base32 encoded
+ */
+function totp(secret) {
+  const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  const bits = [...secret.toUpperCase().replace(/[\s=]/g, "")]
+    .map((char) => {
+      const index = ALPHABET.indexOf(char);
+      if (index === -1) throw new Error("HYDRALOOP_TOTP_SECRET is not base32");
+      return index.toString(2).padStart(5, "0");
+    })
+    .join("");
+  const key = Buffer.from(
+    (bits.match(/.{8}/g) ?? []).map((byte) => parseInt(byte, 2)),
+  );
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30_000)));
+  const hmac = createHmac("sha1", key).update(counter).digest();
+  const offset = hmac[hmac.length - 1] & 0xf;
+  const code = (hmac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000;
+  return String(code).padStart(6, "0");
 }
 
 /** @param {string[]} args */

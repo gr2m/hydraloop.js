@@ -3,12 +3,15 @@
 // HDM API (the one the HDM web app uses), which is not meant for external
 // use and may change at any time. See readme.md in this folder.
 //
-// Credentials (incl. the one-time password) are read from the 1Password item
-// "Hydraloop HDM" via the `op` CLI (override the item with
+// Credentials are read from HYDRALOOP_USERNAME, HYDRALOOP_PASSWORD and
+// HYDRALOOP_TOTP_SECRET (the base32 one-time password secret) when all three
+// are set. Otherwise they are read (incl. the one-time password) from the
+// 1Password item "Hydraloop HDM" via the `op` CLI (override the item with
 // HYDRALOOP_OP_ITEM). Without `op`, it prompts for them instead.
-// Run with: node examples/internal/tank-levels.js
+// Run with: node --env-file=.env examples/internal/tank-levels.js
 
 import { execFileSync } from "node:child_process";
+import { createHmac } from "node:crypto";
 import { createInterface } from "node:readline";
 
 const ROOT_API_URL = "https://hdm.hydraloop.com/api-root";
@@ -73,18 +76,58 @@ function op(...args) {
   }
 }
 
+/**
+ * The current one-time password (RFC 6238: SHA-1, 6 digits, 30 seconds)
+ *
+ * @param {string} secret base32 encoded
+ * @returns {string}
+ */
+function totp(secret) {
+  const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+  const bits = [...secret.toUpperCase().replace(/[\s=]/g, "")]
+    .map((char) => {
+      const index = ALPHABET.indexOf(char);
+      if (index === -1) throw new Error("HYDRALOOP_TOTP_SECRET is not base32");
+      return index.toString(2).padStart(5, "0");
+    })
+    .join("");
+  const key = Buffer.from(
+    (bits.match(/.{8}/g) ?? []).map((byte) => parseInt(byte, 2)),
+  );
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30_000)));
+  const hmac = createHmac("sha1", key).update(counter).digest();
+  const offset = hmac[hmac.length - 1] & 0xf;
+  const code = (hmac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000;
+  return String(code).padStart(6, "0");
+}
+
+const { HYDRALOOP_USERNAME, HYDRALOOP_PASSWORD, HYDRALOOP_TOTP_SECRET } =
+  process.env;
+
 let username, password, getTotpCode;
-const opCredentials = op(
-  "item",
-  "get",
-  OP_ITEM,
-  "--fields",
-  "username,password",
-  "--reveal",
-  "--format",
-  "json",
-);
-if (opCredentials) {
+const opCredentials =
+  HYDRALOOP_USERNAME && HYDRALOOP_PASSWORD && HYDRALOOP_TOTP_SECRET
+    ? null
+    : op(
+        "item",
+        "get",
+        OP_ITEM,
+        "--fields",
+        "username,password",
+        "--reveal",
+        "--format",
+        "json",
+      );
+if (HYDRALOOP_USERNAME && HYDRALOOP_PASSWORD && HYDRALOOP_TOTP_SECRET) {
+  username = HYDRALOOP_USERNAME;
+  password = HYDRALOOP_PASSWORD;
+  // Created only when needed, so the code is fresh when it is sent.
+  getTotpCode = async () => totp(HYDRALOOP_TOTP_SECRET);
+  console.log(
+    "Using credentials from HYDRALOOP_USERNAME, HYDRALOOP_PASSWORD and HYDRALOOP_TOTP_SECRET\n",
+  );
+} else if (opCredentials) {
   /** @type {{ id: string, value: string }[]} */
   const fields = JSON.parse(opCredentials);
   username = fields.find((f) => f.id === "username")?.value;

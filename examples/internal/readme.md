@@ -9,7 +9,9 @@ These examples call the internal Hydraloop Device Manager (HDM) API, the one the
 
 The internal API does not accept the `HYDRALOOP_API_KEY` used by the [external examples](../external/). It needs an HDM user account (username, password and a two-factor one-time password).
 
-The examples read the credentials from the 1Password item "Hydraloop HDM" using the [1Password CLI](https://developer.1password.com/docs/cli/) (`op`). The item needs `username` and `password` fields and a one-time password. To use a different item, set `HYDRALOOP_OP_ITEM`. Without `op`, the examples prompt for the credentials instead.
+The examples read the credentials from the environment variables `HYDRALOOP_USERNAME`, `HYDRALOOP_PASSWORD` and `HYDRALOOP_TOTP_SECRET` (the base32 secret of the one-time password, e.g. the `secret` parameter of an `otpauth://` URL) when all three are set, e.g. in `.env`.
+
+Otherwise, the examples read the credentials from the 1Password item "Hydraloop HDM" using the [1Password CLI](https://developer.1password.com/docs/cli/) (`op`). The item needs `username` and `password` fields and a one-time password. To use a different item, set `HYDRALOOP_OP_ITEM`. Without `op`, the examples prompt for the credentials instead.
 
 The login flow is:
 
@@ -22,7 +24,7 @@ The login flow is:
 From the repository root:
 
 ```bash
-node examples/internal/<name>.js
+node --env-file-if-exists=.env examples/internal/<name>.js
 ```
 
 ## Available Examples
