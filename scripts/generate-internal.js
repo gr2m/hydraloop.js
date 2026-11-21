@@ -12,8 +12,12 @@
 //   lib/internal/<api>/index.js    binds all functions to the SDK state
 //   lib/internal/<api>-types.d.ts  schema types and the method signatures
 //
-// It also writes the list of all methods into readme.internal.md. Everything
-// else in lib/internal/ is written by hand.
+// It also writes the list of all methods into readme.internal.md.
+//
+// From the AsyncAPI document of the socket API in spec/socket/asyncapi.json,
+// written by hand, it generates lib/internal/socket-types.d.ts and the list of
+// socket messages in readme.internal.md. Everything else in lib/internal/ is
+// written by hand.
 
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -23,6 +27,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, "..");
 const LIB_DIR = join(ROOT_DIR, "lib", "internal");
 const README_PATH = join(ROOT_DIR, "readme.internal.md");
+const SOCKET_SPEC_PATH = join(ROOT_DIR, "spec", "socket", "asyncapi.json");
+
+/** The server of the socket API that `hydraloop.local.subscribe()` connects to */
+const SOCKET_SERVER = "device";
 
 const APIS = [
   {
@@ -94,13 +102,27 @@ for (const api of APIS) {
   console.log(`${api.name}: ${count} operations in ${tags.size} namespaces`);
 }
 
+const socketSpec = JSON.parse(readFileSync(SOCKET_SPEC_PATH, "utf8"));
+writeFileSync(
+  join(LIB_DIR, "socket-types.d.ts"),
+  generateSocketTypes(socketSpec),
+);
+console.log(
+  `socket: ${Object.keys(socketSpec.components.messages).length} messages in ${Object.keys(socketSpec.channels).length} channels`,
+);
+
 const readme = readFileSync(README_PATH, "utf8");
 writeFileSync(
   README_PATH,
-  readme.replace(
-    /(<!-- BEGIN GENERATED METHODS -->\n)[\s\S]*(<!-- END GENERATED METHODS -->)/,
-    `$1\n${methodLists.join("\n\n")}\n\n$2`,
-  ),
+  readme
+    .replace(
+      /(<!-- BEGIN GENERATED METHODS -->\n)[\s\S]*(<!-- END GENERATED METHODS -->)/,
+      `$1\n${methodLists.join("\n\n")}\n\n$2`,
+    )
+    .replace(
+      /(<!-- BEGIN GENERATED SOCKET MESSAGES -->\n)[\s\S]*(<!-- END GENERATED SOCKET MESSAGES -->)/,
+      `$1\n${generateSocketMessageList(socketSpec)}\n\n$2`,
+    ),
 );
 
 /**
@@ -473,6 +495,14 @@ function queryParamType(param, indent) {
  * @returns {string}
  */
 function schemaToType(schema, indent) {
+  // JSON Schema (AsyncAPI) marks nullable values with a type array
+  if (Array.isArray(schema.type)) {
+    return schema.type
+      .map((/** @type {string} */ type) =>
+        type === "null" ? "null" : baseType({ ...schema, type }, indent),
+      )
+      .join(" | ");
+  }
   const type = baseType(schema, indent);
   return schema.nullable ? `${type} | null` : type;
 }
@@ -545,7 +575,11 @@ function objectType(schema, indent) {
     const optional = required.includes(name) ? "" : "?";
     return `${doc}${indent}  ${propertyName(name)}${optional}: ${schemaToType(prop, `${indent}  `)};`;
   });
-  if (!properties.length) return "{}";
+  if (!properties.length) {
+    return schema.additionalProperties === false
+      ? "Record<string, never>"
+      : "{}";
+  }
   return `{\n${properties.join("\n")}\n${indent}}`;
 }
 
@@ -561,6 +595,119 @@ function docComment(text, indent) {
     ...lines.map((line) => `${indent} * ${line}`.trimEnd()),
     `${indent} */`,
   ].join("\n");
+}
+
+// ── Socket API ─────────────────────────────────────────────────────────────
+
+/**
+ * The rooms (channels) of a server of the socket API, with their messages.
+ *
+ * @param {any} spec
+ * @param {string} [server] all servers if not set
+ * @returns {{ room: string, server: string, description: string, messages: any[] }[]}
+ */
+function socketRooms(spec, server) {
+  return Object.values(spec.channels)
+    .filter((channel) => channel.servers)
+    .map((channel) => ({
+      room: channel.address,
+      server: channel.servers[0].$ref.split("/").pop(),
+      description: channel.description ?? "",
+      messages: Object.values(channel.messages).map(
+        (/** @type {any} */ message) =>
+          spec.components.messages[message.$ref.split("/").pop()],
+      ),
+    }))
+    .filter((room) => !server || room.server === server);
+}
+
+/**
+ * @param {any} spec
+ */
+function generateSocketTypes(spec) {
+  const schemas = Object.entries(spec.components.schemas).map(
+    ([name, schema]) => {
+      const description = schema.description
+        ? `${docComment(schema.description, "")}\n`
+        : "";
+      if (
+        schema.type === "object" &&
+        Object.keys(schema.properties ?? {}).length &&
+        !schema.additionalProperties
+      ) {
+        return `${description}export interface ${name} ${objectType(schema, "")}`;
+      }
+      return `${description}export type ${name} = ${schemaToType(schema, "")};`;
+    },
+  );
+
+  const messages = Object.values(spec.components.messages)
+    .filter((message) => message.name !== "register")
+    .map((message) => {
+      const doc = [
+        message.summary,
+        message["x-observed"]
+          ? ""
+          : "Not observed with an owner account, the payload is taken from the HDM web app.",
+      ]
+        .filter(Boolean)
+        .join("\n\n");
+      return `${docComment(doc, "  ")}\n  ${JSON.stringify(message.name)}: ${schemaToType(message.payload, "  ")};`;
+    });
+
+  const rooms = socketRooms(spec, SOCKET_SERVER).map(
+    ({ room, description, messages }) =>
+      `${docComment(description, "  ")}\n  ${JSON.stringify(room)}: ${messages.map((m) => JSON.stringify(m.name)).join(" | ")};`,
+  );
+
+  return [
+    HEADER,
+    "",
+    schemas.join("\n\n"),
+    "",
+    "/** The payload of each message, by message name */",
+    "export interface SocketMessages {",
+    messages.join("\n"),
+    "}",
+    "",
+    "/** The rooms of the device socket, with the names of their messages */",
+    "export interface SocketRooms {",
+    rooms.join("\n"),
+    "}",
+    "",
+    "export type SocketRoom = keyof SocketRooms;",
+    "",
+    "/** A message of the given rooms, with its name and payload */",
+    "export type SocketMessage<R extends SocketRoom = SocketRoom> = {",
+    "  [N in SocketRooms[R]]: { name: N; payload: SocketMessages[N] };",
+    "}[SocketRooms[R]];",
+    "",
+  ].join("\n");
+}
+
+/**
+ * @param {any} spec
+ */
+function generateSocketMessageList(spec) {
+  const servers = spec.servers;
+  return socketRooms(spec)
+    .map(({ room, server, description, messages }) => {
+      const rows = messages.map((message) => {
+        const payload = message.payload.$ref.split("/").pop();
+        const summary = message.summary.replaceAll("|", "\\|");
+        return `| \`${message.name}\` | \`${payload}\` | ${summary} | ${message["x-observed"] ? "yes" : "no"} |`;
+      });
+      return [
+        `#### \`${room}\``,
+        "",
+        `${description.replace(/\.$/, "")}. ${servers[server].title}${server === SOCKET_SERVER ? "" : `, not supported by \`subscribe()\``}.`,
+        "",
+        "| Message | Payload | Summary | Observed |",
+        "| --- | --- | --- | --- |",
+        ...rows,
+      ].join("\n");
+    })
+    .join("\n\n");
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────

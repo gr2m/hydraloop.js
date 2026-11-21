@@ -109,6 +109,44 @@ Each device's data lives on a local server, the URL of which "might change depen
 - The local API requires a device-scoped token for these requests, in addition to the user token. The SDK gets it with `hydraloop.root.auth.tokenForDevice({ deviceId })` and caches it until shortly before it expires.
 - All other local API requests are sent to the `localApiUrl` option, or by default to the local API of your first device. Some of these endpoints require a device token as well (e.g. `hydraloop.local.graph.getIoNamesSensorOnly()`), so the SDK sends the one of your first device.
 
+### Real-time messages
+
+#### `hydraloop.local.subscribe(options)`
+
+Subscribes to the real-time messages of a device, which the HDM web app uses for its live views. The device pushes its graph values about every 3 seconds, and every change of a valve, pump, routine or setting as it happens. That is the same data as `getData()`, `getIo()`, `getRoutineData()` and `getTankTreatmentState()` of the local API, without polling.
+
+```js
+const subscription = hydraloop.local.subscribe({
+  deviceId,
+  rooms: ["graph", "device-state"],
+});
+
+for await (const message of subscription) {
+  if (message.name === "graph:routine") {
+    for (const routine of message.payload.routines) {
+      console.log(`${routine.side}: ${routine.name} ${routine.state}`);
+    }
+  }
+  if (message.name === "device-state:setting-value") {
+    console.log(`${message.payload.name} = ${message.payload.value}`);
+  }
+}
+```
+
+| Option         | Type                       | Description                                                                                                                |
+| -------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `deviceId`     | `string`                   | The device ID                                                                                                              |
+| `rooms`        | `SocketRoom[]`             | The rooms to receive the messages of, see [all socket messages](#all-socket-messages)                                      |
+| `signal`       | `AbortSignal`              | Ends the subscription when aborted                                                                                         |
+| `onConnect`    | `() => void`               | Called when connected and subscribed to the rooms, also after reconnecting                                                 |
+| `onDisconnect` | `(reason: string) => void` | Called when the connection is lost, e.g. when an HDM server restarts. The subscription reconnects with a new device token. |
+
+**Returns:** a `Subscription`, an async iterator of messages with their `name` (e.g. `graph:io`) and `payload`. The type of the messages follows from the rooms. `subscription.close()` ends it, as do `break` in a `for await` loop and the `signal`.
+
+Messages are queued until they are read. It reconnects until the subscription is ended, with a growing delay of up to 30 seconds. Messages sent while it was disconnected are lost, load them with the local API if needed. It ends with an error if the device's local API URL or token can't be loaded, e.g. for an expired user token.
+
+The socket API is not part of the OpenAPI specs. It is described in [`spec/socket/asyncapi.json`](spec/socket/asyncapi.json), an [AsyncAPI](https://www.asyncapi.com/) document written from the HDM web app's JavaScript and from listening to an H600. `subscribe()` uses the global `WebSocket` (Node.js 22+, browsers) and speaks the parts of the socket.io protocol that HDM uses itself, so it doesn't need the socket.io client.
+
 ### Types
 
 The types of the schemas in the specs are exported in two namespaces, one per API:
@@ -122,7 +160,14 @@ const data: Local.GraphRecords = await hydraloop.local.graph.getData({
 });
 ```
 
-Also exported are `HydraloopOptions`, `LoginOptions`, `RootApi` and `LocalApi` (the types of `hydraloop.root` and `hydraloop.local`).
+Also exported are `HydraloopOptions`, `LoginOptions`, `RootApi` and `LocalApi` (the types of `hydraloop.root` and `hydraloop.local`), and for `hydraloop.local.subscribe()`: `SubscribeOptions`, `Subscription`, and the `Socket` namespace with the payload types, `SocketMessages`, `SocketRoom` and `SocketMessage`:
+
+```ts
+import type { Socket } from "hydraloop/internal";
+
+function onRoutine(payload: Socket.RoutineMessage) {}
+const message: Socket.SocketMessage<"graph"> = /* … */;
+```
 
 About half of the operations have no response schema in the specs. Their methods resolve with `any`. The response types of the endpoints that regular users can access were checked against actual responses and corrected where needed, see [`spec/internal-patches/`](spec/internal-patches/).
 
@@ -146,7 +191,7 @@ The `authorization` and `additional-authorization` headers are redacted in `erro
 
 ## Development
 
-The endpoint methods (`lib/internal/root/`, `lib/internal/local/`), their types (`lib/internal/*-types.d.ts`) and the [list of all methods](#all-methods) below are generated from [`spec/internal/`](spec/internal/). Don't edit them by hand.
+The endpoint methods (`lib/internal/root/`, `lib/internal/local/`), their types (`lib/internal/*-types.d.ts`) and the [list of all methods](#all-methods) below are generated from [`spec/internal/`](spec/internal/). The types of the socket messages (`lib/internal/socket-types.d.ts`) and the [list of all socket messages](#all-socket-messages) are generated from [`spec/socket/asyncapi.json`](spec/socket/asyncapi.json), which is written by hand. Don't edit the generated files by hand.
 
 The specs are incomplete or wrong in places, e.g. many fields that can be `null` are not marked as nullable. Corrections are kept as [JSON merge patches](https://www.rfc-editor.org/rfc/rfc7386) in [`spec/internal-patches/`](spec/internal-patches/), which are applied to the specs before generating. To add a correction, edit the patch file of the API.
 
@@ -1205,6 +1250,133 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 </details>
 
 <!-- END GENERATED METHODS -->
+
+## All socket messages
+
+The rooms and messages of the [socket API](#real-time-messages), from [`spec/socket/asyncapi.json`](spec/socket/asyncapi.json). "Observed" means the message was seen with an owner account. The payloads of the other messages are taken from how the HDM web app uses them. Rooms the account has no permission for send nothing.
+
+<!-- BEGIN GENERATED SOCKET MESSAGES -->
+
+#### `graph`
+
+Live graph values, valves and routines, used by the graph of the HDM web app. Device socket.
+
+| Message               | Payload               | Summary                                                    | Observed |
+| --------------------- | --------------------- | ---------------------------------------------------------- | -------- |
+| `graph:graph`         | `GraphMessage`        | The latest value of each graph line, about every 3 seconds | yes      |
+| `graph:io`            | `IoMessage`           | A valve, pump or sensor changed, within about 0.1 seconds  | yes      |
+| `graph:routine`       | `RoutineMessage`      | A routine or sub-state of a train changed                  | yes      |
+| `graph:restart`       | `RestartPoint`        | The device controller restarted                            | yes      |
+| `graph:dynamic-graph` | `DynamicGraphMessage` | New values of dynamic graph lines                          | no       |
+
+#### `device-state`
+
+Settings the device reports, e.g. the time left of filth removal. Device socket.
+
+| Message                      | Payload        | Summary                       | Observed |
+| ---------------------------- | -------------- | ----------------------------- | -------- |
+| `device-state:setting-value` | `SettingValue` | The device reported a setting | yes      |
+
+#### `device-status`
+
+Whether the device is connected to HDM. Device socket.
+
+| Message                 | Payload       | Summary                                                          | Observed |
+| ----------------------- | ------------- | ---------------------------------------------------------------- | -------- |
+| `device-status:online`  | `EmptyObject` | The device connected to HDM                                      | yes      |
+| `device-status:offline` | `EmptyObject` | The device disconnected from HDM, e.g. for its scheduled restart | yes      |
+
+#### `maintenance`
+
+The status log. Device socket.
+
+| Message                        | Payload          | Summary                                                                                  | Observed |
+| ------------------------------ | ---------------- | ---------------------------------------------------------------------------------------- | -------- |
+| `maintenance:status-log-entry` | `StatusLogEntry` | A new entry of the status log, e.g. a device signal or a step of a maintenance procedure | no       |
+
+#### `output-priorities`
+
+The priorities of the outlets. Device socket.
+
+| Message                           | Payload        | Summary                                                   | Observed |
+| --------------------------------- | -------------- | --------------------------------------------------------- | -------- |
+| `output-priorities:setting-value` | `SettingValue` | The `prioritySettings` setting (group 100, id 53) changed | no       |
+
+#### `settings`
+
+Device settings, for the settings page of the HDM web app. Device socket.
+
+| Message                  | Payload        | Summary                  | Observed |
+| ------------------------ | -------------- | ------------------------ | -------- |
+| `settings:setting-value` | `SettingValue` | A device setting changed | no       |
+
+#### `fsm`
+
+State machines of the device, e.g. maintenance procedures. Device socket.
+
+| Message          | Payload         | Summary                           | Observed |
+| ---------------- | --------------- | --------------------------------- | -------- |
+| `fsm:transition` | `FsmTransition` | A state machine changed its state | no       |
+
+#### `device-progress`
+
+Firmware uploads. Device socket.
+
+| Message                    | Payload          | Summary                                                                                       | Observed |
+| -------------------------- | ---------------- | --------------------------------------------------------------------------------------------- | -------- |
+| `device-progress:progress` | `DeviceProgress` | Progress of a firmware upload. Also sent with percentage -1 when the device comes back online | yes      |
+
+#### `logging`
+
+The device log. Device socket.
+
+| Message         | Payload        | Summary                      | Observed |
+| --------------- | -------------- | ---------------------------- | -------- |
+| `logging:entry` | `LoggingEntry` | A new line of the device log | no       |
+
+#### `dashboard`
+
+The device dashboard of the HDM web app. Needs permissions owners don't have. Device socket.
+
+| Message                          | Payload                 | Summary                            | Observed |
+| -------------------------------- | ----------------------- | ---------------------------------- | -------- |
+| `dashboard:graph-data`           | `GraphMessage`          | Same as `graph:graph`              | no       |
+| `dashboard:io-data`              | `IoMessage`             | Same as `graph:io`                 | no       |
+| `dashboard:routine`              | `RoutineMessage`        | Same as `graph:routine`            | no       |
+| `dashboard:setting-value`        | `SettingValue`          | A setting the device reported      | no       |
+| `dashboard:time-left-recycling`  | `TimeLeftRecyclingList` | Minutes of cleaning left per train | no       |
+| `dashboard:latest-device-task`   | `DeviceTaskList`        | What each train does               | no       |
+| `dashboard:recycle-statistics`   | `RecycleStatistics`     | Recycled water totals              | no       |
+| `dashboard:firmware-upload-data` | `DeviceProgress`        | Progress of a firmware upload      | no       |
+
+#### `notifications`
+
+Notifications for the owner, e.g. of a leaking toilet. Notifications socket, not supported by `subscribe()`.
+
+| Message              | Payload            | Summary                                           | Observed |
+| -------------------- | ------------------ | ------------------------------------------------- | -------- |
+| `notifications:new`  | `Notification`     | A new notification                                | no       |
+| `notifications:list` | `NotificationList` | The current notifications, sent after registering | no       |
+
+#### `time-log`
+
+Time logs of Hydraloop employees. Person socket, not supported by `subscribe()`.
+
+| Message           | Payload   | Summary                     | Observed |
+| ----------------- | --------- | --------------------------- | -------- |
+| `time-log:update` | `TimeLog` | A time log started or ended | no       |
+
+#### `communication`
+
+Video calls of the HDM web app. Person socket, not supported by `subscribe()`.
+
+| Message                      | Payload           | Summary                                                                                                       | Observed |
+| ---------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------- | -------- |
+| `communication:in-call`      | `CallParticipant` | Someone joined a call                                                                                         | no       |
+| `communication:out-call`     | `CallParticipant` | Someone left a call                                                                                           | no       |
+| `communication:refresh-call` | `CallRefresh`     | The participants of calls should be sent again. Sent every few minutes while someone has the HDM web app open | yes      |
+
+<!-- END GENERATED SOCKET MESSAGES -->
 
 ## License
 

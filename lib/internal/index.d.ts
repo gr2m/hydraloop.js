@@ -1,9 +1,11 @@
 import type { AuthToken } from "./root-types.js";
 import type { RootApi } from "./root-types.js";
 import type { LocalApi } from "./local-types.js";
+import type { SocketMessage, SocketRoom } from "./socket-types.js";
 
 export type * as Root from "./root-types.js";
 export type * as Local from "./local-types.js";
+export type * as Socket from "./socket-types.js";
 export type { RootApi } from "./root-types.js";
 export type { LocalApi } from "./local-types.js";
 
@@ -27,6 +29,29 @@ export interface LoginOptions {
    */
   totpCode?: string | (() => string | Promise<string>);
   rememberDevice?: boolean;
+}
+
+export interface SubscribeOptions<R extends SocketRoom> {
+  /** The device ID */
+  deviceId: string;
+  /** The rooms to receive the messages of, e.g. `["graph", "device-state"]` */
+  rooms: R[];
+  /** Ends the subscription when aborted */
+  signal?: AbortSignal;
+  /** Called when connected and subscribed to the rooms, also after reconnecting */
+  onConnect?: () => void;
+  /** Called when the connection is lost. The subscription reconnects. */
+  onDisconnect?: (reason: string) => void;
+}
+
+/**
+ * Real-time messages of a device, as an async iterator. Ends with `close()`,
+ * a `break` in a `for await` loop, or the `signal` of the options.
+ */
+export interface Subscription<
+  R extends SocketRoom,
+> extends AsyncIterableIterator<SocketMessage<R>> {
+  close(): void;
 }
 
 export interface Route {
@@ -68,5 +93,13 @@ export declare class Hydraloop {
    * Methods of the local API (`/api-local`), grouped by tag. Requests for a
    * device are sent to the device's local API automatically.
    */
-  local: LocalApi;
+  local: LocalApi & {
+    /**
+     * Subscribes to the real-time messages of a device over the socket.io
+     * server of its local API. Reconnects when the connection is lost.
+     */
+    subscribe<R extends SocketRoom>(
+      options: SubscribeOptions<R>,
+    ): Subscription<R>;
+  };
 }

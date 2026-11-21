@@ -6,6 +6,8 @@ import type {
   LoginOptions,
   Root,
   Local,
+  Socket,
+  Subscription,
 } from "../../lib/internal/index.js";
 
 describe("hydraloop/internal types", () => {
@@ -77,6 +79,58 @@ describe("hydraloop/internal types", () => {
     expectTypeOf(
       hydraloop.local.graph.getLastKnownIoState({ deviceId: "device" }),
     ).resolves.toEqualTypeOf<Local.IoState[]>();
+  });
+
+  it("subscribe", async () => {
+    const hydraloop = new Hydraloop();
+    const subscription = hydraloop.local.subscribe({
+      deviceId: "device",
+      rooms: ["graph", "device-state"],
+      // Already aborted, so that nothing is requested
+      signal: AbortSignal.abort(),
+      onConnect: () => {},
+      onDisconnect: (reason) => expectTypeOf(reason).toEqualTypeOf<string>(),
+    });
+    expectTypeOf(subscription).toEqualTypeOf<
+      Subscription<"graph" | "device-state">
+    >();
+
+    for await (const message of subscription) {
+      // Only the messages of the subscribed rooms
+      expectTypeOf(message.name).toEqualTypeOf<
+        | "graph:graph"
+        | "graph:io"
+        | "graph:routine"
+        | "graph:restart"
+        | "graph:dynamic-graph"
+        | "device-state:setting-value"
+      >();
+      if (message.name === "graph:routine") {
+        expectTypeOf(message.payload).toEqualTypeOf<Socket.RoutineMessage>();
+        expectTypeOf(message.payload.routines[0].name).toEqualTypeOf<string>();
+      }
+      if (message.name === "device-state:setting-value") {
+        expectTypeOf(message.payload.value).toEqualTypeOf<number>();
+      }
+    }
+    subscription.close();
+
+    expectTypeOf<
+      Socket.SocketMessages["maintenance:status-log-entry"]
+    >().toEqualTypeOf<Socket.StatusLogEntry>();
+    expectTypeOf<Socket.StatusLogEntry["side"]>().toEqualTypeOf<
+      string | null | undefined
+    >();
+
+    const signal = AbortSignal.abort();
+    // @ts-expect-error unknown room
+    hydraloop.local.subscribe({
+      deviceId: "device",
+      rooms: ["unknown"],
+      signal,
+    });
+    // @ts-expect-error rooms are required
+    hydraloop.local.subscribe({ deviceId: "device", signal });
   });
 
   it("RequestError", () => {
