@@ -231,8 +231,10 @@ export type TimeLog = {
   endTime?: string | null;
 } & Record<string, unknown>;
 
+/** The person, as emitted by the HDM web app: `{ id, name }` with the id and name of its user */
 export type CallParticipant = {
   id: string;
+  name?: string;
 } & Record<string, unknown>;
 
 /** No payload is known. The HDM web app ignores it. */
@@ -259,7 +261,7 @@ export interface CallRefresh {
 
 /** The payload of each message, by message name */
 export interface SocketMessages {
-  /** The latest value of each graph line, about every 3 seconds */
+  /** The latest value of each graph line, about every 3 seconds while the live graph is active */
   "graph:graph": GraphMessage;
   /** A valve, pump or sensor changed, within about 0.1 seconds */
   "graph:io": IoMessage;
@@ -428,7 +430,7 @@ export interface SocketRooms {
     | "dashboard:latest-device-task"
     | "dashboard:recycle-statistics"
     | "dashboard:firmware-upload-data";
-  /** Video calls of the HDM web app. `communication:refresh-call` arrived on the device socket, the person socket sent nothing in six hours of listening. */
+  /** Video calls of the HDM web app. Every HDM web app that shows the device emits `in-call`, `out-call` and `refresh-call` on the device socket, which the server relays to the room, `refresh-call` without the id. */
   communication:
     | "communication:in-call"
     | "communication:out-call"
