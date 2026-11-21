@@ -113,7 +113,7 @@ Each device's data lives on a local server, the URL of which "might change depen
 
 #### `hydraloop.local.subscribe(options)`
 
-Subscribes to the real-time messages of a device, which the HDM web app uses for its live views. The device pushes its graph values about every 3 seconds, and every change of a valve, pump, routine or setting as it happens. That is the same data as `getData()`, `getIo()`, `getRoutineData()` and `getTankTreatmentState()` of the local API, without polling.
+Subscribes to the real-time messages of a device, which the HDM web app uses for its live views. The device pushes every change of a valve, pump, routine or setting as it happens, and its graph values about every 3 seconds while the live graph is active: the HDM web app keeps it active with `local.graph.setActiveHeartBeat()` every 90 seconds. Whether the changes also need it is not known yet, they were only observed while it was active. That is the same data as `getData()`, `getIo()`, `getRoutineData()` and `getTankTreatmentState()` of the local API, without polling.
 
 ```js
 const subscription = hydraloop.local.subscribe({
@@ -1261,13 +1261,13 @@ The rooms and messages of the [socket API](#real-time-messages), from [`spec/soc
 
 Live graph values, valves and routines, used by the graph of the HDM web app. Device socket.
 
-| Message               | Payload               | Summary                                                    | Observed |
-| --------------------- | --------------------- | ---------------------------------------------------------- | -------- |
-| `graph:graph`         | `GraphMessage`        | The latest value of each graph line, about every 3 seconds | yes      |
-| `graph:io`            | `IoMessage`           | A valve, pump or sensor changed, within about 0.1 seconds  | yes      |
-| `graph:routine`       | `RoutineMessage`      | A routine or sub-state of a train changed                  | yes      |
-| `graph:restart`       | `RestartPoint`        | The device controller restarted                            | yes      |
-| `graph:dynamic-graph` | `DynamicGraphMessage` | New values of dynamic graph lines                          | no       |
+| Message               | Payload               | Summary                                                                                   | Observed |
+| --------------------- | --------------------- | ----------------------------------------------------------------------------------------- | -------- |
+| `graph:graph`         | `GraphMessage`        | The latest value of each graph line, about every 3 seconds while the live graph is active | yes      |
+| `graph:io`            | `IoMessage`           | A valve, pump or sensor changed, within about 0.1 seconds                                 | yes      |
+| `graph:routine`       | `RoutineMessage`      | A routine or sub-state of a train changed                                                 | yes      |
+| `graph:restart`       | `RestartPoint`        | The device controller restarted                                                           | yes      |
+| `graph:dynamic-graph` | `DynamicGraphMessage` | New values of dynamic graph lines                                                         | no       |
 
 #### `device-state`
 
@@ -1368,7 +1368,7 @@ Time logs of Hydraloop employees. Person socket, not supported by `subscribe()`.
 
 #### `communication`
 
-Video calls of the HDM web app. `communication:refresh-call` arrived on the device socket, the person socket sent nothing in six hours of listening. Device socket.
+Video calls of the HDM web app. Every HDM web app that shows the device emits `in-call`, `out-call` and `refresh-call` on the device socket, which the server relays to the room, `refresh-call` without the id. Device socket.
 
 | Message                      | Payload           | Summary                                                                                                       | Observed |
 | ---------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------- | -------- |

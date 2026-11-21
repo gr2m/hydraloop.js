@@ -267,7 +267,7 @@
     "communication": {
       "address": "communication",
       "title": "communication",
-      "description": "Video calls of the HDM web app. `communication:refresh-call` arrived on the device socket, the person socket sent nothing in six hours of listening.",
+      "description": "Video calls of the HDM web app. Every HDM web app that shows the device emits `in-call`, `out-call` and `refresh-call` on the device socket, which the server relays to the room, `refresh-call` without the id.",
       "servers": [
         {
           "$ref": "#/servers/device"
@@ -418,11 +418,12 @@
       "graphGraph": {
         "name": "graph:graph",
         "title": "graph:graph",
-        "summary": "The latest value of each graph line, about every 3 seconds",
+        "summary": "The latest value of each graph line, about every 3 seconds while the live graph is active",
         "payload": {
           "$ref": "#/components/schemas/GraphMessage"
         },
-        "x-observed": true
+        "x-observed": true,
+        "description": "Sent while someone keeps the live graph active with `local.graph.setActiveHeartBeat()` (`POST /graph/active-heart-beat`), which the HDM web app calls every 90 seconds while its graph auto-refreshes. Without it, no `graph:graph` messages arrive."
       },
       "graphIo": {
         "name": "graph:io",
@@ -1325,8 +1326,12 @@
       },
       "CallParticipant": {
         "type": "object",
+        "description": "The person, as emitted by the HDM web app: `{ id, name }` with the id and name of its user",
         "properties": {
           "id": {
+            "type": "string"
+          },
+          "name": {
             "type": "string"
           }
         },
