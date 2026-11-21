@@ -1403,6 +1403,11 @@ export function FlowDiagram({
     io[IO.uvValve]?.on !== false;
   const t3Fill = fillOf(tanks.t3);
   const outletKind: Kind = supply.source === "backup" ? "mains" : "clean";
+  // UV-C passes on mains water only when circulation from T4 is its sole feed
+  const uvOutletKind: Kind =
+    t3.receivingFrom.length === 0 && circulatingThroughUv
+      ? outletKind
+      : "clean";
   const off = (connected: boolean | null) =>
     connected === false ? " is-disconnected" : "";
 
@@ -1502,7 +1507,7 @@ export function FlowDiagram({
       {/* UV and into T3 */}
       <Pipe
         d={`M500 ${UV_Y + 17} V540`}
-        kind="clean"
+        kind={uvOutletKind}
         active={t3ReceivingFromUv}
         open={io[IO.uvValve]?.on}
       />
@@ -1524,7 +1529,7 @@ export function FlowDiagram({
         x={500}
         y={(UV_Y + 17 + 540) / 2}
         vertical
-        kind="clean"
+        kind={uvOutletKind}
         io={io[IO.uvValve]}
         active={t3ReceivingFromUv}
         name={IO.uvValve}
@@ -1548,7 +1553,7 @@ export function FlowDiagram({
         y={540}
         bottom={t3Fill === undefined ? undefined : 640 - 100 * t3Fill}
         active={!!t3ReceivingFromUv}
-        kind="clean"
+        kind={uvOutletKind}
       />
 
       {/* T3 drain, out of T3's right side at its bottom, across from the
@@ -1580,27 +1585,28 @@ export function FlowDiagram({
       {/* T4 backup */}
       <BackupTank x={60} y={540} w={130} h={100} state={state} />
 
-      {/* Circulation: the distribution pump pushes T3 water around the right
-          of T3 into the top of UV. The T3 drain and train B's transfer pipe
+      {/* Circulation: the distribution pump pushes T3 water (T4 water while
+          the backup valve is set to T4) around the right of T3 into the top
+          of UV. The T3 drain and train B's transfer pipe
           pass behind it. At the top corners, the backwash pipes branch off up
           into the center of each T2's bottom */}
       <path d={`M700 ${backupY - 4} V${backupY + 4}`} className="pipe-gap" />
       <path d={`M700 ${UV_Y - 4} V${UV_Y + 4}`} className="pipe-gap" />
       <Pipe
         d={`M560 740 H700 V${RUN_Y}`}
-        kind="clean"
+        kind={outletKind}
         active={circulatingThroughUv || backwashing.A || backwashing.B}
         open={t3.circulating || backwash.A?.on || backwash.B?.on}
       />
       <Pipe
         d={`M700 ${RUN_Y} H500`}
-        kind="clean"
+        kind={outletKind}
         active={circulatingThroughUv || backwashing.A}
         open={t3.circulating || backwash.A?.on}
       />
       <Pipe
         d={`M500 ${RUN_Y} V${UV_Y - 17}`}
-        kind="clean"
+        kind={outletKind}
         active={circulatingThroughUv}
         open={t3.circulating}
       />
@@ -1610,7 +1616,7 @@ export function FlowDiagram({
           <g key={side}>
             <Pipe
               d={a ? `M500 ${RUN_Y} H300 V360` : `M700 ${RUN_Y} V360`}
-              kind="clean"
+              kind={outletKind}
               active={backwashing[side]}
               open={backwash[side]?.on}
             />
@@ -1618,7 +1624,7 @@ export function FlowDiagram({
               x={a ? 300 : 700}
               y={(RUN_Y + 360) / 2}
               vertical
-              kind="clean"
+              kind={outletKind}
               io={backwash[side]}
               active={backwashing[side]}
               name={sideIo("diffuser_backwash", side)}
@@ -1633,7 +1639,7 @@ export function FlowDiagram({
         x={500}
         y={(RUN_Y + UV_Y - 17) / 2}
         vertical
-        kind="clean"
+        kind={outletKind}
         io={io[IO.circulation]}
         active={circulatingThroughUv}
         name={IO.circulation}
