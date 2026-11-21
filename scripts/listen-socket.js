@@ -5,7 +5,9 @@
 //
 // Run with, e.g. all day on a Mac that shouldn't go to sleep:
 //
-//   caffeinate -i node --env-file=.env scripts/listen-socket.js [--heartbeat] [--log <file>]
+//   caffeinate -i node --env-file=.env scripts/listen-socket.js [--heartbeat]
+//
+// Every message is appended to logs/socket.json as a JSON line.
 //
 // Environment variables:
 //
@@ -13,7 +15,8 @@
 //   one-time password of the HDM account, read with the 1Password CLI (`op`).
 //   Default: "Hydraloop HDM". Only used when the token can't be refreshed,
 //   e.g. after the computer slept for more than 30 minutes.
-// - HYDRALOOP_TOKEN: a token to start with instead of signing in
+// - HYDRALOOP_TOKEN: a token to start with instead of signing in, unless it
+//   expired
 // - HYDRALOOP_DEVICE_ID: the device, default: the first H600 of the account
 // - DRIFT_GITHUB_TOKEN: a fine-grained token that can write the issues of the
 //   repository. Without it, deviations are only printed.
@@ -25,10 +28,11 @@
 //   `local.graph.setActiveHeartBeat()` every 90 seconds, as the HDM web app
 //   does while it shows the graph. Without it, `graph:graph` only arrives
 //   while someone has the graph open in the HDM web app.
-// - --log <file>: append every message to the file as a JSON line
 
 import { execFileSync } from "node:child_process";
-import { appendFileSync } from "node:fs";
+import { appendFileSync, mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { setTimeout as sleep } from "node:timers/promises";
 import { parseArgs } from "node:util";
 
@@ -38,10 +42,15 @@ import { checkMessage, reportDrift, ROOMS } from "./socket-drift.js";
 const { values: options } = parseArgs({
   options: {
     heartbeat: { type: "boolean", default: false },
-    log: { type: "string" },
   },
 });
 
+const LOG_FILE = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "logs",
+  "socket.json",
+);
 const OP_ITEM = process.env.HYDRALOOP_OP_ITEM ?? "Hydraloop HDM";
 const GITHUB_TOKEN = process.env.DRIFT_GITHUB_TOKEN;
 /** HDM tokens expire after 30 minutes */
@@ -54,8 +63,24 @@ const log = (...args) => console.log(new Date().toISOString(), ...args);
 
 // The SDK keeps the token it was created with, so a new client is created
 // for every new token
-let token = process.env.HYDRALOOP_TOKEN || (await signIn());
+let token = validToken(process.env.HYDRALOOP_TOKEN) ?? (await signIn());
 let client = new Hydraloop({ token });
+
+/**
+ * The token, unless it expires within a minute
+ *
+ * @param {string | undefined} token
+ */
+function validToken(token) {
+  try {
+    const { exp } = JSON.parse(
+      Buffer.from(String(token).split(".")[1], "base64url").toString("utf8"),
+    );
+    return exp * 1000 - Date.now() > 60_000 ? token : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 async function signIn() {
   log(`Signing in with the 1Password item "${OP_ITEM}"`);
@@ -141,6 +166,8 @@ setInterval(() => {
   counts.clear();
 }, SUMMARY_INTERVAL);
 
+mkdirSync(dirname(LOG_FILE), { recursive: true });
+
 log(
   `Listening to device ${deviceId}, rooms: ${ROOMS.join(", ")}`,
   GITHUB_TOKEN ? "" : "(DRIFT_GITHUB_TOKEN is not set, drift is only printed)",
@@ -158,13 +185,8 @@ while (true) {
   try {
     for await (const { name, payload } of subscription) {
       counts.set(name, (counts.get(name) ?? 0) + 1);
-      if (options.log) {
-        const at = new Date().toISOString();
-        appendFileSync(
-          options.log,
-          `${JSON.stringify({ at, name, payload })}\n`,
-        );
-      }
+      const at = new Date().toISOString();
+      appendFileSync(LOG_FILE, `${JSON.stringify({ at, name, payload })}\n`);
       const drift = checkMessage(name, payload);
       if (drift && !reported.has(drift.hash)) await report(drift, payload);
     }

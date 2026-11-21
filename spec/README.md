@@ -54,10 +54,10 @@ The [`hydraloop/internal`](../readme.internal.md) SDK generates the types of the
 To find messages the spec doesn't know or describes differently, run [`scripts/listen-socket.js`](../scripts/listen-socket.js) in the background, e.g. all day:
 
 ```bash
-caffeinate -i node --env-file=.env scripts/listen-socket.js --log socket.jsonl
+caffeinate -i node --env-file=.env scripts/listen-socket.js
 ```
 
-It checks every message against a strict copy of the spec, in which fields the spec doesn't list are deviations too ([`scripts/socket-drift.js`](../scripts/socket-drift.js)). Messages with an unknown name, a payload that doesn't match, or that the spec only inferred (`x-observed: false`) are reported once per fingerprint: the message name and where in the schema it differs. With `DRIFT_GITHUB_TOKEN` in `.env`, a fine-grained token that can write the issues of this repository, each one becomes an issue with the `asyncapi-drift` label, with strings other than timestamps and identifiers removed from the sample. An issue is not created again while it is among the 100 most recent ones with that label, open or closed. The top of the script lists its other options, e.g. `--heartbeat` to keep the live graph active, as `graph:graph` only arrives while it is.
+It checks every message against a strict copy of the spec, in which fields the spec doesn't list are deviations too ([`scripts/socket-drift.js`](../scripts/socket-drift.js)). Messages with an unknown name, a payload that doesn't match, or that the spec only inferred (`x-observed: false`) are reported once per fingerprint: the message name and where in the schema it differs. With `DRIFT_GITHUB_TOKEN` in `.env`, a fine-grained token that can write the issues of this repository, each one becomes an issue with the `asyncapi-drift` label, with strings other than timestamps and identifiers removed from the sample. An issue is not created again while it is among the 100 most recent ones with that label, open or closed. Every message is appended to `logs/socket.json` as a JSON line. The top of the script lists its other options, e.g. `--heartbeat` to keep the live graph active, as `graph:graph` only arrives while it is.
 
 ## Stability
 

@@ -1,5 +1,6 @@
 .gregor
 .env
 coverage
+logs
 node_modules
 .next
