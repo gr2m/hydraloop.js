@@ -1368,7 +1368,7 @@ Time logs of Hydraloop employees. Person socket, not supported by `subscribe()`.
 
 #### `communication`
 
-Video calls of the HDM web app. Person socket, not supported by `subscribe()`.
+Video calls of the HDM web app. `communication:refresh-call` arrived on the device socket, the person socket sent nothing in six hours of listening. Device socket.
 
 | Message                      | Payload           | Summary                                                                                                       | Observed |
 | ---------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------- | -------- |
