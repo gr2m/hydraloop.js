@@ -428,6 +428,11 @@ export interface SocketRooms {
     | "dashboard:latest-device-task"
     | "dashboard:recycle-statistics"
     | "dashboard:firmware-upload-data";
+  /** Video calls of the HDM web app. `communication:refresh-call` arrived on the device socket, the person socket sent nothing in six hours of listening. */
+  communication:
+    | "communication:in-call"
+    | "communication:out-call"
+    | "communication:refresh-call";
 }
 
 export type SocketRoom = keyof SocketRooms;

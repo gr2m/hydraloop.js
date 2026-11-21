@@ -36,7 +36,7 @@
       "pathname": "/api-root/root-socket.io",
       "protocol": "wss",
       "title": "Person socket",
-      "description": "Messages for the logged in person, e.g. time logs and calls. Authenticates with the user token.",
+      "description": "Messages for the logged in person, e.g. time logs. Authenticates with the user token.",
       "security": [
         {
           "$ref": "#/components/securitySchemes/userToken"
@@ -267,8 +267,11 @@
     "communication": {
       "address": "communication",
       "title": "communication",
-      "description": "Video calls of the HDM web app",
+      "description": "Video calls of the HDM web app. `communication:refresh-call` arrived on the device socket, the person socket sent nothing in six hours of listening.",
       "servers": [
+        {
+          "$ref": "#/servers/device"
+        },
         {
           "$ref": "#/servers/person"
         }
