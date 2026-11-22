@@ -405,7 +405,7 @@
         "type": "httpApiKey",
         "name": "token",
         "in": "query",
-        "description": "The device token from `POST /api-root/auth/token-for-device`, sent as `token` in the socket.io auth payload of the CONNECT packet, not as a query parameter."
+        "description": "The device token from `POST /api-root/auth/token-for-device`, sent as `token` in the socket.io auth payload of the CONNECT packet, not as a query parameter. It expires after 30 minutes, but works as a full user token: the root API accepts it as `Authorization: Bearer`, and `POST /api-root/auth/refresh-token` exchanges it for a user token."
       },
       "userToken": {
         "type": "httpApiKey",

@@ -145,6 +145,29 @@ for await (const message of subscription) {
 
 Messages are queued until they are read. It reconnects until the subscription is ended, with a growing delay of up to 30 seconds. Messages sent while it was disconnected are lost, load them with the local API if needed. It ends with an error if the device's local API URL or token can't be loaded, e.g. for an expired user token.
 
+#### `subscribe(options)` of `hydraloop/internal/socket`
+
+The same subscription for a browser that gets the device token from a server, so that it doesn't need the user token. Instead of `deviceId`, it takes `connect()`, which returns the local API URL and a device token before every connection attempt. The module has no other imports, so it doesn't add the endpoint methods to a browser bundle.
+
+```js
+import { subscribe } from "hydraloop/internal/socket";
+
+const subscription = subscribe({
+  rooms: ["graph"],
+  // e.g. a route of your server that calls `root.auth.tokenForDevice()`
+  connect: async ({ refused }) => {
+    const response = await fetch("/api/socket", { method: "POST" });
+    const { localApiUrl, token } = await response.json();
+    return { localApiUrl, token };
+  },
+});
+```
+
+`refused` is `true` when the server refused the previous token. If `connect()` throws an error with a `response.status` below 500, such as a `RequestError`, the subscription ends with that error, other errors are retried. The other options are those of `hydraloop.local.subscribe()`.
+
+> [!WARNING]
+> The device token works as a full user token: the root API accepts it as `Authorization: Bearer`, and `root.auth.refreshToken()` exchanges it for a user token that can be refreshed indefinitely. Only give it to the browser of the user it belongs to, and keep it in memory.
+
 The socket API is not part of the OpenAPI specs. It is described in [`spec/socket/asyncapi.json`](spec/socket/asyncapi.json), an [AsyncAPI](https://www.asyncapi.com/) document written from the HDM web app's JavaScript and from listening to an H600. `subscribe()` uses the global `WebSocket` (Node.js 22+, browsers) and speaks the parts of the socket.io protocol that HDM uses itself, so it doesn't need the socket.io client.
 
 ### Types

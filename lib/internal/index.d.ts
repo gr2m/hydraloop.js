@@ -1,7 +1,10 @@
 import type { AuthToken } from "./root-types.js";
 import type { RootApi } from "./root-types.js";
 import type { LocalApi } from "./local-types.js";
-import type { SocketMessage, SocketRoom } from "./socket-types.js";
+import type { SocketRoom } from "./socket-types.js";
+import type { SocketSubscribeOptions, Subscription } from "./socket.js";
+
+export type { SocketConnection, Subscription } from "./socket.js";
 
 export type * as Root from "./root-types.js";
 export type * as Local from "./local-types.js";
@@ -31,27 +34,12 @@ export interface LoginOptions {
   rememberDevice?: boolean;
 }
 
-export interface SubscribeOptions<R extends SocketRoom> {
+export interface SubscribeOptions<R extends SocketRoom> extends Omit<
+  SocketSubscribeOptions<R>,
+  "connect"
+> {
   /** The device ID */
   deviceId: string;
-  /** The rooms to receive the messages of, e.g. `["graph", "device-state"]` */
-  rooms: R[];
-  /** Ends the subscription when aborted */
-  signal?: AbortSignal;
-  /** Called when connected and subscribed to the rooms, also after reconnecting */
-  onConnect?: () => void;
-  /** Called when the connection is lost. The subscription reconnects. */
-  onDisconnect?: (reason: string) => void;
-}
-
-/**
- * Real-time messages of a device, as an async iterator. Ends with `close()`,
- * a `break` in a `for await` loop, or the `signal` of the options.
- */
-export interface Subscription<
-  R extends SocketRoom,
-> extends AsyncIterableIterator<SocketMessage<R>> {
-  close(): void;
 }
 
 export interface Route {
