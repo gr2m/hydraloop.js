@@ -138,6 +138,11 @@ export type Dataset = {
    * reported. Only loaded for the live views.
    */
   cleaningTimeLeft?: Partial<Record<Side, { t: number; ms: number }>>;
+  /**
+   * Calibration tables of T2 and T3, to convert the pressure points of live
+   * messages to liters in the browser. Undefined if they could not be loaded.
+   */
+  levelTables?: { t1t2: LevelTable; t3: LevelTable };
   /** Data that could not be loaded */
   warnings: string[];
 };

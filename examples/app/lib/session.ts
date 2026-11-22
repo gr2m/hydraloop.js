@@ -6,8 +6,11 @@ import { simulate, simulateMaintenance, simulateStats } from "./demo";
 import {
   loadDataset,
   loadMaintenance as loadHdmMaintenance,
+  loadSocketConnection as loadHdmSocketConnection,
   loadStats as loadHdmStats,
+  sendHeartbeat as sendHdmHeartbeat,
   type LoadOptions,
+  type SocketConnection,
 } from "./hdm";
 import type { Maintenance } from "./maintenance";
 import type { Dataset } from "./model";
@@ -43,6 +46,29 @@ export function loadStats(
 export function loadMaintenance(session: Session): Promise<Maintenance> {
   if (session.kind === "demo") return Promise.resolve(simulateMaintenance());
   return loadHdmMaintenance(session.token);
+}
+
+/** Undefined in demo mode, which simulates data instead of using the socket */
+export async function loadSocketConnection(
+  session: Session,
+): Promise<SocketConnection | undefined> {
+  if (session.kind === "demo") return undefined;
+  return loadHdmSocketConnection(session.token);
+}
+
+export async function sendHeartbeat(session: Session): Promise<void> {
+  if (session.kind === "demo") return;
+  await sendHdmHeartbeat(session.token);
+}
+
+/**
+ * Whether a request comes from a page of this app. Browsers send
+ * `Sec-Fetch-Site` with every request; requests without it (e.g. curl) carry
+ * no cookies of a browser either.
+ */
+export function isSameOrigin(request: Request) {
+  const site = request.headers.get("sec-fetch-site");
+  return site === null || site === "same-origin";
 }
 
 export function isUnauthorized(error: unknown) {

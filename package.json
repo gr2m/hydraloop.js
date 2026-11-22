@@ -11,6 +11,10 @@
     "./internal": {
       "types": "./lib/internal/index.d.ts",
       "import": "./lib/internal/index.js"
+    },
+    "./internal/socket": {
+      "types": "./lib/internal/socket.d.ts",
+      "import": "./lib/internal/socket.js"
     }
   },
   "main": "index.js",

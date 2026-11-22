@@ -113,7 +113,7 @@ Each device's data lives on a local server, the URL of which "might change depen
 
 #### `hydraloop.local.subscribe(options)`
 
-Subscribes to the real-time messages of a device, which the HDM web app uses for its live views. The device pushes every change of a valve, pump, routine or setting as it happens, and its graph values about every 3 seconds while the live graph is active: the HDM web app keeps it active with `local.graph.setActiveHeartBeat()` every 90 seconds. Whether the changes also need it is not known yet, they were only observed while it was active. That is the same data as `getData()`, `getIo()`, `getRoutineData()` and `getTankTreatmentState()` of the local API, without polling.
+Subscribes to the real-time messages of a device, which the HDM web app uses for its live views. The device pushes every change of a valve, pump, routine or setting as it happens, and its graph values about every 3 seconds, usually within a second. During one night they arrived in batches about once a minute instead, for reasons not known yet. The HDM web app calls `local.graph.setActiveHeartBeat()` every 90 seconds while it shows the graph, but the messages also arrived in real time without it. That is the same data as `getData()`, `getIo()`, `getRoutineData()` and `getTankTreatmentState()` of the local API, without polling.
 
 ```js
 const subscription = hydraloop.local.subscribe({
@@ -144,6 +144,29 @@ for await (const message of subscription) {
 **Returns:** a `Subscription`, an async iterator of messages with their `name` (e.g. `graph:io`) and `payload`. The type of the messages follows from the rooms. `subscription.close()` ends it, as do `break` in a `for await` loop and the `signal`.
 
 Messages are queued until they are read. It reconnects until the subscription is ended, with a growing delay of up to 30 seconds. Messages sent while it was disconnected are lost, load them with the local API if needed. It ends with an error if the device's local API URL or token can't be loaded, e.g. for an expired user token.
+
+#### `subscribe(options)` of `hydraloop/internal/socket`
+
+The same subscription for a browser that gets the device token from a server, so that it doesn't need the user token. Instead of `deviceId`, it takes `connect()`, which returns the local API URL and a device token before every connection attempt. The module has no other imports, so it doesn't add the endpoint methods to a browser bundle.
+
+```js
+import { subscribe } from "hydraloop/internal/socket";
+
+const subscription = subscribe({
+  rooms: ["graph"],
+  // e.g. a route of your server that calls `root.auth.tokenForDevice()`
+  connect: async ({ refused }) => {
+    const response = await fetch("/api/socket", { method: "POST" });
+    const { localApiUrl, token } = await response.json();
+    return { localApiUrl, token };
+  },
+});
+```
+
+`refused` is `true` when the server refused the previous token. If `connect()` throws an error with a `response.status` below 500, such as a `RequestError`, the subscription ends with that error, other errors are retried. The other options are those of `hydraloop.local.subscribe()`.
+
+> [!WARNING]
+> The device token works as a full user token: the root API accepts it as `Authorization: Bearer`, and `root.auth.refreshToken()` exchanges it for a user token that can be refreshed indefinitely. Only give it to the browser of the user it belongs to, and keep it in memory.
 
 The socket API is not part of the OpenAPI specs. It is described in [`spec/socket/asyncapi.json`](spec/socket/asyncapi.json), an [AsyncAPI](https://www.asyncapi.com/) document written from the HDM web app's JavaScript and from listening to an H600. `subscribe()` uses the global `WebSocket` (Node.js 22+, browsers) and speaks the parts of the socket.io protocol that HDM uses itself, so it doesn't need the socket.io client.
 
@@ -1261,13 +1284,13 @@ The rooms and messages of the [socket API](#real-time-messages), from [`spec/soc
 
 Live graph values, valves and routines, used by the graph of the HDM web app. Device socket.
 
-| Message               | Payload               | Summary                                                                                   | Observed |
-| --------------------- | --------------------- | ----------------------------------------------------------------------------------------- | -------- |
-| `graph:graph`         | `GraphMessage`        | The latest value of each graph line, about every 3 seconds while the live graph is active | yes      |
-| `graph:io`            | `IoMessage`           | A valve, pump or sensor changed, within about 0.1 seconds                                 | yes      |
-| `graph:routine`       | `RoutineMessage`      | A routine or sub-state of a train changed                                                 | yes      |
-| `graph:restart`       | `RestartPoint`        | The device controller restarted                                                           | yes      |
-| `graph:dynamic-graph` | `DynamicGraphMessage` | New values of dynamic graph lines                                                         | no       |
+| Message               | Payload               | Summary                                                           | Observed |
+| --------------------- | --------------------- | ----------------------------------------------------------------- | -------- |
+| `graph:graph`         | `GraphMessage`        | The latest value of each graph line, about every 3 seconds        | yes      |
+| `graph:io`            | `IoMessage`           | A valve, pump or sensor changed, usually within about 0.1 seconds | yes      |
+| `graph:routine`       | `RoutineMessage`      | A routine or sub-state of a train changed                         | yes      |
+| `graph:restart`       | `RestartPoint`        | The device controller restarted                                   | yes      |
+| `graph:dynamic-graph` | `DynamicGraphMessage` | New values of dynamic graph lines                                 | no       |
 
 #### `device-state`
 
