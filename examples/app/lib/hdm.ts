@@ -341,6 +341,7 @@ export async function loadDataset(
     manual: manualPoints,
     captions,
     routines: routineEvents,
+    levelTables: { t1t2: tableFor("t2a"), t3: tableFor("t3") },
     ventedBefore,
     behaviors: behaviorIntervals(
       (ioData?.behavior ?? []).map((b) => ({
@@ -359,6 +360,49 @@ export async function loadDataset(
         : undefined,
     warnings,
   };
+}
+
+export type SocketConnection = {
+  deviceId: string;
+  localApiUrl: string;
+  /**
+   * A device token. It works as a full user token, so it must only be given
+   * to the browser of the user it belongs to.
+   */
+  token: string;
+  expiresAt: number;
+};
+
+/** What the browser needs to open the device socket itself */
+export async function loadSocketConnection(
+  token: string,
+): Promise<SocketConnection> {
+  const entry = cached(token);
+  const { hydraloop } = entry;
+  const device = await remember(entry, "device", () => firstDevice(hydraloop));
+  // Always a new device token, as the browser asks after the old one was refused
+  const { token: deviceToken, expiresIn } =
+    await hydraloop.root.auth.tokenForDevice({ deviceId: device.id });
+  return {
+    deviceId: device.id,
+    localApiUrl: device.localApiUrl,
+    token: deviceToken,
+    expiresAt: Date.now() + expiresIn * 1000,
+  };
+}
+
+/**
+ * Keeps the live graph of the device active, as the HDM web app does every
+ * 90 seconds while it shows the graph. Without it, the socket sends no
+ * `graph:graph` messages.
+ */
+export async function sendHeartbeat(token: string): Promise<void> {
+  const entry = cached(token);
+  const { hydraloop } = entry;
+  const device = await remember(entry, "device", () => firstDevice(hydraloop));
+  await hydraloop.local.graph.setActiveHeartBeat({
+    body: { deviceId: device.id },
+  });
 }
 
 /**

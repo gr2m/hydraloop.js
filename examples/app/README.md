@@ -7,7 +7,7 @@ A Next.js app that shows the live and historic status of a Hydraloop H600, using
 
 ## Views
 
-**Overview** (`/`) answers the main questions at a glance and links to the details. It refreshes every 10 seconds:
+**Overview** (`/`) answers the main questions at a glance and links to the details. It updates live (see [Live updates](#live-updates)):
 
 - **Until the next cleaning**: how much more greywater the receiving train takes before it starts filth removal (see [Next filth removal](#next-filth-removal)).
 - **Until greywater goes to the drain**: the room for greywater in both trains (see [Room for greywater](#room-for-greywater)).
@@ -20,7 +20,7 @@ And for the last 30 days (see [30-day statistics](#30-day-statistics)):
 - **Greywater lost, both trains busy**: how long the bypass sent greywater to the drain because neither train accepted water, with every bypass episode and its cause.
 - **Fresh water instead of recycled**: an estimate of the backup water the outlets used.
 
-**Live** (`/live`) refreshes every 10 seconds and shows:
+**Live** (`/live`) updates live and shows:
 
 - A flow diagram of both treatment trains (T1 and T2 for A and B), UV-C, T3 storage, T4 backup and the outlets. Tank areas are to scale with their capacities: T1 holds about 24 L, T2 about 200 L and T3 about 280 L. T2 and T3 show their fill level in liters, T1 only in percent (see [Tank levels and capacities](#tank-levels-and-capacities)). Pipes are colored and animated only while a valve or pump signal shows water moving through them, and drawn with more contrast while their valves are open without water moving. The pipes from the distribution pump to the outlets are always pressurized, so they are always drawn open. On/off valves are parallel to their pipe while open and across it while closed. The bypass and A/B valves are triangles pointing to their inlet, filled where the water flows through them to the open outlet. Pump impellers spin while the pump runs. Hover any valve, pump or tank for its raw value.
 - The state of each train (the HDM routine and its sub-state), of storage and of the outlets, and when each train last received water and transferred to T3. Each state says how it was determined: **HDM routine**, **Valve signal**, or **Inferred**.
@@ -153,9 +153,21 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000 and sign in with your HDM account (username, password, and the one-time code if your account uses two-factor authentication). The token is stored in an httpOnly cookie and never reaches browser JavaScript.
+Open http://localhost:3000 and sign in with your HDM account (username, password, and the one-time code if your account uses two-factor authentication). The token is stored in an httpOnly cookie and never reaches browser JavaScript (but see [Live updates](#live-updates) for the device token).
 
 HDM tokens expire after 30 minutes. [`proxy.ts`](proxy.ts) exchanges the token for a new one (`root.auth.refreshToken()`, no new one-time code needed) on any request within 10 minutes of its expiry, and open pages ping the server every 4 minutes. So you stay signed in as long as a page of the app is open, also in a background tab. After all pages were closed for more than 30 minutes, you need to sign in again.
+
+### Live updates
+
+The overview and the live view load the last 8 hours over REST, then keep them current with the real-time messages of the device ([`components/use-live-dataset.tsx`](components/use-live-dataset.tsx), [`lib/live.ts`](lib/live.ts)). The browser opens the socket to HDM itself, with [`hydraloop/internal/socket`](../../readme.internal.md#real-time-messages), so the messages don't go through the server:
+
+- Before each connection attempt, it gets the local API URL and a new device token from [`/api/socket`](app/api/socket/route.ts).
+- It calls [`/api/heartbeat`](app/api/heartbeat/route.ts) every 90 seconds while the page is visible, as the HDM web app does while it shows the graph. With it, readings arrive within about a second.
+- It reloads over REST after every (re)connect, for what was sent while disconnected, and every 5 minutes, for what the socket doesn't send: firmware behaviors, outages, and T2 at the last venting.
+- In demo mode, or if the socket fails, it polls `/api/live` every 10 seconds instead.
+
+> [!IMPORTANT]
+> The device token works as a full HDM user token: the root API accepts it as `Authorization: Bearer`, and `root.auth.refreshToken()` turns it into a user token. So while a live page is open, browser JavaScript holds a token with access to the whole account, as it does in the HDM web app (which keeps the user token in `localStorage`). The app keeps it in memory only, `/api/socket` only answers requests of its own pages (`Sec-Fetch-Site`), and a Content Security Policy ([`next.config.ts`](next.config.ts)) only lets scripts connect to the app and to `wss://*.hydraloop.com`.
 
 To skip the login form, set `HYDRALOOP_TOKEN` to a token from a previous login, e.g. in `.env.local`.
 
@@ -163,20 +175,22 @@ To skip the login form, set `HYDRALOOP_TOKEN` to a token from a previous login, 
 
 ## Structure
 
-| Path                                                                                   | Purpose                                              |
-| -------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [`lib/hdm.ts`](lib/hdm.ts)                                                             | Loads and normalizes data with the SDK (server only) |
-| [`lib/model.ts`](lib/model.ts)                                                         | State at a point in time, phases, events, transfers  |
-| [`lib/stats.ts`](lib/stats.ts)                                                         | 30-day statistics                                    |
-| [`lib/demo.ts`](lib/demo.ts)                                                           | Simulated data                                       |
-| [`lib/maintenance.ts`](lib/maintenance.ts)                                             | Maintenance data: alerts, outages, vitals            |
-| [`lib/hdm-texts.ts`](lib/hdm-texts.ts)                                                 | Texts of the HDM web app, e.g. alert titles          |
-| [`app/api/live`](app/api/live/route.ts), [`app/api/history`](app/api/history/route.ts) | JSON for the live and history views                  |
-| [`app/api/stats`](app/api/stats/route.ts)                                              | JSON for the 30-day statistics                       |
-| [`components/overview.tsx`](components/overview.tsx)                                   | The overview                                         |
-| [`components/flow-diagram.tsx`](components/flow-diagram.tsx)                           | The flow diagram                                     |
-| [`components/timeline.tsx`](components/timeline.tsx)                                   | The history tracks                                   |
-| [`components/maintenance-view.tsx`](components/maintenance-view.tsx)                   | The maintenance view                                 |
+| Path                                                                                           | Purpose                                              |
+| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [`lib/hdm.ts`](lib/hdm.ts)                                                                     | Loads and normalizes data with the SDK (server only) |
+| [`lib/model.ts`](lib/model.ts)                                                                 | State at a point in time, phases, events, transfers  |
+| [`lib/stats.ts`](lib/stats.ts)                                                                 | 30-day statistics                                    |
+| [`lib/demo.ts`](lib/demo.ts)                                                                   | Simulated data                                       |
+| [`lib/maintenance.ts`](lib/maintenance.ts)                                                     | Maintenance data: alerts, outages, vitals            |
+| [`lib/hdm-texts.ts`](lib/hdm-texts.ts)                                                         | Texts of the HDM web app, e.g. alert titles          |
+| [`app/api/live`](app/api/live/route.ts), [`app/api/history`](app/api/history/route.ts)         | JSON for the live and history views                  |
+| [`app/api/socket`](app/api/socket/route.ts), [`app/api/heartbeat`](app/api/heartbeat/route.ts) | Device token and heartbeat for the live socket       |
+| [`lib/live.ts`](lib/live.ts)                                                                   | Applies socket messages to the live data             |
+| [`app/api/stats`](app/api/stats/route.ts)                                                      | JSON for the 30-day statistics                       |
+| [`components/overview.tsx`](components/overview.tsx)                                           | The overview                                         |
+| [`components/flow-diagram.tsx`](components/flow-diagram.tsx)                                   | The flow diagram                                     |
+| [`components/timeline.tsx`](components/timeline.tsx)                                           | The history tracks                                   |
+| [`components/maintenance-view.tsx`](components/maintenance-view.tsx)                           | The maintenance view                                 |
 
 The SDK is linked from the repository root (`"hydraloop": "file:../.."`).
 
