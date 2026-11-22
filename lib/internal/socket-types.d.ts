@@ -261,9 +261,9 @@ export interface CallRefresh {
 
 /** The payload of each message, by message name */
 export interface SocketMessages {
-  /** The latest value of each graph line, about every 3 seconds while the live graph is active */
+  /** The latest value of each graph line, about every 3 seconds */
   "graph:graph": GraphMessage;
-  /** A valve, pump or sensor changed, within about 0.1 seconds */
+  /** A valve, pump or sensor changed, usually within about 0.1 seconds */
   "graph:io": IoMessage;
   /** A routine or sub-state of a train changed */
   "graph:routine": RoutineMessage;

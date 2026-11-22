@@ -118,7 +118,7 @@ export function useLiveDataset(initial: Dataset) {
         });
         if (response.status === 401) expired();
       } catch {
-        // Tank levels arrive less often without it, the socket still works
+        // The socket also works without it
       }
     }
 

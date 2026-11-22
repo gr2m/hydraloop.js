@@ -418,21 +418,22 @@
       "graphGraph": {
         "name": "graph:graph",
         "title": "graph:graph",
-        "summary": "The latest value of each graph line, about every 3 seconds while the live graph is active",
+        "summary": "The latest value of each graph line, about every 3 seconds",
         "payload": {
           "$ref": "#/components/schemas/GraphMessage"
         },
         "x-observed": true,
-        "description": "Sent while someone keeps the live graph active with `local.graph.setActiveHeartBeat()` (`POST /graph/active-heart-beat`), which the HDM web app calls every 90 seconds while its graph auto-refreshes. Without it, no `graph:graph` messages arrive."
+        "description": "On 2026-11-22, the messages arrived within about a second of their time `x`, for 25 minutes without `local.graph.setActiveHeartBeat()` (`POST /graph/active-heart-beat`), which the HDM web app calls every 90 seconds while its graph auto-refreshes, and with it. During a night of listening (2026-11-21/22), they arrived in batches about once a minute, 0–60 seconds after their time, with `graph:io`, `graph:routine` and `device-state:setting-value` messages delayed the same way. Why is not known; whether the heartbeat was active then is not known either. The device clock may be ahead of the server's by a fraction of a second."
       },
       "graphIo": {
         "name": "graph:io",
         "title": "graph:io",
-        "summary": "A valve, pump or sensor changed, within about 0.1 seconds",
+        "summary": "A valve, pump or sensor changed, usually within about 0.1 seconds",
         "payload": {
           "$ref": "#/components/schemas/IoMessage"
         },
-        "x-observed": true
+        "x-observed": true,
+        "description": "Within about 0.1 seconds of the time `x` of the change on 2026-11-20 and 2026-11-22, but 0–60 seconds later, in batches about once a minute, during a night of listening (2026-11-21/22), see `graph:graph`."
       },
       "graphRoutine": {
         "name": "graph:routine",

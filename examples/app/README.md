@@ -162,7 +162,7 @@ HDM tokens expire after 30 minutes. [`proxy.ts`](proxy.ts) exchanges the token f
 The overview and the live view load the last 8 hours over REST, then keep them current with the real-time messages of the device ([`components/use-live-dataset.tsx`](components/use-live-dataset.tsx), [`lib/live.ts`](lib/live.ts)). The browser opens the socket to HDM itself, with [`hydraloop/internal/socket`](../../readme.internal.md#real-time-messages), so the messages don't go through the server:
 
 - Before each connection attempt, it gets the local API URL and a new device token from [`/api/socket`](app/api/socket/route.ts).
-- It calls [`/api/heartbeat`](app/api/heartbeat/route.ts) every 90 seconds while the page is visible, as the HDM web app does while it shows the graph. With it, readings arrive within about a second.
+- It calls [`/api/heartbeat`](app/api/heartbeat/route.ts) every 90 seconds while the page is visible, as the HDM web app does while it shows the graph. Readings also arrived within about a second without it, but it may be what makes the H600 report in real time instead of about once a minute.
 - It reloads over REST after every (re)connect, for what was sent while disconnected, and every 5 minutes, for what the socket doesn't send: firmware behaviors, outages, and T2 at the last venting.
 - In demo mode, or if the socket fails, it polls `/api/live` every 10 seconds instead.
 

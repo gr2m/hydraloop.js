@@ -393,8 +393,9 @@ export async function loadSocketConnection(
 
 /**
  * Keeps the live graph of the device active, as the HDM web app does every
- * 90 seconds while it shows the graph. Without it, the socket sends no
- * `graph:graph` messages.
+ * 90 seconds while it shows the graph. The socket also sent readings in real
+ * time without it, but it may be what keeps the H600 from reporting only
+ * about once a minute.
  */
 export async function sendHeartbeat(token: string): Promise<void> {
   const entry = cached(token);
