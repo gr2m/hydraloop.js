@@ -22,6 +22,14 @@ export const LIVE_ROOMS = ["graph", "device-state", "device-status"] as const;
 
 export type LiveMessage = SocketMessage<(typeof LIVE_ROOMS)[number]>;
 
+/** Messages with data the device reported */
+const DEVICE_DATA = new Set<LiveMessage["name"]>([
+  "graph:graph",
+  "graph:io",
+  "graph:routine",
+  "device-state:setting-value",
+]);
+
 const TANK_BY_LINE = Object.fromEntries(
   Object.entries(TANK_LINES).map(([id, line]) => [line, id as TankId]),
 ) as Record<string, TankId>;
@@ -83,6 +91,10 @@ export function applyMessages(
   const ds = copy(dataset);
 
   for (const message of messages) {
+    // Data from the device means it is online, e.g. after a restart whose
+    // `online` message was missed while the socket was disconnected
+    if (DEVICE_DATA.has(message.name)) ds.device.online = true;
+
     switch (message.name) {
       case "graph:graph":
         for (const [line, points] of Object.entries(message.payload)) {
