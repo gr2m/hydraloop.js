@@ -4,7 +4,7 @@
 
 The diagram shows the inlet and bypass, both treatment trains (T1 and T2 of A and B), UV-C, the T3 storage, the T4 backup and the outlets. Pipes are colored and animated while a routine, valve, pump or sensor signal shows water moving through them. Hover a valve, pump, sensor or tank for its raw value.
 
-The model (`stateAt`) derives that state from tank levels, IO signals, HDM routines and firmware behaviors, as loaded from the internal HDM API with [`hydraloop-internal`](../internal/readme.md). See the [example app](../../examples/app/README.md) for how the H600 was found to work.
+The model (`stateAt`) derives that state from tank levels, IO signals, HDM routines and firmware behaviors, as loaded from the internal HDM API with [`hydraloop-internal`](../internal/readme.md). See the [H600 dashboard](../../apps/h600.gr2m.dev/README.md) for how the H600 was found to work.
 
 > [!WARNING]
 > The model is derived from the data of one H600 (firmware 9.24), not documented by Hydraloop. Its results may change as the inference improves.
@@ -82,7 +82,7 @@ Times in the tooltips use the runtime's locale and time zone. As they can differ
 | `captions`                         | IO captions from `local.graph.getGraphConfig()`                                                                                   |
 | `demo`, `fetchedAt`, `warnings`, … | Not used by the model                                                                                                             |
 
-The example app builds it in [`lib/hdm.ts`](../../examples/app/lib/hdm.ts) and keeps it up to date from the device socket in [`lib/live.ts`](../../examples/app/lib/live.ts).
+The [H600 dashboard](../../apps/h600.gr2m.dev/README.md) builds it in [`lib/hdm.ts`](../../apps/h600.gr2m.dev/lib/hdm.ts) and keeps it up to date from the device socket in [`lib/live.ts`](../../apps/h600.gr2m.dev/lib/live.ts).
 
 ## Styles
 
@@ -111,6 +111,10 @@ The colors are custom properties on `:root` without specificity, so the page can
 | `--hl-font-family`                                                           | The diagram's text. Inherits the font if unset                                                          |
 
 The dark colors apply with `prefers-color-scheme: dark`, unless `<html data-theme="light">`, and with `<html data-theme="dark">`. Animations stop with `prefers-reduced-motion: reduce`.
+
+## Development
+
+Try the diagram with any state in the playground: https://hydraloop-diagram.gr2m.dev, source in [`apps/hydraloop-diagram.gr2m.dev`](../../apps/hydraloop-diagram.gr2m.dev/README.md).
 
 ## License
 

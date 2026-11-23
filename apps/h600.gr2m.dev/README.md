@@ -1,5 +1,7 @@
 # H600 dashboard
 
+https://h600.gr2m.dev
+
 A Next.js app that shows the live and historic status of a Hydraloop H600, using the internal HDM API through [`hydraloop-internal`](../../packages/internal/readme.md).
 
 > [!WARNING]

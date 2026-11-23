@@ -1,5 +1,5 @@
-// Renders the diagram for states of the simulated H600 of the example app
-// (`examples/app/lib/demo.ts`), one per kind of flow. `fixtures/states.json`
+// Renders the diagram for states of the simulated H600 of the H600 dashboard
+// (`apps/h600.gr2m.dev/lib/demo.ts`), one per kind of flow. `fixtures/states.json`
 // holds the `DeviceState` of the first moment of each flow in three
 // simulated days.
 

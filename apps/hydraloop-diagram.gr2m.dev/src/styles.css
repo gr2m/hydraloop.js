@@ -1,0 +1,347 @@
+/* The playground's own UI, after Vercel's design guidelines
+   (https://vercel.com/design.md): monochrome Geist tokens, 36px controls,
+   spacing over borders. The diagram keeps the colors of src/styles.css. */
+
+:root {
+  color-scheme: light dark;
+
+  --pg-bg-100: light-dark(oklch(1 0 0), oklch(0 0 0));
+  --pg-bg-200: light-dark(oklch(0.984 0 0), oklch(0.027 0 0));
+  --pg-gray-100: light-dark(oklch(0.961 0 0), oklch(0.218 0 0));
+  --pg-gray-700: oklch(0.65 0 0);
+  --pg-gray-900: light-dark(oklch(0.42 0 0), oklch(0.706 0 0));
+  --pg-gray-1000: light-dark(oklch(0.205 0 0), oklch(0.946 0 0));
+  --pg-alpha-200: light-dark(oklch(0 0 0 / 0.081), oklch(1 0 0 / 0.09));
+  --pg-alpha-300: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.13));
+  --pg-alpha-400: light-dark(oklch(0 0 0 / 0.08), oklch(1 0 0 / 0.14));
+  --pg-alpha-700: light-dark(oklch(0 0 0 / 0.44), oklch(1 0 0 / 0.54));
+  --pg-focus: light-dark(
+    oklch(57.61% 0.2508 258.23),
+    oklch(71.7% 0.1648 250.794)
+  );
+
+  --pg-text: var(--pg-gray-1000);
+  --pg-text-secondary: var(--pg-gray-900);
+  --pg-border-subtle: var(--pg-alpha-300);
+  --pg-border: var(--pg-alpha-400);
+  --pg-border-strong: var(--pg-alpha-700);
+
+  --pg-control: 36px;
+  --pg-radius: 6px;
+  --pg-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  /* The background behind the diagram, which fills the gaps of crossing pipes */
+  background: var(--hl-bg);
+  color: var(--pg-text);
+  font-family: "Geist", system-ui, sans-serif;
+  font-size: 0.875rem;
+  line-height: 20px;
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 0,
+    "ss11" 1;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+h2 {
+  margin: 0 0 8px;
+  font-size: 0.875rem;
+  line-height: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+p {
+  text-wrap: pretty;
+}
+code {
+  font-family: var(--pg-mono);
+  font-size: 0.8125rem;
+  padding: 0 4px;
+  border: 1px solid var(--pg-border-subtle);
+  border-radius: 4px;
+  background: var(--pg-gray-100);
+}
+
+.meta {
+  margin: 2px 0 0;
+  font-family: var(--pg-mono);
+  font-size: 0.8125rem;
+  color: var(--pg-text-secondary);
+}
+.hint {
+  margin: 0 0 8px;
+  font-size: 0.8125rem;
+  line-height: 18px;
+  color: var(--pg-text-secondary);
+}
+
+/* ── Controls ───────────────────────────────────────────────────────────── */
+
+button,
+select,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  min-height: var(--pg-control);
+  padding: 7px 12px;
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius);
+  background: var(--pg-bg-100);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+button:hover {
+  background: var(--pg-alpha-200);
+}
+button:active {
+  background: var(--pg-alpha-300);
+}
+button[aria-pressed="true"] {
+  background: var(--pg-gray-1000);
+  border-color: var(--pg-gray-1000);
+  color: var(--pg-bg-100);
+}
+
+select,
+input:not([type]),
+input[type="number"] {
+  min-height: var(--pg-control);
+  width: 100%;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 1px solid var(--pg-border);
+  border-radius: var(--pg-radius);
+  background: var(--pg-bg-100);
+  transition: border-color 150ms ease;
+}
+select:hover,
+input:not([type]):hover,
+input[type="number"]:hover {
+  border-color: var(--pg-border-strong);
+}
+input:not([type]) {
+  font-family: var(--pg-mono);
+  font-size: 0.8125rem;
+}
+input[type="number"] {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+input:disabled,
+select:disabled {
+  background: var(--pg-gray-100);
+  color: var(--pg-gray-700);
+}
+input[type="range"],
+input[type="checkbox"] {
+  accent-color: var(--pg-gray-1000);
+}
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+:is(a, button, input, select, summary):focus-visible {
+  outline: 2px solid var(--pg-focus);
+  outline-offset: 3px;
+}
+
+/* Toggle group: the buttons share their borders */
+.segmented {
+  display: inline-flex;
+}
+.segmented button {
+  min-height: 32px;
+  padding: 5px 10px;
+  border-radius: 0;
+}
+.segmented button + button {
+  margin-left: -1px;
+}
+.segmented button:first-child {
+  border-radius: var(--pg-radius) 0 0 var(--pg-radius);
+}
+.segmented button:last-child {
+  border-radius: 0 var(--pg-radius) var(--pg-radius) 0;
+}
+.segmented button[aria-pressed="true"] {
+  position: relative;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--pg-control);
+  cursor: pointer;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+
+.layout {
+  display: grid;
+  grid-template-columns: 440px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.controls {
+  position: sticky;
+  top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding: 24px;
+  background: var(--pg-bg-200);
+  border-right: 1px solid var(--pg-border-subtle);
+}
+.controls header {
+  margin-bottom: 24px;
+}
+.controls header .hint {
+  margin-top: 12px;
+}
+.controls section + section {
+  margin-top: 24px;
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.row .name {
+  display: grid;
+  min-width: 0;
+}
+.io-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--pg-mono);
+  font-size: 0.75rem;
+  line-height: 16px;
+  color: var(--pg-text-secondary);
+}
+.row.routine {
+  grid-template-columns: 56px minmax(0, 1fr) minmax(0, 1.4fr);
+}
+.row.tank {
+  grid-template-columns: 40px minmax(0, 1fr) 44px 72px auto;
+}
+.value {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.preview {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  display: grid;
+  gap: 24px;
+  padding: 24px 32px 48px;
+}
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.preview figure {
+  margin: 0;
+}
+.preview figcaption {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+details summary {
+  cursor: pointer;
+  font-weight: 500;
+  width: fit-content;
+}
+pre {
+  margin: 12px 0 0;
+  max-height: 480px;
+  overflow: auto;
+  padding: 16px;
+  border: 1px solid var(--pg-border-subtle);
+  border-radius: 8px;
+  background: var(--pg-bg-200);
+  font-family: var(--pg-mono);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .controls {
+    order: 2;
+    position: static;
+    max-height: none;
+    border-right: none;
+    border-top: 1px solid var(--pg-border-subtle);
+  }
+  .preview {
+    position: static;
+    padding: 16px;
+  }
+}
+
+/* Touch targets */
+@media (max-width: 800px) {
+  :root {
+    --pg-control: 44px;
+  }
+  .segmented button {
+    min-height: 44px;
+  }
+  select,
+  input {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
