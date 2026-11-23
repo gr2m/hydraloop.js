@@ -38,12 +38,19 @@ const nextConfig: NextConfig = {
   },
   cacheComponents: true,
   partialPrefetching: true,
-  // The SDK is linked from the repository root (`file:../..`), outside of
-  // this project. Load it with Node at runtime instead of bundling it.
-  serverExternalPackages: ["hydraloop"],
-  // Turbopack only resolves files within its root, which needs to include the
-  // linked SDK
-  turbopack: { root: path.join(__dirname, "../..") },
+  turbopack: {
+    // The SDK packages are linked from packages/ (`file:../../packages/…`),
+    // outside of this project. Turbopack only resolves files within its root,
+    // which needs to include them.
+    root: path.join(__dirname, "../.."),
+    resolveAlias: {
+      // hydraloop-internal imports hydraloop. From packages/internal/, that
+      // only resolves when the repository root is installed, which it isn't
+      // when only this app is installed, e.g. on Vercel. Resolve it from this
+      // app's node_modules instead.
+      hydraloop: "./node_modules/hydraloop",
+    },
+  },
 };
 
 export default nextConfig;
