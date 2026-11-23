@@ -25,7 +25,7 @@
 // - HYDRALOOP_DEVICE_ID: the device, default: the first H600 of the account
 // - DRIFT_GITHUB_TOKEN: a fine-grained token that can write the issues of the
 //   repository. Without it, deviations are only printed.
-// - DRIFT_GITHUB_REPOSITORY: default "gr2m/hydraloop.js"
+// - DRIFT_GITHUB_REPOSITORY: default "gr2m/hydraloop"
 //
 // Options:
 //

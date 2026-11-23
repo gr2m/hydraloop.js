@@ -16,7 +16,7 @@
     "prepare": "husky || true",
     "generate:internal": "node scripts/generate-internal.js && prettier --write packages/internal/lib packages/internal/readme.md"
   },
-  "repository": "github:gr2m/hydraloop.js",
+  "repository": "github:gr2m/hydraloop",
   "license": "ISC",
   "engines": {
     "node": ">=22"
