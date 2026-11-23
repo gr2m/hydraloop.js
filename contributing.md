@@ -40,9 +40,15 @@ Thank you for considering contributing to the Hydraloop JavaScript SDK!
 
 ## Code Style
 
+- The repository is an npm workspace with two packages: `packages/hydraloop` (external API) and `packages/internal` (`hydraloop-internal`, internal API). `npm install` at the root installs both and links them.
 - Source code is in JavaScript with JSDoc annotations for IDE support.
-- TypeScript types are maintained in `index.d.ts`.
+- TypeScript types are maintained in `packages/hydraloop/index.d.ts` and `packages/internal/lib/index.d.ts`.
+- Most of `packages/internal/lib/` is generated from `spec/` with `npm run generate:internal`. Don't edit the generated files by hand.
 - Tests use [Vitest](https://vitest.dev/) and `undici` MockAgent for HTTP mocking.
+
+## Releases
+
+Each package is released separately by [`@babblebey/monorepo-semantic-release`](https://github.com/babblebey/monorepo-semantic-release) when changes are merged into `main`, see [`release.config.js`](release.config.js). The version is derived from the [conventional commit](https://www.conventionalcommits.org/) messages of the commits that change files in that package's folder, and tags are `<package name>@<version>`.
 
 ## Reporting Issues
 
