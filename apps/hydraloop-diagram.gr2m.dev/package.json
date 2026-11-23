@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "readme-svg": "node scripts/readme-svg.js"
   },
   "dependencies": {
     "react": "19.3.0",

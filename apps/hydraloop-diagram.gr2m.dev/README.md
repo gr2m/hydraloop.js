@@ -17,6 +17,14 @@ Open http://localhost:5173.
 
 The app uses `hydraloop-diagram-react` from its source in [`packages/diagram-react/src`](../../packages/diagram-react/src), through aliases in [`vite.config.ts`](vite.config.ts) and [`tsconfig.json`](tsconfig.json). Changes to the component show up right away, without building the package.
 
+## Readme image
+
+```bash
+npm run readme-svg
+```
+
+renders the "Receiving greywater" preset to [`packages/diagram-react/assets/receiving-greywater.svg`](../../packages/diagram-react/assets/receiving-greywater.svg), the image in the package's readme. The SVG includes the package's styles, so it shows the same colors and animations as an image, light or dark.
+
 ## Deployment
 
 Vercel deploys this folder to https://hydraloop-diagram.gr2m.dev (project `hydraloop-diagram`, root directory `apps/hydraloop-diagram.gr2m.dev`), with a preview for each pull request.

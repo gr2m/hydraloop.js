@@ -2,6 +2,10 @@
 
 > React flow diagram of a [Hydraloop](https://www.hydraloop.com) H600, and the model that works out what the device is doing from its signals
 
+[![The flow diagram while train A receives greywater, T3 circulates through UV-C and the distribution pump supplies the toilets](assets/receiving-greywater.svg)](https://hydraloop-diagram.gr2m.dev/)
+
+Try it with any state in the playground: https://hydraloop-diagram.gr2m.dev/
+
 The diagram shows the inlet and bypass, both treatment trains (T1 and T2 of A and B), UV-C, the T3 storage, the T4 backup and the outlets. Pipes are colored and animated while a routine, valve, pump or sensor signal shows water moving through them. Hover a valve, pump, sensor or tank for its raw value.
 
 The model (`stateAt`) derives that state from tank levels, IO signals, HDM routines and firmware behaviors, as loaded from the internal HDM API with [`hydraloop-internal`](../internal/readme.md). See the [H600 dashboard](../../apps/h600.gr2m.dev/README.md) for how the H600 was found to work.
@@ -114,7 +118,7 @@ The dark colors apply with `prefers-color-scheme: dark`, unless `<html data-them
 
 ## Development
 
-Try the diagram with any state in the playground: https://hydraloop-diagram.gr2m.dev, source in [`apps/hydraloop-diagram.gr2m.dev`](../../apps/hydraloop-diagram.gr2m.dev/README.md).
+The playground at https://hydraloop-diagram.gr2m.dev/ renders the diagram for any state, from the source in [`apps/hydraloop-diagram.gr2m.dev`](../../apps/hydraloop-diagram.gr2m.dev/README.md). The image above is its "Receiving greywater" preset, rendered with `npm run readme-svg` in that folder.
 
 ## License
 
