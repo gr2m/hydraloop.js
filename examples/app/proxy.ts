@@ -1,4 +1,4 @@
-import { Hydraloop } from "hydraloop/internal";
+import { Hydraloop } from "hydraloop-internal";
 import { NextResponse, type NextRequest } from "next/server";
 
 import {

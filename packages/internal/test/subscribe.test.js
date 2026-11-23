@@ -6,8 +6,8 @@ import { MockAgent, setGlobalDispatcher } from "undici";
 import { Server } from "socket.io";
 import { WebSocketServer } from "ws";
 
-import { Hydraloop, RequestError } from "../../lib/internal/index.js";
-import { socketUrl } from "../../lib/internal/subscribe.js";
+import { Hydraloop, RequestError } from "../lib/index.js";
+import { socketUrl } from "../lib/subscribe.js";
 
 const DEVICE_ID = "device-001";
 const ORIGIN = "https://hdm.hydraloop.com";

@@ -2,9 +2,10 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
+    include: ["packages/*/test/**/*.test.js"],
     resolveSnapshotPath: (testPath, snapExtension) => testPath + snapExtension,
     coverage: {
-      include: ["index.js", "lib/**/*.js"],
+      include: ["packages/*/index.js", "packages/*/lib/**/*.js"],
       thresholds: {
         lines: 100,
         functions: 100,
@@ -13,7 +14,7 @@ export default defineConfig({
       },
     },
     typecheck: {
-      include: ["test/types.test.ts", "test/internal/types.test.ts"],
+      include: ["packages/*/test/types.test.ts"],
     },
   },
 });

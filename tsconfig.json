@@ -8,6 +8,12 @@
     "allowJs": true,
     "checkJs": true
   },
-  "include": ["index.js", "index.d.ts", "lib/**/*.js", "examples/**/*.js"],
+  "include": [
+    "packages/*/index.js",
+    "packages/*/index.d.ts",
+    "packages/*/lib/**/*.js",
+    "examples/**/*.js",
+    "scripts/release-set-workspace-dependencies.js"
+  ],
   "exclude": ["examples/app"]
 }

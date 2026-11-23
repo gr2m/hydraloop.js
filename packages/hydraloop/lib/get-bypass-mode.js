@@ -4,9 +4,9 @@ import { getLocalApiUrl } from "./get-local-api-url.js";
 import { request } from "./request.js";
 
 /**
- * @param {import("../../index.d.ts").State} state
+ * @param {import("../index.d.ts").State} state
  * @param {{ deviceId: string }} options
- * @returns {Promise<import("../../index.d.ts").BypassMode>}
+ * @returns {Promise<import("../index.d.ts").BypassMode>}
  */
 export async function getBypassMode(state, { deviceId }) {
   const localApiUrl = await getLocalApiUrl(state, deviceId);

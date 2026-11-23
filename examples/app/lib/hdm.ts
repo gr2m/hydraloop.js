@@ -1,6 +1,6 @@
 import "server-only";
 
-import { Hydraloop, type Local, type Root } from "hydraloop/internal";
+import { Hydraloop, type Local, type Root } from "hydraloop-internal";
 
 import {
   behaviorIntervals,

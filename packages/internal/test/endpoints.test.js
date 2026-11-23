@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { readFile } from "node:fs/promises";
 import { MockAgent, setGlobalDispatcher } from "undici";
 
-import { Hydraloop } from "../../lib/internal/index.js";
+import { Hydraloop } from "../lib/index.js";
 
 const DEVICE_ID = "device-001";
 const ORIGIN = "https://hdm.hydraloop.com";
@@ -10,7 +10,7 @@ const METHODS = ["get", "post", "put", "patch", "delete"];
 
 async function loadSpec(name) {
   const content = await readFile(
-    new URL(`../../spec/internal/${name}-api.json`, import.meta.url),
+    new URL(`../../../spec/internal/${name}-api.json`, import.meta.url),
     "utf8",
   );
   return JSON.parse(content);
@@ -125,7 +125,7 @@ describe("generated endpoint methods", () => {
       for (const [path, pathItem] of Object.entries(spec.paths)) {
         for (const [method, operation] of Object.entries(pathItem)) {
           if (!METHODS.includes(method)) continue;
-          // not included in hydraloop/internal, see scripts/generate-internal.js
+          // not included in hydraloop-internal, see scripts/generate-internal.js
           if (operation.tags[0] === "external-api") continue;
 
           const namespace = camelCase(operation.tags[0]);

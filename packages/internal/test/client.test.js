@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { MockAgent, setGlobalDispatcher } from "undici";
 
-import { Hydraloop, RequestError, VERSION } from "../../lib/internal/index.js";
-import { RequestError as ExternalRequestError } from "../../index.js";
+import { Hydraloop, RequestError, VERSION } from "../lib/index.js";
+import { RequestError as ExternalRequestError } from "hydraloop";
 
 const DEVICE_ID = "device-001";
 const ORIGIN = "https://hdm.hydraloop.com";
 const JSON_HEADERS = { headers: { "content-type": "application/json" } };
 
-describe("hydraloop/internal", () => {
+describe("hydraloop-internal", () => {
   /** @type {import("undici").MockAgent} */
   let mockAgent;
   /** @type {import("undici").Interceptable} */

@@ -2,7 +2,7 @@
 // live views load the dataset over REST and keep it current with the socket
 // (see components/use-live-dataset.tsx).
 
-import type { SocketMessage } from "hydraloop/internal/socket";
+import type { SocketMessage } from "hydraloop-internal/socket";
 
 import {
   behaviorLabel,

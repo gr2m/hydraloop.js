@@ -7,7 +7,7 @@
 // See spec/socket/asyncapi.json for the rooms and messages.
 //
 // This module has no other imports, so that browsers can load it on its own
-// (`hydraloop/internal/socket`) without the endpoint methods.
+// (`hydraloop-internal/socket`) without the endpoint methods.
 
 const RECONNECT_MIN_MS = 1000;
 const RECONNECT_MAX_MS = 30_000;

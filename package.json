@@ -1,29 +1,10 @@
 {
-  "name": "hydraloop",
-  "version": "0.0.0-development",
-  "description": "JavaScript SDK for the Hydraloop home water recycling system API",
+  "name": "hydraloop-monorepo",
+  "private": true,
+  "description": "Monorepo for the hydraloop and hydraloop-internal packages",
   "type": "module",
-  "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js"
-    },
-    "./internal": {
-      "types": "./lib/internal/index.d.ts",
-      "import": "./lib/internal/index.js"
-    },
-    "./internal/socket": {
-      "types": "./lib/internal/socket.d.ts",
-      "import": "./lib/internal/socket.js"
-    }
-  },
-  "main": "index.js",
-  "types": "index.d.ts",
-  "files": [
-    "index.js",
-    "index.d.ts",
-    "lib/",
-    "readme.internal.md"
+  "workspaces": [
+    "packages/*"
   ],
   "scripts": {
     "lint": "prettier --check .",
@@ -33,16 +14,8 @@
     "test:tsc": "tsc",
     "test:types": "vitest --typecheck.only run",
     "prepare": "husky || true",
-    "generate:internal": "node scripts/generate-internal.js && prettier --write lib/internal readme.internal.md"
+    "generate:internal": "node scripts/generate-internal.js && prettier --write packages/internal/lib packages/internal/readme.md"
   },
-  "keywords": [
-    "hydraloop",
-    "water",
-    "recycling",
-    "greywater",
-    "iot",
-    "smart-home"
-  ],
   "repository": "github:gr2m/hydraloop.js",
   "license": "ISC",
   "engines": {
@@ -62,31 +35,6 @@
     "undici": "^7.0.0",
     "vitest": "^4.0.18",
     "ws": "^8.18.0"
-  },
-  "release": {
-    "branches": [
-      "+([0-9]).x",
-      "main",
-      "next",
-      {
-        "name": "beta",
-        "prerelease": true
-      }
-    ],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/github",
-      [
-        "semantic-release-plugin-update-version-in-files",
-        {
-          "files": [
-            "lib/external/version.js"
-          ]
-        }
-      ],
-      "@semantic-release/npm"
-    ]
   },
   "renovate": {
     "extends": [

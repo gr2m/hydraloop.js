@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Generates the endpoint methods and types of the internal SDK
-// (`hydraloop/internal`) from the OpenAPI specs in spec/internal/.
+// (`hydraloop-internal`) from the OpenAPI specs in spec/internal/.
 //
 // The specs are incomplete or wrong in places. Corrections found by calling
 // the API are kept in spec/internal-patches/ as JSON merge patches
@@ -8,15 +8,15 @@
 // Run with: node scripts/generate-internal.js
 //
 // Writes, for each of the two APIs ("root" and "local"):
-//   lib/internal/<api>/<tag>.js    one function per operation of the tag
-//   lib/internal/<api>/index.js    binds all functions to the SDK state
-//   lib/internal/<api>-types.d.ts  schema types and the method signatures
+//   packages/internal/lib/<api>/<tag>.js    one function per operation of the tag
+//   packages/internal/lib/<api>/index.js    binds all functions to the SDK state
+//   packages/internal/lib/<api>-types.d.ts  schema types and the method signatures
 //
-// It also writes the list of all methods into readme.internal.md.
+// It also writes the list of all methods into packages/internal/readme.md.
 //
 // From the AsyncAPI document of the socket API in spec/socket/asyncapi.json,
-// written by hand, it generates lib/internal/socket-types.d.ts and the list of
-// socket messages in readme.internal.md. Everything else in lib/internal/ is
+// written by hand, it generates packages/internal/lib/socket-types.d.ts and the list of
+// socket messages in packages/internal/readme.md. Everything else in packages/internal/lib/ is
 // written by hand.
 
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -25,8 +25,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, "..");
-const LIB_DIR = join(ROOT_DIR, "lib", "internal");
-const README_PATH = join(ROOT_DIR, "readme.internal.md");
+const LIB_DIR = join(ROOT_DIR, "packages", "internal", "lib");
+const README_PATH = join(ROOT_DIR, "packages", "internal", "readme.md");
 const SOCKET_SPEC_PATH = join(ROOT_DIR, "spec", "socket", "asyncapi.json");
 
 /** The server of the socket API that `hydraloop.local.subscribe()` connects to */

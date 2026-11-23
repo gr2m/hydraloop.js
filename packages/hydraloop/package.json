@@ -1,0 +1,36 @@
+{
+  "name": "hydraloop",
+  "version": "0.0.0-development",
+  "description": "JavaScript SDK for the Hydraloop home water recycling system API",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    }
+  },
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "lib/"
+  ],
+  "keywords": [
+    "hydraloop",
+    "water",
+    "recycling",
+    "greywater",
+    "iot",
+    "smart-home"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gr2m/hydraloop.js.git",
+    "directory": "packages/hydraloop"
+  },
+  "license": "ISC",
+  "engines": {
+    "node": ">=22"
+  }
+}

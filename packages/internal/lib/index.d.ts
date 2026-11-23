@@ -62,7 +62,7 @@ export interface State {
 
 export declare const VERSION: string;
 
-export { RequestError } from "../../index.js";
+export { RequestError } from "hydraloop";
 
 export declare class Hydraloop {
   static VERSION: string;

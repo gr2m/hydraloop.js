@@ -1,6 +1,6 @@
 // @ts-check
 
-import { RequestError } from "../external/request-error.js";
+import { RequestError } from "hydraloop";
 
 const REDACTED_HEADERS = ["authorization", "additional-authorization"];
 
