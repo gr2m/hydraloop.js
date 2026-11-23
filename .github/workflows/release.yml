@@ -24,6 +24,6 @@ jobs:
           node-version: lts/*
           cache: npm
       - run: npm ci
-      - run: npx @babblebey/monorepo-semantic-release@1.0.0-beta.6
+      - run: npx @babblebey/monorepo-semantic-release@1.0.0-beta.6 --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
