@@ -7,8 +7,8 @@ Thank you for considering contributing to the Hydraloop JavaScript SDK!
 1. Clone the repository:
 
    ```
-   git clone https://github.com/gr2m/hydraloop.js.git
-   cd hydraloop.js
+   git clone https://github.com/gr2m/hydraloop.git
+   cd hydraloop
    ```
 
 2. Install dependencies:

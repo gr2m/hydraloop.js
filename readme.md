@@ -1,4 +1,4 @@
-# hydraloop.js
+# hydraloop
 
 > JavaScript SDKs for the [Hydraloop](https://www.hydraloop.com) home water recycling system
 

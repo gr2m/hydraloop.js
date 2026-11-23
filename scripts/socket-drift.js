@@ -17,7 +17,7 @@ const spec = JSON.parse(
   ),
 );
 
-const REPOSITORY = process.env.DRIFT_GITHUB_REPOSITORY ?? "gr2m/hydraloop.js";
+const REPOSITORY = process.env.DRIFT_GITHUB_REPOSITORY ?? "gr2m/hydraloop";
 const LABEL = "asyncapi-drift";
 /** Issue bodies are limited to 65536 characters */
 const MAX_JSON = 20_000;
