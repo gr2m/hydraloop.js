@@ -27,3 +27,8 @@ jobs:
       - run: npx @babblebey/monorepo-semantic-release@1.0.0-beta.6 --debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # `npm version` in a workspace package re-installs the workspace by
+          # default. Once hydraloop has its new version, hydraloop-internal's
+          # dependency on "hydraloop": "0.0.0-development" no longer matches
+          # the local package and npm fails with ETARGET.
+          npm_config_workspaces_update: "false"
