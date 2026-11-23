@@ -1,13 +1,13 @@
 // @ts-check
 
-import { VERSION } from "../external/version.js";
+import { VERSION } from "./version.js";
 import { login } from "./login.js";
 import { createRootApi } from "./root/index.js";
 import { createLocalApi } from "./local/index.js";
 import { subscribe } from "./subscribe.js";
 
-export { VERSION } from "../external/version.js";
-export { RequestError } from "../external/request-error.js";
+export { VERSION } from "./version.js";
+export { RequestError } from "hydraloop";
 
 const ROOT_API_URL = "https://hdm.hydraloop.com/api-root";
 

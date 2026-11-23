@@ -1,18 +1,18 @@
-# hydraloop/internal
+# hydraloop-internal
 
 > JavaScript SDK for the internal Hydraloop Device Manager (HDM) API
 
 > [!WARNING]
-> The internal API is the one the HDM web app at https://hdm.hydraloop.com/hdm/ uses. Hydraloop does not intend it for external use. It may change at any time without notice. See [`spec/README.md`](spec/README.md#stability).
+> The internal API is the one the HDM web app at https://hdm.hydraloop.com/hdm/ uses. Hydraloop does not intend it for external use. It may change at any time without notice. See [`spec/README.md`](../../spec/README.md#stability).
 >
-> For integrations, use the [external API SDK](readme.md) (`hydraloop`) instead.
+> For integrations, use the [external API SDK](../hydraloop/readme.md) (`hydraloop`) instead.
 
-The SDK is generated from the OpenAPI specs in [`spec/internal/`](spec/internal/), with corrections from [`spec/internal-patches/`](spec/internal-patches/). It covers every operation of both HDM backends, except for the `/external-api/*` endpoints. These don't accept a login token, and the main [`hydraloop`](readme.md) export already covers them.
+The SDK is generated from the OpenAPI specs in [`spec/internal/`](../../spec/internal/), with corrections from [`spec/internal-patches/`](../../spec/internal-patches/). It covers every operation of both HDM backends, except for the `/external-api/*` endpoints. These don't accept a login token, and the [`hydraloop`](../hydraloop/readme.md) package already covers them.
 
 ## Usage
 
 ```js
-import { Hydraloop } from "hydraloop/internal";
+import { Hydraloop } from "hydraloop-internal";
 
 const hydraloop = new Hydraloop();
 
@@ -38,7 +38,7 @@ const levels = await hydraloop.local.graph.getDeviceLevels({
 ## Install
 
 ```
-npm install hydraloop
+npm install hydraloop-internal
 ```
 
 ## API
@@ -145,12 +145,12 @@ for await (const message of subscription) {
 
 Messages are queued until they are read. It reconnects until the subscription is ended, with a growing delay of up to 30 seconds. Messages sent while it was disconnected are lost, load them with the local API if needed. It ends with an error if the device's local API URL or token can't be loaded, e.g. for an expired user token.
 
-#### `subscribe(options)` of `hydraloop/internal/socket`
+#### `subscribe(options)` of `hydraloop-internal/socket`
 
 The same subscription for a browser that gets the device token from a server, so that it doesn't need the user token. Instead of `deviceId`, it takes `connect()`, which returns the local API URL and a device token before every connection attempt. The module has no other imports, so it doesn't add the endpoint methods to a browser bundle.
 
 ```js
-import { subscribe } from "hydraloop/internal/socket";
+import { subscribe } from "hydraloop-internal/socket";
 
 const subscription = subscribe({
   rooms: ["graph"],
@@ -168,14 +168,14 @@ const subscription = subscribe({
 > [!WARNING]
 > The device token works as a full user token: the root API accepts it as `Authorization: Bearer`, and `root.auth.refreshToken()` exchanges it for a user token that can be refreshed indefinitely. Only give it to the browser of the user it belongs to, and keep it in memory.
 
-The socket API is not part of the OpenAPI specs. It is described in [`spec/socket/asyncapi.json`](spec/socket/asyncapi.json), an [AsyncAPI](https://www.asyncapi.com/) document written from the HDM web app's JavaScript and from listening to an H600. `subscribe()` uses the global `WebSocket` (Node.js 22+, browsers) and speaks the parts of the socket.io protocol that HDM uses itself, so it doesn't need the socket.io client.
+The socket API is not part of the OpenAPI specs. It is described in [`spec/socket/asyncapi.json`](../../spec/socket/asyncapi.json), an [AsyncAPI](https://www.asyncapi.com/) document written from the HDM web app's JavaScript and from listening to an H600. `subscribe()` uses the global `WebSocket` (Node.js 22+, browsers) and speaks the parts of the socket.io protocol that HDM uses itself, so it doesn't need the socket.io client.
 
 ### Types
 
 The types of the schemas in the specs are exported in two namespaces, one per API:
 
 ```ts
-import type { Root, Local } from "hydraloop/internal";
+import type { Root, Local } from "hydraloop-internal";
 
 const device: Root.Device = await hydraloop.root.devices.getDevice({ id });
 const data: Local.GraphRecords = await hydraloop.local.graph.getData({
@@ -186,20 +186,20 @@ const data: Local.GraphRecords = await hydraloop.local.graph.getData({
 Also exported are `HydraloopOptions`, `LoginOptions`, `RootApi` and `LocalApi` (the types of `hydraloop.root` and `hydraloop.local`), and for `hydraloop.local.subscribe()`: `SubscribeOptions`, `Subscription`, and the `Socket` namespace with the payload types, `SocketMessages`, `SocketRoom` and `SocketMessage`:
 
 ```ts
-import type { Socket } from "hydraloop/internal";
+import type { Socket } from "hydraloop-internal";
 
 function onRoutine(payload: Socket.RoutineMessage) {}
 const message: Socket.SocketMessage<"graph"> = /* … */;
 ```
 
-About half of the operations have no response schema in the specs. Their methods resolve with `any`. The response types of the endpoints that regular users can access were checked against actual responses and corrected where needed, see [`spec/internal-patches/`](spec/internal-patches/).
+About half of the operations have no response schema in the specs. Their methods resolve with `any`. The response types of the endpoints that regular users can access were checked against actual responses and corrected where needed, see [`spec/internal-patches/`](../../spec/internal-patches/).
 
 ## Error Handling
 
-API errors throw the same `RequestError` as the [external SDK](readme.md#error-handling), with `.request` and `.response` properties for debugging.
+API errors throw the same `RequestError` as the [external SDK](../hydraloop/readme.md#error-handling), with `.request` and `.response` properties for debugging.
 
 ```js
-import { Hydraloop, RequestError } from "hydraloop/internal";
+import { Hydraloop, RequestError } from "hydraloop-internal";
 
 try {
   await hydraloop.root.devices.getDevice({ id: "unknown" });
@@ -214,9 +214,9 @@ The `authorization` and `additional-authorization` headers are redacted in `erro
 
 ## Development
 
-The endpoint methods (`lib/internal/root/`, `lib/internal/local/`), their types (`lib/internal/*-types.d.ts`) and the [list of all methods](#all-methods) below are generated from [`spec/internal/`](spec/internal/). The types of the socket messages (`lib/internal/socket-types.d.ts`) and the [list of all socket messages](#all-socket-messages) are generated from [`spec/socket/asyncapi.json`](spec/socket/asyncapi.json), which is written by hand. Don't edit the generated files by hand.
+The endpoint methods (`lib/root/`, `lib/local/`), their types (`lib/*-types.d.ts`) and the [list of all methods](#all-methods) below are generated from [`spec/internal/`](../../spec/internal/). The types of the socket messages (`lib/socket-types.d.ts`) and the [list of all socket messages](#all-socket-messages) are generated from [`spec/socket/asyncapi.json`](../../spec/socket/asyncapi.json), which is written by hand. Don't edit the generated files by hand.
 
-The specs are incomplete or wrong in places, e.g. many fields that can be `null` are not marked as nullable. Corrections are kept as [JSON merge patches](https://www.rfc-editor.org/rfc/rfc7386) in [`spec/internal-patches/`](spec/internal-patches/), which are applied to the specs before generating. To add a correction, edit the patch file of the API.
+The specs are incomplete or wrong in places, e.g. many fields that can be `null` are not marked as nullable. Corrections are kept as [JSON merge patches](https://www.rfc-editor.org/rfc/rfc7386) in [`spec/internal-patches/`](../../spec/internal-patches/), which are applied to the specs before generating. To add a correction, edit the patch file of the API.
 
 To regenerate, run:
 
@@ -1276,7 +1276,7 @@ The [Update OpenAPI Specs](.github/workflows/update-spec.yml) workflow does that
 
 ## All socket messages
 
-The rooms and messages of the [socket API](#real-time-messages), from [`spec/socket/asyncapi.json`](spec/socket/asyncapi.json). "Observed" means the message was seen with an owner account. The payloads of the other messages are taken from how the HDM web app uses them. Rooms the account has no permission for send nothing.
+The rooms and messages of the [socket API](#real-time-messages), from [`spec/socket/asyncapi.json`](../../spec/socket/asyncapi.json). "Observed" means the message was seen with an owner account. The payloads of the other messages are taken from how the HDM web app uses them. Rooms the account has no permission for send nothing.
 
 <!-- BEGIN GENERATED SOCKET MESSAGES -->
 

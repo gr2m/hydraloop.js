@@ -3,7 +3,7 @@
 import { listDevices } from "./list-devices.js";
 
 /**
- * @param {import("../../index.d.ts").State} state
+ * @param {import("../index.d.ts").State} state
  * @param {string} deviceId
  * @returns {Promise<string>}
  */

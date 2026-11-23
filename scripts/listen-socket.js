@@ -42,7 +42,7 @@ import { fileURLToPath } from "node:url";
 import { setTimeout as sleep } from "node:timers/promises";
 import { parseArgs } from "node:util";
 
-import { Hydraloop, RequestError } from "../lib/internal/index.js";
+import { Hydraloop, RequestError } from "hydraloop-internal";
 import { checkMessage, reportDrift, ROOMS } from "./socket-drift.js";
 
 const { values: options } = parseArgs({

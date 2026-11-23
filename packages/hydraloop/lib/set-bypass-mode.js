@@ -4,7 +4,7 @@ import { getLocalApiUrl } from "./get-local-api-url.js";
 import { request } from "./request.js";
 
 /**
- * @param {import("../../index.d.ts").State} state
+ * @param {import("../index.d.ts").State} state
  * @param {{ deviceId: string, activate: boolean }} options
  * @returns {Promise<void>}
  */

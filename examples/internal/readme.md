@@ -1,6 +1,6 @@
 # Internal API examples
 
-These examples call the internal Hydraloop Device Manager (HDM) API, the one the HDM web app at https://hdm.hydraloop.com/hdm/ uses. They call it directly with `fetch`. For an SDK for the internal API, see [`hydraloop/internal`](../../readme.internal.md).
+These examples call the internal Hydraloop Device Manager (HDM) API, the one the HDM web app at https://hdm.hydraloop.com/hdm/ uses. They call it directly with `fetch`. For an SDK for the internal API, see [`hydraloop-internal`](../../packages/internal/readme.md).
 
 > [!WARNING]
 > Hydraloop does not intend the internal API for external use. It may change at any time without notice, and these examples may stop working. See [`spec/README.md`](../../spec/README.md#stability).

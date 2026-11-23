@@ -1,6 +1,6 @@
 "use client";
 
-import { subscribe } from "hydraloop/internal/socket";
+import { subscribe } from "hydraloop-internal/socket";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 

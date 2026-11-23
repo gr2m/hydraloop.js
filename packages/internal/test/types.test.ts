@@ -1,6 +1,6 @@
 import { describe, it, expectTypeOf } from "vitest";
 
-import { Hydraloop, RequestError } from "../../lib/internal/index.js";
+import { Hydraloop, RequestError } from "../lib/index.js";
 import type {
   HydraloopOptions,
   LoginOptions,
@@ -8,9 +8,9 @@ import type {
   Local,
   Socket,
   Subscription,
-} from "../../lib/internal/index.js";
+} from "../lib/index.js";
 
-describe("hydraloop/internal types", () => {
+describe("hydraloop-internal types", () => {
   it("constructor options are optional", () => {
     expectTypeOf(new Hydraloop()).toMatchTypeOf<Hydraloop>();
     const options: HydraloopOptions = {

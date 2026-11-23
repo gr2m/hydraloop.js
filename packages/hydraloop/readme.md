@@ -8,11 +8,11 @@ Request an Hydroloop API key by contacting them:
 https://info.hydraloop.com/docs/how-to-use-the-hydraloop-api/
 
 > [!NOTE]
-> This package also includes an SDK for the internal API that the Hydraloop Device Manager web app uses, which requires an HDM login instead of an API key. It is not meant for integrations. See [readme.internal.md](readme.internal.md).
+> For the internal API that the Hydraloop Device Manager web app uses, which requires an HDM login instead of an API key, see [`hydraloop-internal`](../internal/readme.md). It is not meant for integrations.
 
 ## Usage
 
-Find more examples in [examples/](examples/).
+Find more examples in [examples/](../../examples/).
 
 ```js
 import { Hydraloop } from "hydraloop";

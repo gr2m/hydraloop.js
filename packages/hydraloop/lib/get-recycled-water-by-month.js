@@ -12,9 +12,9 @@ function mapTimestampLiters(records) {
 }
 
 /**
- * @param {import("../../index.d.ts").State} state
+ * @param {import("../index.d.ts").State} state
  * @param {{ deviceId: string, year: number, month: number }} options
- * @returns {Promise<import("../../index.d.ts").WaterRecycledRecords>}
+ * @returns {Promise<import("../index.d.ts").WaterRecycledRecords>}
  */
 export async function getRecycledWaterByMonth(
   state,

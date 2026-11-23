@@ -12,9 +12,9 @@ function mapTimestampLiters(records) {
 }
 
 /**
- * @param {import("../../index.d.ts").State} state
+ * @param {import("../index.d.ts").State} state
  * @param {{ deviceId: string, year: number }} options
- * @returns {Promise<import("../../index.d.ts").WaterRecycledRecords>}
+ * @returns {Promise<import("../index.d.ts").WaterRecycledRecords>}
  */
 export async function getRecycledWaterByYear(state, { deviceId, year }) {
   const localApiUrl = await getLocalApiUrl(state, deviceId);

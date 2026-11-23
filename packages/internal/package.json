@@ -1,0 +1,41 @@
+{
+  "name": "hydraloop-internal",
+  "version": "0.0.0-development",
+  "description": "JavaScript SDK for the internal Hydraloop Device Manager (HDM) API, including the live device socket",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./socket": {
+      "types": "./lib/socket.d.ts",
+      "import": "./lib/socket.js"
+    }
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib/"
+  ],
+  "keywords": [
+    "hydraloop",
+    "water",
+    "recycling",
+    "greywater",
+    "iot",
+    "smart-home"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gr2m/hydraloop.js.git",
+    "directory": "packages/internal"
+  },
+  "license": "ISC",
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "hydraloop": "0.0.0-development"
+  }
+}

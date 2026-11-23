@@ -8,7 +8,8 @@
     "start": "next start"
   },
   "dependencies": {
-    "hydraloop": "file:../..",
+    "hydraloop": "file:../../packages/hydraloop",
+    "hydraloop-internal": "file:../../packages/internal",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0",

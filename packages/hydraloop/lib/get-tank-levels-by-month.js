@@ -5,7 +5,7 @@ import { request } from "./request.js";
 
 /**
  * @param {{ x: string, percentage: number, liters: number }[]} points
- * @returns {import("../../index.d.ts").TankLevel[]}
+ * @returns {import("../index.d.ts").TankLevel[]}
  */
 function mapTankLevelPoints(points) {
   return points.map(({ x, percentage, liters }) => ({
@@ -16,9 +16,9 @@ function mapTankLevelPoints(points) {
 }
 
 /**
- * @param {import("../../index.d.ts").State} state
+ * @param {import("../index.d.ts").State} state
  * @param {{ deviceId: string, year: number, month: number }} options
- * @returns {Promise<import("../../index.d.ts").TankLevelsByMonth>}
+ * @returns {Promise<import("../index.d.ts").TankLevelsByMonth>}
  */
 export async function getTankLevelsByMonth(state, { deviceId, year, month }) {
   const localApiUrl = await getLocalApiUrl(state, deviceId);

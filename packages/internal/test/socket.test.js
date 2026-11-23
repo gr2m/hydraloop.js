@@ -4,9 +4,9 @@ import { once } from "node:events";
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { WebSocketServer } from "ws";
 
-import { subscribe } from "../../lib/internal/socket.js";
+import { subscribe } from "../lib/socket.js";
 
-describe("subscribe() of hydraloop/internal/socket", () => {
+describe("subscribe() of hydraloop-internal/socket", () => {
   /** @type {import("node:http").Server} */
   let httpServer;
   /** @type {string} */
