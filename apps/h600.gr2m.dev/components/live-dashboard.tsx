@@ -1,10 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
+import {
+  DiagramLegend,
+  FlowDiagram,
+  FlowSummary,
+} from "hydraloop-diagram-react";
 
 import { stateAt, type Dataset } from "@/lib/model";
 
-import { DiagramLegend, FlowDiagram, FlowSummary } from "./flow-diagram";
 import { SignalTable } from "./signal-table";
 import { SessionKeepAlive } from "./session-keep-alive";
 import { SiteHeader } from "./site-header";

@@ -2,6 +2,11 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  DiagramLegend,
+  FlowDiagram,
+  FlowSummary,
+} from "hydraloop-diagram-react";
 
 import {
   cleanings,
@@ -17,7 +22,6 @@ import {
 } from "@/lib/model";
 
 import { EventTable } from "./event-table";
-import { DiagramLegend, FlowDiagram, FlowSummary } from "./flow-diagram";
 import { SessionKeepAlive } from "./session-keep-alive";
 import { SiteHeader } from "./site-header";
 import { StatusPanel } from "./status-panel";

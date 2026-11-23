@@ -3,12 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "npm run build --prefix ../../packages/diagram-react",
     "dev": "next dev",
+    "prebuild": "npm run build --prefix ../../packages/diagram-react",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
     "hydraloop": "file:../../packages/hydraloop",
+    "hydraloop-diagram-react": "file:../../packages/diagram-react",
     "hydraloop-internal": "file:../../packages/internal",
     "next": "16.4.6",
     "react": "19.3.0",

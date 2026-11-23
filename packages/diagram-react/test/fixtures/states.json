@@ -1,0 +1,2322 @@
+{
+  "device": {
+    "id": "demo",
+    "name": "Demo H600",
+    "serial": "SIMULATED",
+    "type": "H600",
+    "firmware": null,
+    "online": true,
+    "outlets": { "toilet": true, "washingMachine": false, "auxiliary": false }
+  },
+  "states": {
+    "circulation": {
+      "t": 1794916920000,
+      "tanks": {
+        "t1a": {
+          "liters": 14.967112177284433,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.623629674053518
+        },
+        "t2a": {
+          "liters": 133.36951184018687,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.7209162802172263
+        },
+        "t1b": {
+          "liters": 13.570291513045893,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.5654288130435788
+        },
+        "t2b": {
+          "liters": 109.96470182941168,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.5944037936724955
+        },
+        "t3": {
+          "liters": 203.23432196776844,
+          "max": 280,
+          "pct": 0.7258368641706016
+        }
+      },
+      "io": {
+        "grey_water_bypass": {
+          "on": false,
+          "value": 0,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "grey_water_ab_selection_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794798247000,
+          "manual": false
+        },
+        "uv_valve": {
+          "on": true,
+          "value": 1,
+          "since": 1794916891000,
+          "manual": false
+        },
+        "uv_power": {
+          "on": true,
+          "value": 1,
+          "since": 1794916891000,
+          "manual": false
+        },
+        "circulation_pump": {
+          "on": true,
+          "value": 1,
+          "since": 1794916891000,
+          "manual": false
+        },
+        "distribution_pump": {
+          "on": true,
+          "value": 1,
+          "since": 1794916892000,
+          "manual": false
+        },
+        "pre_backup_water_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "backup_water": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "back_flush": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "waste_storage_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794778632228,
+          "manual": false
+        },
+        "auxiliary": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "wash": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "toilet": {
+          "on": false,
+          "value": 0,
+          "since": 1794898225861,
+          "manual": false
+        },
+        "tank4": {
+          "on": false,
+          "value": 0,
+          "since": 1794781148000,
+          "manual": false
+        },
+        "tank4_enough_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794916849000,
+          "manual": false
+        },
+        "accu_charge_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "battery_power_on": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "battery_power_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "buzzer": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "air_pump": {
+          "on": true,
+          "value": 1,
+          "since": 1794916919000,
+          "manual": false
+        },
+        "air_pump_b": {
+          "on": true,
+          "value": 1,
+          "since": 1794916919000,
+          "manual": false
+        },
+        "add_air_valve": {
+          "on": true,
+          "value": 1,
+          "since": 1794916919000,
+          "manual": false
+        },
+        "add_air_valve_b": {
+          "on": true,
+          "value": 1,
+          "since": 1794916919000,
+          "manual": false
+        },
+        "bubbles_block": {
+          "on": false,
+          "value": 0,
+          "since": 1794876168598,
+          "manual": false
+        },
+        "bubbles_block_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794890677903,
+          "manual": false
+        },
+        "release_air": {
+          "on": false,
+          "value": 0,
+          "since": 1794916899000,
+          "manual": false
+        },
+        "release_air_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794916899000,
+          "manual": false
+        },
+        "transfer_path": {
+          "on": false,
+          "value": 0,
+          "since": 1794815771000,
+          "manual": false
+        },
+        "transfer_path_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794820341000,
+          "manual": false
+        },
+        "diffuser_backwash": {
+          "on": false,
+          "value": 0,
+          "since": 1794916891000,
+          "manual": false
+        },
+        "diffuser_backwash_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794916891000,
+          "manual": false
+        },
+        "waste_clean_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794759774919,
+          "manual": false
+        },
+        "waste_clean_tank_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794261350000,
+          "manual": false
+        }
+      },
+      "routine": {
+        "A": {
+          "t": 1794916919000,
+          "side": "A",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "CONFIGURE_HEIGHT"
+        },
+        "B": {
+          "t": 1794916919000,
+          "side": "B",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "CONFIGURE_HEIGHT"
+        }
+      },
+      "inlet": { "bypass": false, "receiving": [] },
+      "trains": {
+        "A": {
+          "side": "A",
+          "evidence": ["Air pump running"],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Configure height",
+          "confidence": "reported",
+          "since": 1794891387000
+        },
+        "B": {
+          "side": "B",
+          "evidence": ["Air pump running"],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Configure height",
+          "confidence": "reported",
+          "since": 1794891387000
+        }
+      },
+      "t3": {
+        "receivingFrom": [],
+        "uv": true,
+        "circulating": true,
+        "draining": false,
+        "label": "Circulating through UV",
+        "confidence": "valve",
+        "evidence": ["Circulation valve open", "UV on"]
+      },
+      "t4": { "max": false, "min": true, "label": "Above min" },
+      "supply": {
+        "pumping": true,
+        "toOutlets": true,
+        "source": "recycled",
+        "toilet": false,
+        "wash": false,
+        "auxiliary": false
+      },
+      "systemBehaviors": [],
+      "room": {
+        "liters": 26.821929271491342,
+        "partial": false,
+        "bypass": false,
+        "restart": false,
+        "filling": "A",
+        "trains": {
+          "A": {
+            "side": "A",
+            "liters": 2.3266817419622896,
+            "t2": 131.6733182580377,
+            "measuredAt": 1794891380000,
+            "accepting": true,
+            "reason": "Accepting water"
+          },
+          "B": {
+            "side": "B",
+            "liters": 24.495247529529053,
+            "t2": 109.50475247047095,
+            "measuredAt": 1794891380000,
+            "accepting": true,
+            "reason": "Accepting water"
+          }
+        }
+      }
+    },
+    "bypass": {
+      "t": 1794924630000,
+      "tanks": {
+        "t1a": {
+          "liters": 12.944573285826483,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.5393572202427701,
+          "trend": -0.0010640676319598086
+        },
+        "t2a": {
+          "liters": 135.67504354123665,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.7333786137364143,
+          "trend": 0.0040500339120598024
+        },
+        "t1b": {
+          "liters": 13.006985925731716,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.5419577469054881,
+          "trend": -0.0020023405586833574
+        },
+        "t2b": {
+          "liters": 110.70772785950291,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.5984201505919077,
+          "trend": -0.015492772883735028
+        },
+        "t3": {
+          "liters": 203.62895733451,
+          "max": 280,
+          "pct": 0.7272462761946786,
+          "trend": -0.001037755059076062
+        }
+      },
+      "io": {
+        "grey_water_bypass": {
+          "on": true,
+          "value": 1,
+          "since": 1794924612000,
+          "manual": false
+        },
+        "grey_water_ab_selection_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794798247000,
+          "manual": false
+        },
+        "uv_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794917351181,
+          "manual": false
+        },
+        "uv_power": {
+          "on": false,
+          "value": 0,
+          "since": 1794923806473,
+          "manual": false
+        },
+        "circulation_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794917350181,
+          "manual": false
+        },
+        "distribution_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794917347181,
+          "manual": false
+        },
+        "pre_backup_water_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "backup_water": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "back_flush": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "waste_storage_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794778632228,
+          "manual": false
+        },
+        "auxiliary": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "wash": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "toilet": {
+          "on": false,
+          "value": 0,
+          "since": 1794898225861,
+          "manual": false
+        },
+        "tank4": {
+          "on": false,
+          "value": 0,
+          "since": 1794781148000,
+          "manual": false
+        },
+        "tank4_enough_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794916849000,
+          "manual": false
+        },
+        "accu_charge_enable": {
+          "on": false,
+          "value": 0,
+          "since": 1794919612000,
+          "manual": false
+        },
+        "battery_power_on": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "battery_power_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "buzzer": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "air_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794924612000,
+          "manual": false
+        },
+        "air_pump_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794924612000,
+          "manual": false
+        },
+        "add_air_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794924331964,
+          "manual": false
+        },
+        "add_air_valve_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794924328277,
+          "manual": false
+        },
+        "bubbles_block": {
+          "on": false,
+          "value": 0,
+          "since": 1794876168598,
+          "manual": false
+        },
+        "bubbles_block_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794890677903,
+          "manual": false
+        },
+        "release_air": {
+          "on": false,
+          "value": 0,
+          "since": 1794924244147,
+          "manual": false
+        },
+        "release_air_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794924234230,
+          "manual": false
+        },
+        "transfer_path": {
+          "on": false,
+          "value": 0,
+          "since": 1794815771000,
+          "manual": false
+        },
+        "transfer_path_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794820341000,
+          "manual": false
+        },
+        "diffuser_backwash": {
+          "on": false,
+          "value": 0,
+          "since": 1794917354181,
+          "manual": false
+        },
+        "diffuser_backwash_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794917354181,
+          "manual": false
+        },
+        "waste_clean_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794759774919,
+          "manual": false
+        },
+        "waste_clean_tank_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794261350000,
+          "manual": false
+        }
+      },
+      "routine": {
+        "A": {
+          "t": 1794924331964,
+          "side": "A",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "PASSIVE_CIRCULATE"
+        },
+        "B": {
+          "t": 1794924328277,
+          "side": "B",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "PASSIVE_CIRCULATE"
+        }
+      },
+      "inlet": { "bypass": true, "receiving": [] },
+      "trains": {
+        "A": {
+          "side": "A",
+          "evidence": [],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Passive circulate",
+          "confidence": "reported",
+          "since": 1794891387000
+        },
+        "B": {
+          "side": "B",
+          "evidence": [],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Passive circulate",
+          "confidence": "reported",
+          "since": 1794891387000
+        }
+      },
+      "t3": {
+        "receivingFrom": [],
+        "uv": false,
+        "circulating": false,
+        "draining": false,
+        "label": "Holding",
+        "confidence": "valve",
+        "evidence": []
+      },
+      "t4": { "max": false, "min": true, "label": "Above min" },
+      "supply": {
+        "pumping": false,
+        "toOutlets": false,
+        "source": "recycled",
+        "toilet": false,
+        "wash": false,
+        "auxiliary": false
+      },
+      "systemBehaviors": [],
+      "room": {
+        "liters": 0,
+        "partial": false,
+        "bypass": true,
+        "restart": false,
+        "filling": "A",
+        "trains": {
+          "A": {
+            "side": "A",
+            "liters": 2.3266817419622896,
+            "t2": 131.6733182580377,
+            "measuredAt": 1794891380000,
+            "accepting": true,
+            "reason": "Accepting water"
+          },
+          "B": {
+            "side": "B",
+            "liters": 24.495247529529053,
+            "t2": 109.50475247047095,
+            "measuredAt": 1794891380000,
+            "accepting": true,
+            "reason": "Accepting water"
+          }
+        }
+      }
+    },
+    "draining": {
+      "t": 1794925860000,
+      "tanks": {
+        "t1a": {
+          "liters": 13.523812373124427,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.5634921822135178,
+          "trend": -0.04153006191968096
+        },
+        "t2a": {
+          "liters": 105.3332758437325,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.5693690586147703,
+          "trend": -0.18830141835010467
+        },
+        "t1b": {
+          "liters": 0.9354985658657563,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.03897910691107318,
+          "trend": -1.2145555356599314
+        },
+        "t2b": {
+          "liters": 7.330571277963853,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.03962470961061542,
+          "trend": -10.331854382941533
+        },
+        "t3": {
+          "liters": 201.68135706807948,
+          "max": 280,
+          "pct": 0.7202905609574267,
+          "trend": -0.2153316492028523
+        }
+      },
+      "io": {
+        "grey_water_bypass": {
+          "on": true,
+          "value": 1,
+          "since": 1794924612000,
+          "manual": false
+        },
+        "grey_water_ab_selection_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794798247000,
+          "manual": false
+        },
+        "uv_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794917351181,
+          "manual": false
+        },
+        "uv_power": {
+          "on": false,
+          "value": 0,
+          "since": 1794925606320,
+          "manual": false
+        },
+        "circulation_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794917350181,
+          "manual": false
+        },
+        "distribution_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794917347181,
+          "manual": false
+        },
+        "pre_backup_water_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "backup_water": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "back_flush": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "waste_storage_tank": {
+          "on": true,
+          "value": 1,
+          "since": 1794925859000,
+          "manual": false
+        },
+        "auxiliary": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "wash": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "toilet": {
+          "on": false,
+          "value": 0,
+          "since": 1794898225861,
+          "manual": false
+        },
+        "tank4": {
+          "on": false,
+          "value": 0,
+          "since": 1794781148000,
+          "manual": false
+        },
+        "tank4_enough_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794916849000,
+          "manual": false
+        },
+        "accu_charge_enable": {
+          "on": false,
+          "value": 0,
+          "since": 1794919612000,
+          "manual": false
+        },
+        "battery_power_on": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "battery_power_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "buzzer": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "air_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794924612000,
+          "manual": false
+        },
+        "air_pump_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794924612000,
+          "manual": false
+        },
+        "add_air_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794924331964,
+          "manual": false
+        },
+        "add_air_valve_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794924328277,
+          "manual": false
+        },
+        "bubbles_block": {
+          "on": false,
+          "value": 0,
+          "since": 1794876168598,
+          "manual": false
+        },
+        "bubbles_block_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794890677903,
+          "manual": false
+        },
+        "release_air": {
+          "on": false,
+          "value": 0,
+          "since": 1794925162000,
+          "manual": false
+        },
+        "release_air_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794925281000,
+          "manual": false
+        },
+        "transfer_path": {
+          "on": false,
+          "value": 0,
+          "since": 1794815771000,
+          "manual": false
+        },
+        "transfer_path_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794820341000,
+          "manual": false
+        },
+        "diffuser_backwash": {
+          "on": false,
+          "value": 0,
+          "since": 1794917354181,
+          "manual": false
+        },
+        "diffuser_backwash_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794917354181,
+          "manual": false
+        },
+        "waste_clean_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794925271000,
+          "manual": false
+        },
+        "waste_clean_tank_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794925859000,
+          "manual": false
+        }
+      },
+      "routine": {
+        "A": {
+          "t": 1794924674000,
+          "side": "A",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "ENTRY"
+        },
+        "B": {
+          "t": 1794924674000,
+          "side": "B",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "ENTRY"
+        }
+      },
+      "inlet": { "bypass": true, "receiving": [] },
+      "trains": {
+        "A": {
+          "side": "A",
+          "evidence": [],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": false,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Entry",
+          "confidence": "reported",
+          "since": 1794891387000
+        },
+        "B": {
+          "side": "B",
+          "evidence": [],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": false,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Entry",
+          "confidence": "reported",
+          "since": 1794891387000
+        }
+      },
+      "t3": {
+        "receivingFrom": [],
+        "uv": false,
+        "circulating": false,
+        "draining": true,
+        "label": "Draining",
+        "confidence": "valve",
+        "evidence": ["T3 drain valve open"]
+      },
+      "t4": { "max": false, "min": true, "label": "Above min" },
+      "supply": {
+        "pumping": false,
+        "toOutlets": false,
+        "source": "recycled",
+        "toilet": false,
+        "wash": false,
+        "auxiliary": false
+      },
+      "systemBehaviors": [
+        {
+          "name": "fullWastePowerLoss",
+          "typeId": 19,
+          "side": "SYSTEM",
+          "label": "Full waste power loss",
+          "start": 1794925152000,
+          "end": 1794926985000,
+          "open": false
+        }
+      ],
+      "room": {
+        "liters": 0,
+        "partial": false,
+        "bypass": true,
+        "restart": false,
+        "filling": "A",
+        "trains": {
+          "A": {
+            "side": "A",
+            "liters": 2.3266817419622896,
+            "t2": 131.6733182580377,
+            "measuredAt": 1794891380000,
+            "accepting": true,
+            "reason": "Accepting water"
+          },
+          "B": {
+            "side": "B",
+            "liters": 24.495247529529053,
+            "t2": 109.50475247047095,
+            "measuredAt": 1794891380000,
+            "accepting": true,
+            "reason": "Accepting water"
+          }
+        }
+      }
+    },
+    "receiving": {
+      "t": 1794928350000,
+      "tanks": {
+        "t1a": {
+          "liters": 13.37866793863228,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.5574444974430116,
+          "trend": 0.03269001649854175
+        },
+        "t2a": {
+          "liters": 106.82200548203384,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.5774162458488316,
+          "trend": 0.10975510893111533
+        },
+        "t1b": {
+          "liters": 0.5258232966470912,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.02190930402696213,
+          "trend": 0.050556219072876565
+        },
+        "t2b": {
+          "liters": 7.422882050910461,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.04012368676167817,
+          "trend": -0.04008773005274504
+        },
+        "t3": {
+          "liters": 25.799921287316828,
+          "max": 280,
+          "pct": 0.09214257602613153,
+          "trend": 0.18557735511101753
+        }
+      },
+      "io": {
+        "grey_water_bypass": {
+          "on": false,
+          "value": 0,
+          "since": 1794926985000,
+          "manual": false
+        },
+        "grey_water_ab_selection_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794798247000,
+          "manual": false
+        },
+        "uv_valve": {
+          "on": true,
+          "value": 1,
+          "since": 1794927691000,
+          "manual": false
+        },
+        "uv_power": {
+          "on": true,
+          "value": 1,
+          "since": 1794927691000,
+          "manual": false
+        },
+        "circulation_pump": {
+          "on": true,
+          "value": 1,
+          "since": 1794927691000,
+          "manual": false
+        },
+        "distribution_pump": {
+          "on": true,
+          "value": 1,
+          "since": 1794927692000,
+          "manual": false
+        },
+        "pre_backup_water_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "backup_water": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "back_flush": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "waste_storage_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794926985000,
+          "manual": false
+        },
+        "auxiliary": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "wash": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "toilet": {
+          "on": false,
+          "value": 0,
+          "since": 1794927894417,
+          "manual": false
+        },
+        "tank4": {
+          "on": false,
+          "value": 0,
+          "since": 1794781148000,
+          "manual": false
+        },
+        "tank4_enough_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794916849000,
+          "manual": false
+        },
+        "accu_charge_enable": {
+          "on": false,
+          "value": 0,
+          "since": 1794919612000,
+          "manual": false
+        },
+        "battery_power_on": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "battery_power_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "buzzer": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "air_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794928347770,
+          "manual": false
+        },
+        "air_pump_b": {
+          "on": true,
+          "value": 1,
+          "since": 1794927022000,
+          "manual": false
+        },
+        "add_air_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794927089987,
+          "manual": false
+        },
+        "add_air_valve_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794927100006,
+          "manual": false
+        },
+        "bubbles_block": {
+          "on": false,
+          "value": 0,
+          "since": 1794876168598,
+          "manual": false
+        },
+        "bubbles_block_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794890677903,
+          "manual": false
+        },
+        "release_air": {
+          "on": true,
+          "value": 1,
+          "since": 1794928347770,
+          "manual": false
+        },
+        "release_air_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794927002000,
+          "manual": false
+        },
+        "transfer_path": {
+          "on": false,
+          "value": 0,
+          "since": 1794815771000,
+          "manual": false
+        },
+        "transfer_path_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794820341000,
+          "manual": false
+        },
+        "diffuser_backwash": {
+          "on": false,
+          "value": 0,
+          "since": 1794927691000,
+          "manual": false
+        },
+        "diffuser_backwash_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794927691000,
+          "manual": false
+        },
+        "waste_clean_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794925271000,
+          "manual": false
+        },
+        "waste_clean_tank_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794925859000,
+          "manual": false
+        }
+      },
+      "routine": {
+        "A": {
+          "t": 1794928347770,
+          "side": "A",
+          "routine": 2,
+          "name": "INCOMING_WATER",
+          "state": "LEVEL_TANKS"
+        },
+        "B": {
+          "t": 1794927100006,
+          "side": "B",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "PASSIVE_CIRCULATE"
+        }
+      },
+      "inlet": { "bypass": false, "receiving": ["A"] },
+      "trains": {
+        "A": {
+          "side": "A",
+          "lastIncoming": 1794928347770,
+          "evidence": ["A/B valve set to A"],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": false,
+          "phase": "receiving",
+          "label": "Incoming water",
+          "detail": "Level tanks",
+          "confidence": "valve",
+          "since": 1794928347770
+        },
+        "B": {
+          "side": "B",
+          "evidence": ["Air pump running"],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Passive circulate",
+          "confidence": "reported",
+          "since": 1794891387000
+        }
+      },
+      "t3": {
+        "receivingFrom": [],
+        "uv": true,
+        "circulating": true,
+        "draining": false,
+        "label": "Circulating through UV",
+        "confidence": "valve",
+        "evidence": ["Circulation valve open", "UV on"]
+      },
+      "t4": { "max": false, "min": true, "label": "Above min" },
+      "supply": {
+        "pumping": true,
+        "toOutlets": true,
+        "source": "recycled",
+        "toilet": false,
+        "wash": false,
+        "auxiliary": false
+      },
+      "systemBehaviors": [],
+      "room": {
+        "liters": 26.821929271491342,
+        "partial": false,
+        "bypass": false,
+        "restart": false,
+        "filling": "A",
+        "trains": {
+          "A": {
+            "side": "A",
+            "liters": 2.3266817419622896,
+            "t2": 131.6733182580377,
+            "measuredAt": 1794891380000,
+            "accepting": true,
+            "reason": "Accepting water"
+          },
+          "B": {
+            "side": "B",
+            "liters": 24.495247529529053,
+            "t2": 109.50475247047095,
+            "measuredAt": 1794891380000,
+            "accepting": true,
+            "reason": "Accepting water"
+          }
+        }
+      }
+    },
+    "filth-removal": {
+      "t": 1794930660000,
+      "tanks": {
+        "t1a": {
+          "liters": 23.915257357922382,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.9964690565800992,
+          "trend": 0.37740506391884665
+        },
+        "t2a": {
+          "liters": 151.49257931731728,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.818878807120634,
+          "trend": -0.3925930948970972
+        },
+        "t1b": {
+          "liters": 0,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0,
+          "trend": -0.10234152221931903
+        },
+        "t2b": {
+          "liters": 8.004720974946395,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.04326876202673727,
+          "trend": 0.08951973361308516
+        },
+        "t3": {
+          "liters": 26.113462332077326,
+          "max": 280,
+          "pct": 0.09326236547170473,
+          "trend": 0.011370624788105488
+        }
+      },
+      "io": {
+        "grey_water_bypass": {
+          "on": false,
+          "value": 0,
+          "since": 1794926985000,
+          "manual": false
+        },
+        "grey_water_ab_selection_valve": {
+          "on": true,
+          "value": 1,
+          "since": 1794930127000,
+          "manual": false
+        },
+        "uv_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794929681616,
+          "manual": false
+        },
+        "uv_power": {
+          "on": false,
+          "value": 0,
+          "since": 1794930106210,
+          "manual": false
+        },
+        "circulation_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794929680616,
+          "manual": false
+        },
+        "distribution_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794929677616,
+          "manual": false
+        },
+        "pre_backup_water_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "backup_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794929682616,
+          "manual": false
+        },
+        "back_flush": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "waste_storage_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794926985000,
+          "manual": false
+        },
+        "auxiliary": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "wash": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "toilet": {
+          "on": false,
+          "value": 0,
+          "since": 1794927894417,
+          "manual": false
+        },
+        "tank4": {
+          "on": false,
+          "value": 0,
+          "since": 1794781148000,
+          "manual": false
+        },
+        "tank4_enough_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794916849000,
+          "manual": false
+        },
+        "accu_charge_enable": {
+          "on": false,
+          "value": 0,
+          "since": 1794919612000,
+          "manual": false
+        },
+        "battery_power_on": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "battery_power_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "buzzer": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "air_pump": {
+          "on": true,
+          "value": 1,
+          "since": 1794930232000,
+          "manual": false
+        },
+        "air_pump_b": {
+          "on": true,
+          "value": 1,
+          "since": 1794930164000,
+          "manual": false
+        },
+        "add_air_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794930320088,
+          "manual": false
+        },
+        "add_air_valve_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794930227620,
+          "manual": false
+        },
+        "bubbles_block": {
+          "on": false,
+          "value": 0,
+          "since": 1794930188000,
+          "manual": false
+        },
+        "bubbles_block_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794890677903,
+          "manual": false
+        },
+        "release_air": {
+          "on": false,
+          "value": 0,
+          "since": 1794930255000,
+          "manual": false
+        },
+        "release_air_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794930144000,
+          "manual": false
+        },
+        "transfer_path": {
+          "on": false,
+          "value": 0,
+          "since": 1794815771000,
+          "manual": false
+        },
+        "transfer_path_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794820341000,
+          "manual": false
+        },
+        "diffuser_backwash": {
+          "on": false,
+          "value": 0,
+          "since": 1794929684616,
+          "manual": false
+        },
+        "diffuser_backwash_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794929684616,
+          "manual": false
+        },
+        "waste_clean_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794925271000,
+          "manual": false
+        },
+        "waste_clean_tank_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794925859000,
+          "manual": false
+        }
+      },
+      "routine": {
+        "A": {
+          "t": 1794930656088,
+          "side": "A",
+          "routine": 4,
+          "name": "FILTH_REMOVAL",
+          "state": "REMOVE_FILTH_ON_HEIGHT"
+        },
+        "B": {
+          "t": 1794930227620,
+          "side": "B",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "PASSIVE_CIRCULATE"
+        }
+      },
+      "inlet": { "bypass": false, "receiving": [] },
+      "trains": {
+        "A": {
+          "side": "A",
+          "lastIncoming": 1794929337941,
+          "evidence": [
+            "Air pump running",
+            "Skimming over the overflow (inferred)"
+          ],
+          "t2ToT1": false,
+          "skimming": true,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "cleaning",
+          "label": "Filth removal",
+          "detail": "Remove filth on height",
+          "confidence": "reported",
+          "since": 1794930280088
+        },
+        "B": {
+          "side": "B",
+          "lastIncoming": 1794929362624,
+          "evidence": ["Air pump running"],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Passive circulate",
+          "confidence": "reported",
+          "since": 1794930127000
+        }
+      },
+      "t3": {
+        "receivingFrom": [],
+        "uv": false,
+        "circulating": false,
+        "draining": false,
+        "label": "Holding",
+        "confidence": "valve",
+        "evidence": []
+      },
+      "t4": { "max": false, "min": true, "label": "Above min" },
+      "supply": {
+        "pumping": false,
+        "toOutlets": false,
+        "source": "backup",
+        "toilet": false,
+        "wash": false,
+        "auxiliary": false
+      },
+      "systemBehaviors": [],
+      "room": {
+        "liters": 126.88985096629438,
+        "partial": false,
+        "bypass": false,
+        "restart": false,
+        "filling": "B",
+        "trains": {
+          "A": {
+            "side": "A",
+            "liters": 0,
+            "t2": 155.0490247307225,
+            "measuredAt": 1794930120000,
+            "accepting": false,
+            "reason": "Filth removal, not accepting water"
+          },
+          "B": {
+            "side": "B",
+            "liters": 126.88985096629438,
+            "t2": 7.1101490337056275,
+            "measuredAt": 1794930120000,
+            "accepting": true,
+            "reason": "Accepting water"
+          }
+        }
+      }
+    },
+    "backup-water": {
+      "t": 1794934350000,
+      "tanks": {
+        "t1a": {
+          "liters": 24,
+          "max": 24,
+          "capacity": 24,
+          "pct": 1,
+          "trend": 0.0008875121106392214
+        },
+        "t2a": {
+          "liters": 149.32146378884948,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.8071430475072945,
+          "trend": -0.023144036413503953
+        },
+        "t1b": { "liters": 0, "max": 24, "capacity": 24, "pct": 0, "trend": 0 },
+        "t2b": {
+          "liters": 7.810380643117242,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.04221827374657969,
+          "trend": -0.027153302435763037
+        },
+        "t3": {
+          "liters": 26.010675056651237,
+          "max": 280,
+          "pct": 0.09289526805946871,
+          "trend": -0.018911569463088897
+        }
+      },
+      "io": {
+        "grey_water_bypass": {
+          "on": false,
+          "value": 0,
+          "since": 1794926985000,
+          "manual": false
+        },
+        "grey_water_ab_selection_valve": {
+          "on": true,
+          "value": 1,
+          "since": 1794930127000,
+          "manual": false
+        },
+        "uv_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794929681616,
+          "manual": false
+        },
+        "uv_power": {
+          "on": false,
+          "value": 0,
+          "since": 1794933706307,
+          "manual": false
+        },
+        "circulation_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794929680616,
+          "manual": false
+        },
+        "distribution_pump": {
+          "on": true,
+          "value": 1,
+          "since": 1794934322090,
+          "manual": false
+        },
+        "pre_backup_water_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "backup_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794929682616,
+          "manual": false
+        },
+        "back_flush": {
+          "on": false,
+          "value": 0,
+          "since": 1794916872000,
+          "manual": false
+        },
+        "waste_storage_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794926985000,
+          "manual": false
+        },
+        "auxiliary": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "wash": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "toilet": {
+          "on": true,
+          "value": 1,
+          "since": 1794934322090,
+          "manual": false
+        },
+        "tank4": {
+          "on": false,
+          "value": 0,
+          "since": 1794781148000,
+          "manual": false
+        },
+        "tank4_enough_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794916849000,
+          "manual": false
+        },
+        "accu_charge_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794933972000,
+          "manual": false
+        },
+        "battery_power_on": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "battery_power_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "buzzer": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "air_pump": {
+          "on": true,
+          "value": 1,
+          "since": 1794930232000,
+          "manual": false
+        },
+        "air_pump_b": {
+          "on": true,
+          "value": 1,
+          "since": 1794930164000,
+          "manual": false
+        },
+        "add_air_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794934304147,
+          "manual": false
+        },
+        "add_air_valve_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794930227620,
+          "manual": false
+        },
+        "bubbles_block": {
+          "on": false,
+          "value": 0,
+          "since": 1794930188000,
+          "manual": false
+        },
+        "bubbles_block_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794890677903,
+          "manual": false
+        },
+        "release_air": {
+          "on": false,
+          "value": 0,
+          "since": 1794930255000,
+          "manual": false
+        },
+        "release_air_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794930144000,
+          "manual": false
+        },
+        "transfer_path": {
+          "on": false,
+          "value": 0,
+          "since": 1794815771000,
+          "manual": false
+        },
+        "transfer_path_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794820341000,
+          "manual": false
+        },
+        "diffuser_backwash": {
+          "on": false,
+          "value": 0,
+          "since": 1794929684616,
+          "manual": false
+        },
+        "diffuser_backwash_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794929684616,
+          "manual": false
+        },
+        "waste_clean_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794925271000,
+          "manual": false
+        },
+        "waste_clean_tank_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794925859000,
+          "manual": false
+        }
+      },
+      "routine": {
+        "A": {
+          "t": 1794930656088,
+          "side": "A",
+          "routine": 4,
+          "name": "FILTH_REMOVAL",
+          "state": "REMOVE_FILTH_ON_HEIGHT"
+        },
+        "B": {
+          "t": 1794930227620,
+          "side": "B",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "PASSIVE_CIRCULATE"
+        }
+      },
+      "inlet": { "bypass": false, "receiving": [] },
+      "trains": {
+        "A": {
+          "side": "A",
+          "lastIncoming": 1794929337941,
+          "evidence": [
+            "Air pump running",
+            "Skimming over the overflow (inferred)"
+          ],
+          "t2ToT1": false,
+          "skimming": true,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "cleaning",
+          "label": "Filth removal",
+          "detail": "Remove filth on height",
+          "confidence": "reported",
+          "since": 1794930280088
+        },
+        "B": {
+          "side": "B",
+          "lastIncoming": 1794929362624,
+          "evidence": ["Air pump running"],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Passive circulate",
+          "confidence": "reported",
+          "since": 1794930127000
+        }
+      },
+      "t3": {
+        "receivingFrom": [],
+        "uv": false,
+        "circulating": false,
+        "draining": false,
+        "label": "Holding",
+        "confidence": "valve",
+        "evidence": []
+      },
+      "t4": { "max": false, "min": true, "label": "Above min" },
+      "supply": {
+        "pumping": true,
+        "toOutlets": true,
+        "source": "backup",
+        "toilet": true,
+        "wash": false,
+        "auxiliary": false
+      },
+      "systemBehaviors": [],
+      "room": {
+        "liters": 126.88985096629438,
+        "partial": false,
+        "bypass": false,
+        "restart": false,
+        "filling": "B",
+        "trains": {
+          "A": {
+            "side": "A",
+            "liters": 0,
+            "t2": 155.0490247307225,
+            "measuredAt": 1794930120000,
+            "accepting": false,
+            "reason": "Filth removal, not accepting water"
+          },
+          "B": {
+            "side": "B",
+            "liters": 126.88985096629438,
+            "t2": 7.1101490337056275,
+            "measuredAt": 1794930120000,
+            "accepting": true,
+            "reason": "Accepting water"
+          }
+        }
+      }
+    },
+    "transfer": {
+      "t": 1794947730000,
+      "tanks": {
+        "t1a": {
+          "liters": 20.424997143524983,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.8510415476468743,
+          "trend": -0.15320026813696047
+        },
+        "t2a": {
+          "liters": 144.88201642623557,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.7831460347364084,
+          "trend": 0.043995037512314636
+        },
+        "t1b": {
+          "liters": 0.12949596180114895,
+          "max": 24,
+          "capacity": 24,
+          "pct": 0.0053956650750478724,
+          "trend": 0.000587214042898268
+        },
+        "t2b": {
+          "liters": 8.196313041029498,
+          "max": 185,
+          "capacity": 200,
+          "pct": 0.044304394816375665,
+          "trend": 0.01354483838891607
+        },
+        "t3": {
+          "liters": 25.148472929559652,
+          "max": 280,
+          "pct": 0.08981597474842733,
+          "trend": 0.12355560075491709
+        }
+      },
+      "io": {
+        "grey_water_bypass": {
+          "on": false,
+          "value": 0,
+          "since": 1794926985000,
+          "manual": false
+        },
+        "grey_water_ab_selection_valve": {
+          "on": true,
+          "value": 1,
+          "since": 1794930127000,
+          "manual": false
+        },
+        "uv_valve": {
+          "on": true,
+          "value": 1,
+          "since": 1794947710000,
+          "manual": false
+        },
+        "uv_power": {
+          "on": true,
+          "value": 1,
+          "since": 1794947710000,
+          "manual": false
+        },
+        "circulation_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794947726000,
+          "manual": false
+        },
+        "distribution_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794947724000,
+          "manual": false
+        },
+        "pre_backup_water_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "backup_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794945905593,
+          "manual": false
+        },
+        "back_flush": {
+          "on": false,
+          "value": 0,
+          "since": 1794945317531,
+          "manual": false
+        },
+        "waste_storage_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794945317531,
+          "manual": false
+        },
+        "auxiliary": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "wash": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "toilet": {
+          "on": false,
+          "value": 0,
+          "since": 1794947251847,
+          "manual": false
+        },
+        "tank4": {
+          "on": false,
+          "value": 0,
+          "since": 1794781148000,
+          "manual": false
+        },
+        "tank4_enough_water": {
+          "on": true,
+          "value": 1,
+          "since": 1794916849000,
+          "manual": false
+        },
+        "accu_charge_enable": {
+          "on": false,
+          "value": 0,
+          "since": 1794938112000,
+          "manual": false
+        },
+        "battery_power_on": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "battery_power_enable": {
+          "on": true,
+          "value": 1,
+          "since": 1794916852000,
+          "manual": false
+        },
+        "buzzer": {
+          "on": false,
+          "value": 0,
+          "since": 1792454400000,
+          "manual": false
+        },
+        "air_pump": {
+          "on": false,
+          "value": 0,
+          "since": 1794946872531,
+          "manual": false
+        },
+        "air_pump_b": {
+          "on": true,
+          "value": 1,
+          "since": 1794944847945,
+          "manual": false
+        },
+        "add_air_valve": {
+          "on": false,
+          "value": 0,
+          "since": 1794946835531,
+          "manual": false
+        },
+        "add_air_valve_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794946844221,
+          "manual": false
+        },
+        "bubbles_block": {
+          "on": false,
+          "value": 0,
+          "since": 1794930188000,
+          "manual": false
+        },
+        "bubbles_block_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794890677903,
+          "manual": false
+        },
+        "release_air": {
+          "on": true,
+          "value": 1,
+          "since": 1794947702000,
+          "manual": false
+        },
+        "release_air_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794944827945,
+          "manual": false
+        },
+        "transfer_path": {
+          "on": true,
+          "value": 1,
+          "since": 1794947710000,
+          "manual": false
+        },
+        "transfer_path_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794820341000,
+          "manual": false
+        },
+        "diffuser_backwash": {
+          "on": false,
+          "value": 0,
+          "since": 1794947702000,
+          "manual": false
+        },
+        "diffuser_backwash_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794947702000,
+          "manual": false
+        },
+        "waste_clean_tank": {
+          "on": false,
+          "value": 0,
+          "since": 1794925271000,
+          "manual": false
+        },
+        "waste_clean_tank_b": {
+          "on": false,
+          "value": 0,
+          "since": 1794925859000,
+          "manual": false
+        }
+      },
+      "routine": {
+        "A": {
+          "t": 1794947729000,
+          "side": "A",
+          "routine": 5,
+          "name": "TRANSFER",
+          "state": "TRANSFER_WATER_T3_LEVELED"
+        },
+        "B": {
+          "t": 1794944919239,
+          "side": "B",
+          "routine": 1,
+          "name": "STANDBY",
+          "state": "PASSIVE_CIRCULATE"
+        }
+      },
+      "inlet": { "bypass": false, "receiving": [] },
+      "trains": {
+        "A": {
+          "side": "A",
+          "lastIncoming": 1794929337941,
+          "lastTransfer": 1794946872531,
+          "evidence": ["Transfer valve open"],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": false,
+          "phase": "transferring",
+          "label": "Transferring to T3",
+          "detail": "HDM routine: Transfer · Transfer water t3 leveled",
+          "confidence": "valve",
+          "since": 1794947710000
+        },
+        "B": {
+          "side": "B",
+          "lastIncoming": 1794929362624,
+          "evidence": ["Air pump running"],
+          "t2ToT1": false,
+          "skimming": false,
+          "behaviors": [],
+          "pressurized": true,
+          "phase": "idle",
+          "label": "Standby",
+          "detail": "Passive circulate",
+          "confidence": "reported",
+          "since": 1794930127000
+        }
+      },
+      "t3": {
+        "receivingFrom": ["A"],
+        "uv": true,
+        "circulating": false,
+        "draining": false,
+        "label": "Receiving from A",
+        "confidence": "valve",
+        "evidence": ["Transfer A open"]
+      },
+      "t4": { "max": false, "min": true, "label": "Above min" },
+      "supply": {
+        "pumping": false,
+        "toOutlets": false,
+        "source": "backup",
+        "toilet": false,
+        "wash": false,
+        "auxiliary": false
+      },
+      "systemBehaviors": [],
+      "room": {
+        "liters": 126.88985096629438,
+        "partial": false,
+        "bypass": false,
+        "restart": false,
+        "filling": "B",
+        "trains": {
+          "A": {
+            "side": "A",
+            "liters": 0,
+            "t2": 155.0490247307225,
+            "measuredAt": 1794930120000,
+            "accepting": true,
+            "reason": "Full"
+          },
+          "B": {
+            "side": "B",
+            "liters": 126.88985096629438,
+            "t2": 7.1101490337056275,
+            "measuredAt": 1794930120000,
+            "accepting": true,
+            "reason": "Accepting water"
+          }
+        }
+      }
+    }
+  }
+}

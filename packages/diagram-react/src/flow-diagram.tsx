@@ -2,6 +2,9 @@
 // and outlets. Pipes are colored and animated only while a routine, valve,
 // pump or sensor signal shows water moving through them. Pipes that their
 // valves leave open, but without water moving, are drawn with more contrast.
+//
+// Plain React without hooks, so it also renders as a server component. The
+// class names are prefixed with `hl-`, see `styles.css`.
 
 import {
   capacityNote,
@@ -13,10 +16,15 @@ import {
   type IoValue,
   type Side,
   type TankLevel,
-} from "@/lib/model";
+} from "./model.js";
 
 type Kind = "grey" | "clean" | "mains" | "waste" | "air";
 
+/**
+ * Times in tooltips, in the runtime's locale and time zone. They can differ
+ * between server and browser, so the `<title>` elements that show them have
+ * `suppressHydrationWarning`.
+ */
 function formatTime(t: number | undefined) {
   if (t === undefined) return "";
   return new Date(t).toLocaleTimeString([], {
@@ -67,15 +75,15 @@ function Pipe({
             : "idle";
   return (
     <g
-      className={`pipe kind-${kind} is-${state}${still ? " is-still" : ""}${square ? " is-square" : ""}`}
+      className={`hl-pipe hl-kind-${kind} is-${state}${still ? " is-still" : ""}${square ? " is-square" : ""}`}
     >
       {title && <title>{title}</title>}
-      <path d={d} className="pipe-base" />
-      {state === "filled" && <path d={d} className="pipe-water" />}
-      {active && <path d={d} className="pipe-flow" />}
+      <path d={d} className="hl-pipe-base" />
+      {state === "filled" && <path d={d} className="hl-pipe-water" />}
+      {active && <path d={d} className="hl-pipe-flow" />}
       {arrow && (
         <path
-          className="pipe-arrow"
+          className="hl-pipe-arrow"
           d={
             arrow.dir === "down"
               ? `M${arrow.x - 7} ${arrow.y} L${arrow.x + 7} ${arrow.y} L${arrow.x} ${arrow.y + 9} Z`
@@ -139,15 +147,15 @@ function Valve({
   ]);
   return (
     <g
-      className={`valve kind-${kind} is-${state}${state === "open" && active ? " is-flowing" : ""}`}
+      className={`hl-valve hl-kind-${kind} is-${state}${state === "open" && active ? " is-flowing" : ""}`}
       tabIndex={0}
       role="img"
       aria-label={title}
     >
       <title suppressHydrationWarning>{title}</title>
-      <rect x={x - 14} y={y - 14} width={28} height={28} className="hit" />
+      <rect x={x - 14} y={y - 14} width={28} height={28} className="hl-hit" />
       <g
-        className="valve-body"
+        className="hl-valve-body"
         style={{
           transform: `rotate(${angle}deg)`,
           transformOrigin: `${x}px ${y}px`,
@@ -161,7 +169,7 @@ function Valve({
           x={x + labelDx}
           y={y + labelDy}
           textAnchor={labelAnchor}
-          className="diagram-label"
+          className="hl-diagram-label"
         >
           {label}
         </text>
@@ -300,7 +308,7 @@ function Distributor({
   const title = ioTitle(label, name, io, words);
   return (
     <g
-      className={`distributor kind-${kind}`}
+      className={`hl-distributor hl-kind-${kind}`}
       tabIndex={0}
       role="img"
       aria-label={title}
@@ -313,9 +321,9 @@ function Distributor({
         }
         width={up ? 2 * w + 8 : w + 8}
         height={up ? w + 8 : 2 * w + 8}
-        className="hit"
+        className="hl-hit"
       />
-      <g className="valve-body">
+      <g className="hl-valve-body">
         {open === 0 || left.open === undefined ? (
           <polygon
             points={outline(
@@ -359,7 +367,7 @@ function Distributor({
         x={x + labelDx}
         y={y + labelDy}
         textAnchor={labelAnchor}
-        className={strong ? "diagram-label is-bold" : "diagram-label"}
+        className={strong ? "hl-diagram-label is-bold" : "hl-diagram-label"}
       >
         {label}
       </text>
@@ -407,26 +415,26 @@ function Pump({
   const title = ioTitle(label, name, io, ["running", "off"]);
   return (
     <g
-      className={`pump kind-${kind} is-${state}`}
+      className={`hl-pump hl-kind-${kind} is-${state}`}
       tabIndex={0}
       role="img"
       aria-label={title}
     >
       <title suppressHydrationWarning>{title}</title>
-      <circle cx={x} cy={y} r={r} className="pump-casing" />
+      <circle cx={x} cy={y} r={r} className="hl-pump-casing" />
       <g transform={`translate(${x} ${y})`}>
-        <g className="impeller">
+        <g className="hl-impeller">
           {/* Centers the box the impeller spins around */}
-          <circle r={blades + 1} className="impeller-box" />
-          <path d={impellerPath(blades)} className="impeller-blades" />
-          <circle r={r * 0.22} className="impeller-hub" />
+          <circle r={blades + 1} className="hl-impeller-box" />
+          <path d={impellerPath(blades)} className="hl-impeller-blades" />
+          <circle r={r * 0.22} className="hl-impeller-hub" />
         </g>
       </g>
       <text
         x={x + (labelAnchor === "end" ? -labelDx : labelDx)}
         y={y + labelDy}
         textAnchor={labelAnchor}
-        className="diagram-label"
+        className="hl-diagram-label"
       >
         {label}
       </text>
@@ -458,7 +466,7 @@ function Sensor({
   const title = ioTitle(label, name, io, ["on", "off"]);
   return (
     <g
-      className={`sensor kind-${kind} is-${state}`}
+      className={`hl-sensor hl-kind-${kind} is-${state}`}
       tabIndex={0}
       role="img"
       aria-label={title}
@@ -469,7 +477,7 @@ function Sensor({
         x={x + labelDx}
         y={y + 4}
         textAnchor={labelAnchor}
-        className="diagram-label"
+        className="hl-diagram-label"
       >
         {label}
       </text>
@@ -493,7 +501,7 @@ function Bubbles({
   if (!active) return null;
   const columns = 5;
   return (
-    <g className="bubbles" aria-hidden>
+    <g className="hl-bubbles" aria-hidden>
       {Array.from({ length: columns * 2 }, (_, i) => {
         const cx = x + ((i % columns) + 0.5) * (w / columns);
         const delay = (i * 0.37) % 1.6;
@@ -531,7 +539,7 @@ function Drips({
 }) {
   if (!active || bottom === undefined || bottom - y < 4) return null;
   return (
-    <g className={`drips kind-${kind}`} aria-hidden>
+    <g className={`hl-drips hl-kind-${kind}`} aria-hidden>
       {[0, 0.3, 0.6].map((delay) => (
         <circle
           key={delay}
@@ -583,7 +591,7 @@ function WaterRings({
 }) {
   const rings = Math.ceil(radius / 14) + 1;
   return (
-    <g className={`water-rings${out ? " is-out" : ""}`}>
+    <g className={`hl-water-rings${out ? " is-out" : ""}`}>
       <linearGradient
         id={`${id}-fade`}
         gradientUnits="userSpaceOnUse"
@@ -611,7 +619,7 @@ function WaterRings({
             cx={x}
             cy={y}
             r={rings * 14}
-            className="pressure-ring"
+            className="hl-pressure-ring"
             style={{
               transform: `scale(${i / rings})`,
               animationDuration: `${rings * 0.9}s`,
@@ -712,7 +720,7 @@ function Tank({
             ? `, ${trend >= 0 ? "+" : ""}${trend.toFixed(1)} L/min`
             : ""
         }. ${capacityNote(level!)}`.trimEnd();
-  const clipId = `pressure-${label}-${side ?? sub ?? ""}`;
+  const clipId = `hl-pressure-${label}-${side ?? sub ?? ""}`;
   const ringX = venting ?? x + w / 2;
   // Enough rings to reach the far corners of the space above the water
   const rings =
@@ -726,7 +734,7 @@ function Tank({
   const anchor = small === "start" ? "end" : "start";
   return (
     <g
-      className={`tank kind-${kind}`}
+      className={`hl-tank hl-kind-${kind}`}
       tabIndex={0}
       role="img"
       aria-label={title}
@@ -738,7 +746,7 @@ function Tank({
         width={w}
         height={h}
         rx={square ? 0 : 5}
-        className={known ? "tank-shell" : "tank-shell is-unknown"}
+        className={known ? "hl-tank-shell" : "hl-tank-shell is-unknown"}
       />
       {known && (
         <>
@@ -748,14 +756,14 @@ function Tank({
             width={w - 2}
             height={Math.max(0, fillHeight - 1)}
             rx={!square && fillHeight > 8 ? 4 : 0}
-            className="tank-fill"
+            className="hl-tank-fill"
           />
           <line
             x1={x + 1}
             x2={x + w - 1}
             y1={y + h - fillHeight}
             y2={y + h - fillHeight}
-            className="tank-surface"
+            className="hl-tank-surface"
           />
         </>
       )}
@@ -764,7 +772,7 @@ function Tank({
         // pressurized, and gathers towards the pipe it leaves through. Rings
         // start where the entering pipe's dashes leave off, and vanish where
         // the leaving pipe's dashes start
-        <g className="circulation" aria-hidden>
+        <g className="hl-circulation" aria-hidden>
           <clipPath id={`${clipId}-water`}>
             <rect
               x={x + 1}
@@ -797,7 +805,7 @@ function Tank({
           x2={x + w}
           y1={y + h - base - (h - base) * f}
           y2={y + h - base - (h - base) * f}
-          className="tank-tick"
+          className="hl-tank-tick"
         />
       ))}
       <Bubbles x={x} y={y} w={w} h={h} active={aeration} />
@@ -810,7 +818,7 @@ function Tank({
           // down the pipe: a step of 14 px takes 0.9 s, see .pipe-flow. While
           // venting, they move in towards the release air pipe instead
           <g
-            className={`pressure${venting !== undefined ? " is-venting" : pressureHeld ? " is-held" : ""}`}
+            className={`hl-pressure${venting !== undefined ? " is-venting" : pressureHeld ? " is-held" : ""}`}
             aria-hidden
           >
             <clipPath id={clipId}>
@@ -849,7 +857,7 @@ function Tank({
                 y={y}
                 width={w}
                 height={h - fillHeight}
-                className="pressure-fill"
+                className="hl-pressure-fill"
               />
               <g mask={`url(#${clipId}-mask)`}>
                 {Array.from({ length: rings }, (_, i) => (
@@ -860,7 +868,7 @@ function Tank({
                     cx={ringX}
                     cy={y}
                     r={rings * 14}
-                    className="pressure-ring"
+                    className="hl-pressure-ring"
                     style={{
                       transform: `scale(${i / rings})`,
                       animationDuration: `${rings * 0.9}s`,
@@ -876,11 +884,11 @@ function Tank({
         x={textX}
         y={small ? y + h / 2 - 6 : y + 22}
         textAnchor={anchor}
-        className="tank-label"
+        className="hl-tank-label"
       >
         {label}
         {sub && (
-          <tspan className="tank-sub" dx={6}>
+          <tspan className="hl-tank-sub" dx={6}>
             {sub}
           </tspan>
         )}
@@ -890,7 +898,7 @@ function Tank({
           x={textX}
           y={y + h / 2 + 20}
           textAnchor={anchor}
-          className="tank-value"
+          className="hl-tank-value"
         >
           {percent}
         </text>
@@ -900,12 +908,12 @@ function Tank({
           <text
             x={x + 12}
             y={y + h - (h > 100 ? 30 : 26)}
-            className="tank-value"
+            className="hl-tank-value"
           >
             {Math.round(level!.liters!)} L{" "}
-            {arrow && <tspan className="tank-trend">{arrow}</tspan>}
+            {arrow && <tspan className="hl-tank-trend">{arrow}</tspan>}
           </text>
-          <text x={x + 12} y={y + h - 12} className="tank-meta">
+          <text x={x + 12} y={y + h - 12} className="hl-tank-meta">
             {percent} of {level!.capacity ? "~" : ""}
             {Math.round(size)} L
           </text>
@@ -935,7 +943,7 @@ function BackupTank({
   // The water is at least as high as the highest wet float
   const fillTop = t4.max ? maxY : t4.min ? minY : undefined;
   return (
-    <g className="tank kind-mains">
+    <g className="hl-tank hl-kind-mains">
       <rect
         x={x}
         y={y}
@@ -943,8 +951,8 @@ function BackupTank({
         height={h}
         className={
           t4.max === undefined && t4.min === undefined
-            ? "tank-shell is-unknown"
-            : "tank-shell"
+            ? "hl-tank-shell is-unknown"
+            : "hl-tank-shell"
         }
       />
       {fillTop !== undefined && (
@@ -954,20 +962,20 @@ function BackupTank({
             y={fillTop}
             width={w - 2}
             height={y + h - fillTop - 1}
-            className="tank-fill"
+            className="hl-tank-fill"
           />
           <line
             x1={x + 1}
             x2={x + w - 1}
             y1={fillTop}
             y2={fillTop}
-            className="tank-surface is-dashed"
+            className="hl-tank-surface is-dashed"
           />
         </>
       )}
-      <text x={x + 12} y={y + 22} className="tank-label">
+      <text x={x + 12} y={y + 22} className="hl-tank-label">
         T4
-        <tspan className="tank-sub" dx={6}>
+        <tspan className="hl-tank-sub" dx={6}>
           Backup
         </tspan>
       </text>
@@ -991,7 +999,7 @@ function BackupTank({
         labelAnchor="end"
         labelDx={-12}
       />
-      <text x={x + 12} y={y + 40} className="tank-meta">
+      <text x={x + 12} y={y + 40} className="hl-tank-meta">
         {t4.label}
       </text>
     </g>
@@ -1110,7 +1118,7 @@ export function FlowDiagram({
           x={a ? 20 : 980}
           y={146}
           textAnchor={a ? "start" : "end"}
-          className="train-label"
+          className="hl-train-label"
         >
           Train {side}
         </text>
@@ -1189,7 +1197,7 @@ export function FlowDiagram({
             cx={releaseX}
             cy={136}
             r={14}
-            className="vent-ring"
+            className="hl-vent-ring"
             style={{
               animationDelay: `${(-((14 - (96 % 14)) % 14) / 14) * 0.9}s`,
             }}
@@ -1225,7 +1233,10 @@ export function FlowDiagram({
           return (
             <g key={y}>
               {/* A gap in the air pipe into T1, which passes behind */}
-              <path d={`M${gapX - 4} ${y} H${gapX + 4}`} className="pipe-gap" />
+              <path
+                d={`M${gapX - 4} ${y} H${gapX + 4}`}
+                className="hl-pipe-gap"
+              />
               <Pipe
                 d={
                   i === 0
@@ -1252,7 +1263,7 @@ export function FlowDiagram({
                 // Gaps where the upper pipe passes behind T2's walls
                 <path
                   d={`M${t2Edge + (a ? -3 : 3)} ${y} H${t2Edge} M${t2FarEdge} ${y} H${t2FarEdge + (a ? 3 : -3)}`}
-                  className="pipe-gap"
+                  className="hl-pipe-gap"
                 />
               )}
             </g>
@@ -1319,7 +1330,7 @@ export function FlowDiagram({
           x={a ? 57 : 943}
           y={228}
           textAnchor="middle"
-          className="diagram-label"
+          className="hl-diagram-label"
         >
           Skim
         </text>
@@ -1351,7 +1362,12 @@ export function FlowDiagram({
           labelDx={0}
           labelDy={24}
         />
-        <text x={drainX} y={498} textAnchor="middle" className="diagram-label">
+        <text
+          x={drainX}
+          y={498}
+          textAnchor="middle"
+          className="hl-diagram-label"
+        >
           Drain
         </text>
 
@@ -1359,7 +1375,7 @@ export function FlowDiagram({
             behind it */}
         <path
           d={`M${gapX - 4} ${transferY} H${gapX + 4}`}
-          className="pipe-gap"
+          className="hl-pipe-gap"
         />
         <Pipe
           d={`M${t1Edge} ${transferY} H${transferX} V${UV_Y} H${a ? 460 : 540}`}
@@ -1414,24 +1430,24 @@ export function FlowDiagram({
   return (
     <svg
       viewBox="0 -38 1000 863"
-      className="flow-diagram"
+      className="hl-flow-diagram"
       role="group"
       aria-label="Water flow through the H600"
     >
       <defs>
         <pattern
-          id="hatch"
+          id="hl-hatch"
           width="6"
           height="6"
           patternUnits="userSpaceOnUse"
           patternTransform="rotate(45)"
         >
-          <line x1="0" y1="0" x2="0" y2="6" className="hatch-line" />
+          <line x1="0" y1="0" x2="0" y2="6" className="hl-hatch-line" />
         </pattern>
       </defs>
 
       {/* Inlet and bypass */}
-      <text x={60} y={10} className="diagram-label is-strong">
+      <text x={60} y={10} className="hl-diagram-label is-strong">
         Greywater from showers and baths
       </text>
       <Pipe
@@ -1476,7 +1492,7 @@ export function FlowDiagram({
         labelAnchor="start"
         labelDx={14}
       />
-      <text x={948} y={-18} className="diagram-label">
+      <text x={948} y={-18} className="hl-diagram-label">
         Sewer
       </text>
 
@@ -1512,7 +1528,7 @@ export function FlowDiagram({
         open={io[IO.uvValve]?.on}
       />
       <g
-        className={`uv is-${t3.uv === undefined ? "unknown" : t3.uv ? "on" : "off"}`}
+        className={`hl-uv is-${t3.uv === undefined ? "unknown" : t3.uv ? "on" : "off"}`}
         tabIndex={0}
         role="img"
         aria-label={ioTitle("UV-C", IO.uvPower, io[IO.uvPower], ["on", "off"])}
@@ -1578,7 +1594,7 @@ export function FlowDiagram({
         labelDx={0}
         labelDy={-16}
       />
-      <text x={970} y={763} textAnchor="middle" className="diagram-label">
+      <text x={970} y={763} textAnchor="middle" className="hl-diagram-label">
         Drain
       </text>
 
@@ -1590,8 +1606,8 @@ export function FlowDiagram({
           of UV. The T3 drain and train B's transfer pipe
           pass behind it. At the top corners, the backwash pipes branch off up
           into the center of each T2's bottom */}
-      <path d={`M700 ${backupY - 4} V${backupY + 4}`} className="pipe-gap" />
-      <path d={`M700 ${UV_Y - 4} V${UV_Y + 4}`} className="pipe-gap" />
+      <path d={`M700 ${backupY - 4} V${backupY + 4}`} className="hl-pipe-gap" />
+      <path d={`M700 ${UV_Y - 4} V${UV_Y + 4}`} className="hl-pipe-gap" />
       <Pipe
         d={`M560 740 H700 V${RUN_Y}`}
         kind={outletKind}
@@ -1726,7 +1742,7 @@ export function FlowDiagram({
         active={supply.toOutlets ?? false}
         open
       />
-      <g className={`outlet${off(device.outlets.toilet)}`}>
+      <g className={`hl-outlet${off(device.outlets.toilet)}`}>
         <Pipe
           d="M360 740 V790"
           kind={outletKind}
@@ -1742,11 +1758,11 @@ export function FlowDiagram({
           name={IO.toilet}
           label=""
         />
-        <text x={360} y={815} textAnchor="middle" className="diagram-label">
+        <text x={360} y={815} textAnchor="middle" className="hl-diagram-label">
           Toilets
         </text>
       </g>
-      <g className={`outlet${off(device.outlets.washingMachine)}`}>
+      <g className={`hl-outlet${off(device.outlets.washingMachine)}`}>
         <Pipe
           d="M460 740 V790"
           kind={outletKind}
@@ -1762,11 +1778,11 @@ export function FlowDiagram({
           name={IO.wash}
           label=""
         />
-        <text x={460} y={815} textAnchor="middle" className="diagram-label">
+        <text x={460} y={815} textAnchor="middle" className="hl-diagram-label">
           Washer
         </text>
       </g>
-      <g className={`outlet${off(device.outlets.auxiliary)}`}>
+      <g className={`hl-outlet${off(device.outlets.auxiliary)}`}>
         <Pipe
           d="M560 740 V790"
           kind={outletKind}
@@ -1784,7 +1800,7 @@ export function FlowDiagram({
           name={IO.auxiliary}
           label=""
         />
-        <text x={560} y={815} textAnchor="middle" className="diagram-label">
+        <text x={560} y={815} textAnchor="middle" className="hl-diagram-label">
           Auxiliary
         </text>
       </g>
@@ -1800,19 +1816,19 @@ export function DiagramLegend() {
     ["waste", "Filth removal"],
   ];
   return (
-    <ul className="legend" aria-label="Legend">
+    <ul className="hl-legend" aria-label="Legend">
       {items.map(([kind, text]) => (
         <li key={kind}>
-          <span className={`legend-swatch kind-${kind}`} />
+          <span className={`hl-legend-swatch hl-kind-${kind}`} />
           {text}
         </li>
       ))}
       <li>
-        <span className="legend-swatch is-open" />
+        <span className="hl-legend-swatch is-open" />
         Open, no flow
       </li>
       <li>
-        <span className="legend-swatch is-idle" />
+        <span className="hl-legend-swatch is-idle" />
         No flow
       </li>
     </ul>
@@ -1859,8 +1875,8 @@ export function activeFlows(state: DeviceState) {
 export function FlowSummary({ state }: { state: DeviceState }) {
   const flows = activeFlows(state);
   return (
-    <p className="flow-summary">
-      <span className="muted">Water moving: </span>
+    <p className="hl-flow-summary">
+      <span className="hl-flow-summary-label">Water moving: </span>
       {flows.length ? flows.join(" · ") : "None"}
     </p>
   );

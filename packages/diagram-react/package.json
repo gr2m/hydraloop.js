@@ -1,0 +1,47 @@
+{
+  "name": "hydraloop-diagram-react",
+  "version": "0.0.0-development",
+  "description": "React flow diagram of a Hydraloop H600, and the model that derives what the device is doing from its signals",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./model": {
+      "types": "./dist/model.d.ts",
+      "import": "./dist/model.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && cp src/styles.css dist/styles.css",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "hydraloop",
+    "h600",
+    "react",
+    "diagram",
+    "water",
+    "recycling",
+    "greywater"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gr2m/hydraloop.git",
+    "directory": "packages/diagram-react"
+  },
+  "license": "ISC",
+  "peerDependencies": {
+    "react": ">=19"
+  }
+}

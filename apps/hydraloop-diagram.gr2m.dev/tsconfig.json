@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "es2022",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["vite/client"],
+    "paths": {
+      "hydraloop-diagram-react": ["../../packages/diagram-react/src/index.ts"],
+      "hydraloop-diagram-react/model": [
+        "../../packages/diagram-react/src/model.ts"
+      ],
+      "hydraloop-diagram-react/test/*": ["../../packages/diagram-react/test/*"],
+      "react": ["./node_modules/@types/react"],
+      "react/*": ["./node_modules/@types/react/*"]
+    }
+  },
+  "include": ["src", "scripts", "vite.config.ts"]
+}

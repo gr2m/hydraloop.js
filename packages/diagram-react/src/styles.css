@@ -1,0 +1,586 @@
+/* Styles of hydraloop-diagram-react: FlowDiagram, DiagramLegend and
+   FlowSummary. All class names, custom properties and keyframes are prefixed
+   with `hl-`.
+
+   The colors are custom properties on :root without specificity, so a host
+   page can override any of them, e.g. with its own theme:
+
+     :root {
+       --hl-bg: var(--background);
+       --hl-fg: var(--foreground);
+     }
+
+   --hl-bg must match the background behind the diagram, as it fills the gaps
+   where pipes cross. The dark colors apply with `prefers-color-scheme: dark`
+   unless <html data-theme="light">, and with <html data-theme="dark">. The
+   diagram's text inherits the font, or uses --hl-font-family if it is set. */
+
+:where(:root) {
+  --hl-bg: #ffffff;
+  --hl-fg: #171717;
+  --hl-muted: #666666;
+  --hl-subtle: #8f8f8f;
+  --hl-border: #ebebeb;
+  --hl-border-strong: #d4d4d4;
+  --hl-focus: #0070f3;
+
+  --hl-grey: #b26a00;
+  --hl-clean: #16893f;
+  --hl-mains: #0068d6;
+  --hl-waste: #8a5a3c;
+  --hl-air: #8f8f8f;
+  --hl-uv: #7c3aed;
+  --hl-pipe-idle: #e6e6e6;
+  --hl-pipe-open: #a8a8a8;
+}
+
+@media (prefers-color-scheme: dark) {
+  :where(:root:not([data-theme="light"])) {
+    --hl-bg: #0a0a0a;
+    --hl-fg: #ededed;
+    --hl-muted: #a1a1a1;
+    --hl-subtle: #707070;
+    --hl-border: #262626;
+    --hl-border-strong: #3d3d3d;
+    --hl-focus: #52a8ff;
+
+    --hl-grey: #f0a43a;
+    --hl-clean: #4cc274;
+    --hl-mains: #52a8ff;
+    --hl-waste: #93603b;
+    --hl-air: #8f8f8f;
+    --hl-uv: #a78bfa;
+    --hl-pipe-idle: #262626;
+    --hl-pipe-open: #5c5c5c;
+  }
+}
+
+:where(:root[data-theme="dark"]) {
+  --hl-bg: #0a0a0a;
+  --hl-fg: #ededed;
+  --hl-muted: #a1a1a1;
+  --hl-subtle: #707070;
+  --hl-border: #262626;
+  --hl-border-strong: #3d3d3d;
+  --hl-focus: #52a8ff;
+
+  --hl-grey: #f0a43a;
+  --hl-clean: #4cc274;
+  --hl-mains: #52a8ff;
+  --hl-waste: #93603b;
+  --hl-air: #8f8f8f;
+  --hl-uv: #a78bfa;
+  --hl-pipe-idle: #262626;
+  --hl-pipe-open: #5c5c5c;
+}
+
+/* Pipes, tanks and legend swatches are colored by the kind of water */
+.hl-kind-grey {
+  --hl-k: var(--hl-grey);
+}
+.hl-kind-clean {
+  --hl-k: var(--hl-clean);
+}
+.hl-kind-mains {
+  --hl-k: var(--hl-mains);
+}
+.hl-kind-waste {
+  --hl-k: var(--hl-waste);
+}
+.hl-kind-air {
+  --hl-k: var(--hl-air);
+}
+.hl-kind-uv {
+  --hl-k: var(--hl-uv);
+}
+
+/* ── Legend and summary ─────────────────────────────────────────────────── */
+
+.hl-flow-summary {
+  font-size: 14px;
+  margin: 8px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+.hl-legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  color: var(--hl-muted);
+}
+.hl-legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.hl-legend-swatch {
+  display: inline-block;
+  width: 20px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--hl-k);
+}
+.hl-legend-swatch.is-idle {
+  background: var(--hl-pipe-idle);
+}
+.hl-legend-swatch.is-open {
+  background: var(--hl-pipe-open);
+}
+
+.hl-flow-summary-label {
+  color: var(--hl-muted);
+}
+
+/* ── Flow diagram ───────────────────────────────────────────────────────── */
+
+.hl-flow-diagram {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--hl-font-family, inherit);
+}
+.hl-flow-diagram [tabindex]:focus-visible {
+  outline: none;
+}
+.hl-flow-diagram
+  [tabindex]:focus-visible
+  > :is(circle, polygon, rect:not(.hl-hit)),
+.hl-flow-diagram [tabindex]:focus-visible > .hl-valve-body > polygon {
+  stroke: var(--hl-focus);
+  stroke-width: 2.5;
+}
+
+.hl-pipe-base {
+  fill: none;
+  stroke: var(--hl-pipe-idle);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.hl-pipe.is-square :is(.hl-pipe-base, .hl-pipe-water, .hl-pipe-flow) {
+  stroke-linecap: butt;
+}
+.hl-pipe.hl-kind-air .hl-pipe-base {
+  stroke-width: 5;
+}
+.hl-pipe.is-open .hl-pipe-base {
+  stroke: var(--hl-pipe-open);
+}
+.hl-pipe.is-filled .hl-pipe-base {
+  stroke: var(--hl-border-strong);
+}
+/* The same color as .hl-tank-fill over the tank's background */
+.hl-pipe-water {
+  fill: none;
+  stroke: color-mix(in srgb, var(--hl-k) 16%, var(--hl-bg));
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.hl-pipe.is-active .hl-pipe-base {
+  stroke: var(--hl-k);
+}
+.hl-pipe.is-unknown .hl-pipe-base {
+  stroke: var(--hl-border-strong);
+  stroke-width: 3;
+  stroke-dasharray: 0.5 7;
+}
+.hl-pipe-flow {
+  fill: none;
+  stroke: var(--hl-bg);
+  stroke-opacity: 0.75;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 3 11;
+  animation: hl-flow 0.9s linear infinite;
+}
+.hl-pipe.is-filled .hl-pipe-flow {
+  stroke: var(--hl-k);
+  stroke-opacity: 0.45;
+}
+/* Inverted: the pipe is dark inside, with light gaps moving down. The gaps
+   keep the dashes' place, where T2's pressure rings pick them up */
+.hl-pipe.hl-kind-air .hl-pipe-flow {
+  stroke-width: 2;
+  stroke-dasharray: 7 7;
+  animation-name: hl-flow-air;
+}
+/* Air held under pressure: the pattern stays, standing still */
+.hl-pipe.is-still .hl-pipe-flow,
+.hl-pressure.is-held .hl-pressure-ring {
+  animation: none;
+}
+.hl-pressure.is-held .hl-pressure-ring {
+  stroke-opacity: 0.3;
+}
+/* Air leaves through the release air pipe: the rings move in towards it */
+.hl-pressure.is-venting .hl-pressure-ring {
+  animation-direction: reverse;
+}
+/* Water circulating through a tank: rings in the water's color, spreading
+   from where it enters and gathering towards where it leaves */
+.hl-water-rings .hl-pressure-ring {
+  stroke: var(--hl-k);
+}
+.hl-water-rings.is-out .hl-pressure-ring {
+  animation-direction: reverse;
+}
+/* Where a pipe passes behind another: 3 px of background on either side of
+   the 7 px pipe in front */
+.hl-pipe-gap {
+  stroke: var(--hl-bg);
+  stroke-width: 13;
+}
+.hl-pipe-arrow {
+  fill: var(--hl-pipe-idle);
+}
+.hl-pipe.is-open .hl-pipe-arrow {
+  fill: var(--hl-pipe-open);
+}
+.hl-pipe.is-active .hl-pipe-arrow {
+  fill: var(--hl-k);
+}
+.hl-pipe.is-unknown .hl-pipe-arrow {
+  fill: var(--hl-border-strong);
+}
+
+@keyframes hl-flow {
+  to {
+    stroke-dashoffset: -14;
+  }
+}
+@keyframes hl-flow-air {
+  from {
+    stroke-dashoffset: -5;
+  }
+  to {
+    stroke-dashoffset: -19;
+  }
+}
+
+.hl-hit {
+  fill: transparent;
+}
+
+.hl-valve polygon {
+  fill: var(--hl-bg);
+  stroke: var(--hl-muted);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.hl-valve-body {
+  transition: transform 0.3s ease;
+}
+/* Outlined, so an open valve stands out from its pipe without water */
+.hl-valve.is-open polygon {
+  fill: var(--hl-pipe-open);
+  stroke: var(--hl-bg);
+  stroke-width: 1;
+}
+.hl-valve.is-flowing polygon {
+  fill: var(--hl-k);
+  stroke: var(--hl-k);
+  stroke-width: 1.5;
+}
+.hl-valve.is-unknown polygon {
+  stroke: var(--hl-subtle);
+  stroke-dasharray: 2 2;
+}
+
+/* A distributor is filled like its pipe where the water can flow through it,
+   the closed side is outlined like the idle pipe it would lead to */
+.hl-distributor polygon {
+  fill: var(--hl-bg);
+  stroke: var(--hl-border-strong);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+.hl-distributor polygon.is-closed {
+  stroke: var(--hl-pipe-idle);
+  stroke-width: 3;
+}
+.hl-distributor polygon.is-open {
+  fill: var(--hl-pipe-open);
+  stroke: none;
+}
+.hl-distributor polygon.is-flowing {
+  fill: var(--hl-k);
+  stroke: none;
+}
+.hl-distributor polygon.is-unknown {
+  stroke: var(--hl-subtle);
+  stroke-dasharray: 2 2;
+}
+
+.hl-pump-casing {
+  fill: var(--hl-bg);
+  stroke: var(--hl-muted);
+  stroke-width: 1.5;
+}
+.hl-impeller {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.hl-impeller-box {
+  fill: none;
+}
+.hl-impeller-blades {
+  fill: none;
+  stroke: var(--hl-muted);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+}
+.hl-impeller-hub {
+  fill: var(--hl-muted);
+}
+.hl-pump.is-on .hl-pump-casing {
+  fill: var(--hl-k);
+  stroke: var(--hl-k);
+}
+.hl-pump.is-on .hl-impeller {
+  animation: hl-spin 1.2s linear infinite;
+}
+.hl-pump.is-on .hl-impeller-blades {
+  stroke: var(--hl-bg);
+}
+.hl-pump.is-on .hl-impeller-hub {
+  fill: var(--hl-bg);
+}
+.hl-pump.is-unknown .hl-pump-casing {
+  stroke: var(--hl-subtle);
+  stroke-dasharray: 2 2;
+}
+.hl-pump.is-unknown .hl-impeller-blades {
+  stroke: var(--hl-subtle);
+}
+.hl-pump.is-unknown .hl-impeller-hub {
+  fill: var(--hl-subtle);
+}
+
+@keyframes hl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hl-tank-shell {
+  fill: var(--hl-bg);
+  stroke: var(--hl-border-strong);
+  stroke-width: 1.5;
+}
+.hl-tank-shell.is-unknown {
+  fill: url(#hl-hatch);
+}
+.hl-hatch-line {
+  stroke: var(--hl-border);
+  stroke-width: 2;
+}
+.hl-tank-fill {
+  fill: var(--hl-k);
+  fill-opacity: 0.16;
+}
+.hl-tank-surface {
+  stroke: var(--hl-k);
+  stroke-width: 2;
+}
+.hl-tank-surface.is-dashed {
+  stroke-dasharray: 4 3;
+}
+.hl-sensor circle {
+  fill: var(--hl-bg);
+  stroke: var(--hl-muted);
+  stroke-width: 1.5;
+}
+.hl-sensor.is-on circle {
+  fill: var(--hl-k);
+  stroke: var(--hl-k);
+}
+.hl-sensor.is-unknown circle {
+  stroke: var(--hl-subtle);
+  stroke-dasharray: 2 2;
+}
+.hl-tank-tick {
+  stroke: var(--hl-border-strong);
+}
+.hl-tank-label {
+  font-size: 16px;
+  font-weight: 600;
+  fill: var(--hl-fg);
+}
+.hl-tank-sub {
+  font-size: 13px;
+  font-weight: 400;
+  fill: var(--hl-muted);
+}
+.hl-tank-value {
+  font-size: 22px;
+  font-weight: 600;
+  fill: var(--hl-fg);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+.hl-tank-trend {
+  font-weight: 400;
+  fill: var(--hl-muted);
+}
+.hl-tank-meta {
+  font-size: 12.5px;
+  fill: var(--hl-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.hl-bubbles circle {
+  fill: var(--hl-air);
+  animation: hl-rise 1.6s ease-in infinite;
+  opacity: 0;
+}
+@keyframes hl-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(var(--hl-rise));
+    opacity: 0;
+  }
+}
+
+/* Water dripping from the upper exchange pipe onto T2's surface */
+.hl-drips circle {
+  fill: var(--hl-k);
+  opacity: 0;
+  animation: hl-drip 0.9s ease-in infinite;
+}
+@keyframes hl-drip {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15%,
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(var(--hl-fall));
+    opacity: 0;
+  }
+}
+
+/* Air pumped into T2 presses on the water. Same colors and rhythm as the air
+   pipe's .hl-pipe-flow */
+.hl-pressure-fill {
+  fill: var(--hl-bg);
+}
+.hl-pressure-ring {
+  fill: none;
+  stroke: var(--hl-air);
+  stroke-opacity: 0.5;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hl-ripple linear infinite;
+}
+@keyframes hl-ripple {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+/* Air leaving the release air pipe's open end, at the rings' pace. It fades
+   out by the air pump's radius, 13 of the circle's 14 px */
+.hl-vent-ring {
+  fill: none;
+  stroke: var(--hl-air);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hl-vent 0.9s linear infinite;
+}
+@keyframes hl-vent {
+  from {
+    transform: scale(0);
+    opacity: 1;
+  }
+  92.857% {
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.hl-diagram-label {
+  font-size: 13px;
+  fill: var(--hl-muted);
+}
+.hl-diagram-label.is-strong {
+  fill: var(--hl-fg);
+  font-weight: 500;
+}
+.hl-diagram-label.is-bold {
+  fill: var(--hl-fg);
+  font-weight: 700;
+}
+.hl-diagram-label.is-muted {
+  fill: var(--hl-subtle);
+}
+.hl-train-label {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--hl-fg);
+}
+
+.hl-uv rect {
+  fill: var(--hl-bg);
+  stroke: var(--hl-border-strong);
+  stroke-width: 1.5;
+}
+.hl-uv text {
+  font-size: 13px;
+  font-weight: 500;
+  fill: var(--hl-muted);
+}
+.hl-uv.is-on rect {
+  fill: var(--hl-uv);
+  stroke: var(--hl-uv);
+}
+.hl-uv.is-on text {
+  fill: #fff;
+}
+.hl-uv.is-unknown rect {
+  stroke-dasharray: 2 2;
+}
+
+.hl-outlet.is-disconnected {
+  opacity: 0.4;
+}
+.hl-outlet.is-disconnected text {
+  text-decoration: line-through;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hl-pipe-flow,
+  .hl-pipe.hl-kind-air .hl-pipe-flow,
+  .hl-pressure-ring,
+  .hl-pump.is-on .hl-impeller {
+    animation: none;
+  }
+  .hl-valve-body {
+    transition: none;
+  }
+  .hl-bubbles,
+  .hl-drips,
+  .hl-vent-ring {
+    display: none;
+  }
+}

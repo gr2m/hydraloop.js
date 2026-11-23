@@ -40,8 +40,9 @@ Thank you for considering contributing to the Hydraloop JavaScript SDK!
 
 ## Code Style
 
-- The repository is an npm workspace with two packages: `packages/hydraloop` (external API) and `packages/internal` (`hydraloop-internal`, internal API). `npm install` at the root installs both and links them.
-- Source code is in JavaScript with JSDoc annotations for IDE support.
+- The repository is an npm workspace with three packages: `packages/hydraloop` (external API), `packages/internal` (`hydraloop-internal`, internal API) and `packages/diagram-react` (`hydraloop-diagram-react`, the H600 flow diagram). `npm install` at the root installs them and links them.
+- The SDKs are written in JavaScript with JSDoc annotations for IDE support.
+- `hydraloop-diagram-react` is written in TypeScript and React. `npm run build` builds it to `packages/diagram-react/dist/`. Its tests render the diagram for states of the simulated data of the H600 dashboard ([`apps/h600.gr2m.dev`](apps/h600.gr2m.dev/README.md)) (`test/fixtures/states.json`). [`apps/hydraloop-diagram.gr2m.dev`](apps/hydraloop-diagram.gr2m.dev/README.md) is a playground to try it with any state.
 - TypeScript types are maintained in `packages/hydraloop/index.d.ts` and `packages/internal/lib/index.d.ts`.
 - Most of `packages/internal/lib/` is generated from `spec/` with `npm run generate:internal`. Don't edit the generated files by hand.
 - Tests use [Vitest](https://vitest.dev/) and `undici` MockAgent for HTTP mocking.
