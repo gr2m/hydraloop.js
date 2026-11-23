@@ -4,7 +4,9 @@
 // and its tags are `<package name>@<version>`, e.g. `hydraloop@2.0.0`.
 //
 // `hydraloop` is released before `hydraloop-internal`, because the latter
-// depends on it.
+// depends on it. `hydraloop-diagram-react` depends on neither. It is written
+// in TypeScript and built to dist/ by its `prepack` script when
+// @semantic-release/npm publishes it.
 
 /** @type {import("semantic-release").GlobalConfig} */
 export default {
@@ -24,7 +26,7 @@ export default {
     // relative to the package folder
     [
       "semantic-release-plugin-update-version-in-files",
-      { files: ["lib/version.js"] },
+      { files: ["lib/version.js", "src/version.ts"] },
     ],
     // must come before @semantic-release/npm, which publishes package.json
     new URL("./scripts/release-set-workspace-dependencies.js", import.meta.url)

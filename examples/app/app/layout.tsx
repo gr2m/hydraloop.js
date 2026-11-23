@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
+import "hydraloop-diagram-react/styles.css";
 import "./globals.css";
 
 const geistSans = Geist({

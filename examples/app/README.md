@@ -69,7 +69,7 @@ The live and history views estimate how much more greywater the H600 can take be
 - Greywater only enters the train selected by the A/B valve, and only in `STANDBY` (or `INCOMING_WATER`).
 - A train starts `FILTH_REMOVAL` when it is full (see [Next filth removal](#next-filth-removal)), and takes no water for the ~4.5 h it lasts.
 
-So the estimate is the sum over the trains that accept water of `134 L − T2` ([`TRAIN_FULL_LITERS`](lib/model.ts)). T2 is taken from the last time it was vented (about once an hour), as the H600 checks it vented, too. A train in `FILTH_REMOVAL` or with its waste valve open counts as 0, and so does the whole H600 while the bypass is open. The bypass valve falls open while the controller restarts, which it does every 12 hours. `local.connectivity.getOutageSummaries()` lists these as `scheduled_restart`, together with `battery_power_on` going to 0. Both trains accept water again right after, so openings that overlap a scheduled restart don't count ([`isScheduledRestart`](lib/model.ts)). If the outages can't be loaded, openings shorter than 2 minutes are taken for the restart. The history chart shades the times the bypass was open, to compare, and the restarts lighter. The diagram labels the bypass "Bypass (user override)" while it is switched on in the app (`bypassByAppBypassValve`). The live view loads the last 8 hours, so that it includes a venting of both trains. If only one train has a venting, the estimate is shown as a lower bound (`≥ X L`) from that train alone.
+So the estimate is the sum over the trains that accept water of `134 L − T2` ([`TRAIN_FULL_LITERS`](../../packages/diagram-react/src/model.ts)). T2 is taken from the last time it was vented (about once an hour), as the H600 checks it vented, too. A train in `FILTH_REMOVAL` or with its waste valve open counts as 0, and so does the whole H600 while the bypass is open. The bypass valve falls open while the controller restarts, which it does every 12 hours. `local.connectivity.getOutageSummaries()` lists these as `scheduled_restart`, together with `battery_power_on` going to 0. Both trains accept water again right after, so openings that overlap a scheduled restart don't count ([`isScheduledRestart`](../../packages/diagram-react/src/model.ts)). If the outages can't be loaded, openings shorter than 2 minutes are taken for the restart. The history chart shades the times the bypass was open, to compare, and the restarts lighter. The diagram labels the bypass "Bypass (user override)" while it is switched on in the app (`bypassByAppBypassValve`). The live view loads the last 8 hours, so that it includes a venting of both trains. If only one train has a venting, the estimate is shown as a lower bound (`≥ X L`) from that train alone.
 
 ### Next filth removal
 
@@ -146,9 +146,10 @@ T2 is a closed tank. The air pump pressurizes it to push water up into T1, and `
 
 ## Run
 
-From this folder:
+Install the repository's dependencies first, which `hydraloop-diagram-react` needs to build. Then from this folder:
 
 ```bash
+npm install --prefix ../..
 npm install
 npm run dev
 ```
@@ -178,7 +179,8 @@ To skip the login form, set `HYDRALOOP_TOKEN` to a token from a previous login, 
 | Path                                                                                           | Purpose                                              |
 | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | [`lib/hdm.ts`](lib/hdm.ts)                                                                     | Loads and normalizes data with the SDK (server only) |
-| [`lib/model.ts`](lib/model.ts)                                                                 | State at a point in time, phases, events, transfers  |
+| [`hydraloop-diagram-react/model`](../../packages/diagram-react/src/model.ts)                   | State at a point in time, phases, room for greywater |
+| [`lib/model.ts`](lib/model.ts)                                                                 | Routine segments, events, transfers, cleanings       |
 | [`lib/stats.ts`](lib/stats.ts)                                                                 | 30-day statistics                                    |
 | [`lib/demo.ts`](lib/demo.ts)                                                                   | Simulated data                                       |
 | [`lib/maintenance.ts`](lib/maintenance.ts)                                                     | Maintenance data: alerts, outages, vitals            |
@@ -188,11 +190,11 @@ To skip the login form, set `HYDRALOOP_TOKEN` to a token from a previous login, 
 | [`lib/live.ts`](lib/live.ts)                                                                   | Applies socket messages to the live data             |
 | [`app/api/stats`](app/api/stats/route.ts)                                                      | JSON for the 30-day statistics                       |
 | [`components/overview.tsx`](components/overview.tsx)                                           | The overview                                         |
-| [`components/flow-diagram.tsx`](components/flow-diagram.tsx)                                   | The flow diagram                                     |
+| [`hydraloop-diagram-react`](../../packages/diagram-react/readme.md)                            | The flow diagram                                     |
 | [`components/timeline.tsx`](components/timeline.tsx)                                           | The history tracks                                   |
 | [`components/maintenance-view.tsx`](components/maintenance-view.tsx)                           | The maintenance view                                 |
 
-The SDK is linked from the repository root (`"hydraloop": "file:../.."`).
+The packages are linked from the repository (`"hydraloop": "file:../../packages/hydraloop"`). The flow diagram and the model behind it come from [`hydraloop-diagram-react`](../../packages/diagram-react/readme.md), which is written in TypeScript. `npm run dev` and `npm run build` build it first. `lib/model.ts` re-exports its model, so the app imports both from `@/lib/model`.
 
 ## Background
 

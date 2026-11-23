@@ -1,7 +1,7 @@
 {
   "name": "hydraloop-monorepo",
   "private": true,
-  "description": "Monorepo for the hydraloop and hydraloop-internal packages",
+  "description": "Monorepo for the hydraloop, hydraloop-internal and hydraloop-diagram-react packages",
   "type": "module",
   "workspaces": [
     "packages/*"
@@ -11,10 +11,11 @@
     "lint:fix": "prettier --write .",
     "test": "vitest run --coverage",
     "test:coverage": "vitest run --coverage --coverage.reporter=html && open coverage/index.html",
-    "test:tsc": "tsc",
+    "test:tsc": "tsc && tsc -p packages/diagram-react",
     "test:types": "vitest --typecheck.only run",
     "prepare": "husky || true",
-    "generate:internal": "node scripts/generate-internal.js && prettier --write packages/internal/lib packages/internal/readme.md"
+    "generate:internal": "node scripts/generate-internal.js && prettier --write packages/internal/lib packages/internal/readme.md",
+    "build": "npm run build --workspace hydraloop-diagram-react"
   },
   "repository": "github:gr2m/hydraloop",
   "license": "ISC",
@@ -23,11 +24,15 @@
   },
   "devDependencies": {
     "@types/node": "^25.3.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "@vitest/coverage-v8": "^4.0.18",
     "ajv": "^8.20.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.8.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "semantic-release": "^25.0.3",
     "semantic-release-plugin-update-version-in-files": "^2.0.1",
     "socket.io": "^4.8.1",
