@@ -22,7 +22,12 @@ export default {
   plugins: [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
-    "@semantic-release/github",
+    [
+      "@semantic-release/github",
+      {
+        "successComment": ":tada: This ${issue.pull_request ? 'PR is included' : 'issue has been resolved'} in **${nextRelease.gitTag}** :tada:\n\n${releases?.length ? `The release is available on${releases.length === 1 ? ` [${releases[0].name}](${releases[0].url || ''})` : `:\\n${releases.map((release) => `- [${release.name}](${release.url || ''})`).join('\\n')}`}` : ''}\n\nYour **[semantic-release](https://github.com/semantic-release/semantic-release)** bot :package::rocket:"
+      }
+    ],
     // relative to the package folder
     [
       "semantic-release-plugin-update-version-in-files",
