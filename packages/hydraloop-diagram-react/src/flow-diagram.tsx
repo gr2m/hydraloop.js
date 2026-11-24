@@ -1478,7 +1478,7 @@ export function FlowDiagram({
           square
         />
         <Valve
-          x={a ? 380 : 620}
+          x={T2_CENTER[side]}
           y={UV_Y}
           kind="clean"
           io={transfer}
