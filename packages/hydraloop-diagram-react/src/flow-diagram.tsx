@@ -56,7 +56,7 @@ function Pipe({
   filled?: boolean;
   /** An active pipe's pattern stands still, for air held under pressure */
   still?: boolean;
-  /** Square ends, for pipes that end at a distributor */
+  /** Square ends, for pipes that end at a distributor, tank or UV-C */
   square?: boolean;
   /** Draw an outlet arrow at this point, pointing in this direction */
   arrow?: { x: number; y: number; dir: "down" | "right" | "left" };
@@ -1170,6 +1170,7 @@ export function FlowDiagram({
           kind="air"
           active={bubbling}
           open={bubblesValve?.on}
+          square
         />
         <Valve
           x={bubblesX}
@@ -1191,6 +1192,7 @@ export function FlowDiagram({
           active={addingAir || holdingAir}
           still={holdingAir}
           open={addAir?.on}
+          square
         />
         <Valve
           x={t2c}
@@ -1235,6 +1237,7 @@ export function FlowDiagram({
           kind="air"
           active={release?.on}
           open={release?.on}
+          square
         />
         <Valve
           x={releaseX}
@@ -1272,6 +1275,7 @@ export function FlowDiagram({
                 kind="grey"
                 active={filled && bubbling === true}
                 filled={filled}
+                square
               />
               {i === 0 &&
                 !filled &&
@@ -1352,6 +1356,7 @@ export function FlowDiagram({
           kind="waste"
           active={skimming}
           title={`Skim overflow of T1 ${side}${skimming ? ": filth spilling over to the drain (inferred from the FILTH_REMOVAL routine)" : ""}`}
+          square
         />
         <text
           x={(a ? 57 : 943) + dx}
@@ -1368,6 +1373,7 @@ export function FlowDiagram({
           kind="waste"
           active={waste?.on}
           open={waste?.on}
+          square
         />
         {/* Shared by the skim overflow and the waste valve */}
         <Pipe
@@ -1415,6 +1421,7 @@ export function FlowDiagram({
           kind="clean"
           active={transferring}
           open={transferring}
+          square
         />
         <Valve
           x={a ? 380 : 620}
@@ -1561,6 +1568,7 @@ export function FlowDiagram({
         kind={uvOutletKind}
         active={t3ReceivingFromUv}
         open={io[IO.uvValve]?.on}
+        square
       />
       <g
         className={`hl-uv is-${t3.uv === undefined ? "unknown" : t3.uv ? "on" : "off"}`}
@@ -1659,6 +1667,7 @@ export function FlowDiagram({
         kind={outletKind}
         active={circulatingThroughUv}
         open={t3.circulating}
+        square
       />
       {(["A", "B"] as Side[]).map((side) => {
         const a = side === "A";
@@ -1673,6 +1682,7 @@ export function FlowDiagram({
               kind={outletKind}
               active={backwashing[side]}
               open={backwash[side]?.on}
+              square
             />
             <Valve
               x={T2_CENTER[side]}
@@ -1765,6 +1775,7 @@ export function FlowDiagram({
         kind={outletKind}
         active={backFlushing}
         open={io[IO.backFlush]?.on}
+        square
       />
       <Valve
         x={500}
