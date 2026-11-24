@@ -1315,13 +1315,15 @@ export function FlowDiagram({
           phase={trainInletPhase}
         />
 
-        {/* Air pump into T2, through the add air valve */}
+        {/* Air pump into T2, through the add air valve. A pipe after a valve
+        only shows it open while the air pump runs, so it doesn't stand out
+        while no air can move through it */}
         <Pipe d={`M${t2c} ${teeY} H${bubblesX}`} kind="air" active={air?.on} />
         <Pipe
           d={`M${bubblesX} ${teeY} H${gapX} V${airBelowY} H${airX} V${t1Bottom}`}
           kind="air"
           active={bubbling}
-          open={bubblesValve?.on}
+          open={air?.on && bubblesValve?.on}
           square
         />
         <Valve
@@ -1343,7 +1345,7 @@ export function FlowDiagram({
           kind="air"
           active={addingAir || holdingAir}
           still={holdingAir}
-          open={addAir?.on}
+          open={air?.on && addAir?.on}
           square
         />
         <Valve
