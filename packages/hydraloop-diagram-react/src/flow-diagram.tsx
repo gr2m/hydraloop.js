@@ -788,10 +788,11 @@ function Tank({
    */
   venting?: number;
   /**
-   * A tank too narrow for its text: the label and the level in percent go
-   * next to it, before (`start`) or after (`end`) it
+   * A tank too narrow for its text: the label and the level in percent are
+   * centered in it, the label at the top as in other tanks, the level in
+   * percent small enough to fit, centered vertically on `percentY`
    */
-  small?: "start" | "end";
+  small?: { percentY: number };
   /** Square corners */
   square?: boolean;
   /**
@@ -833,8 +834,8 @@ function Tank({
   // Venting rings vanish where the pipe's dashes start, at its beginning
   const phase =
     venting === undefined && pressurized ? flowDelay(pressurized) : 0;
-  const textX = small === "end" ? x + w + 10 : small ? x - 10 : x + 12;
-  const anchor = small === "start" ? "end" : "start";
+  const textX = small ? x + w / 2 : x + 12;
+  const anchor = small ? "middle" : "start";
   return (
     <g
       className={`hl-tank hl-kind-${kind}`}
@@ -983,12 +984,7 @@ function Tank({
             </g>
           </g>
         )}
-      <text
-        x={textX}
-        y={small ? y + h / 2 - 6 : y + 22}
-        textAnchor={anchor}
-        className="hl-tank-label"
-      >
+      <text x={textX} y={y + 22} textAnchor={anchor} className="hl-tank-label">
         {label}
         {sub && (
           <tspan className="hl-tank-sub" dx={6}>
@@ -1011,9 +1007,11 @@ function Tank({
       {known && small && (
         <text
           x={textX}
-          y={y + h / 2 + 20}
+          // Centered on percentY: half the cap height (0.71 of the font size,
+          // see .hl-tank-value.is-small) below it
+          y={small.percentY + (6.5 * 0.71) / 2}
           textAnchor={anchor}
-          className="hl-tank-value"
+          className="hl-tank-value is-small"
         >
           {percent}
         </text>
@@ -1467,7 +1465,8 @@ export function FlowDiagram({
           label="T1"
           side={side}
           aeration={bubbling}
-          small={a ? "start" : "end"}
+          // The level in percent lines up with the transfer pipe leaving T1
+          small={{ percentY: transferY }}
           square
           base={t1Bottom - 360}
         />
