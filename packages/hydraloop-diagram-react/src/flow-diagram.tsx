@@ -205,6 +205,15 @@ const T2_X: Record<Side, number> = { A: 288, B: 540 };
 const SEWER_END = { left: 1000 - 935, right: 935 };
 /** The space between a sewer arrow's tip and its label */
 const SEWER_LABEL_DX = 13;
+/** T4's left edge */
+const T4_X = 60;
+/** The width of a "Sewer" label */
+const SEWER_LABEL_W = 38;
+/**
+ * The outer edge of each train's sewer label, lined up with T4's left edge,
+ * mirrored on the right
+ */
+const TRAIN_SEWER_LABEL_X: Record<Side, number> = { A: T4_X, B: 1000 - T4_X };
 /** The mains pipe into T4, level with the transfer pipes into UV-C */
 const MAINS_Y = UV_Y;
 /** Where the mains pipe enters T4's top */
@@ -1157,9 +1166,13 @@ export function FlowDiagram({
     const bubblesX = a ? t2c - 4 * 14 : t2c + 4 * 14;
     const bubbling = air?.on && bubblesValve?.on !== false;
     const receiving = inlet.receiving.includes(side);
-    const drainX = (a ? 30 : 970) + dx;
     // The drain leaves to the outside, its arrow pointing at its label
-    const drainEnd = a ? SEWER_END.left : SEWER_END.right;
+    const drainEnd =
+      TRAIN_SEWER_LABEL_X[side] +
+      (a ? 1 : -1) * (SEWER_LABEL_W + SEWER_LABEL_DX);
+    // The skim overflow joins the drain 23 px before its end, which keeps it
+    // clear of T1's level in percent ("100%") next to T1
+    const drainX = drainEnd + (a ? 23 : -23);
     const transferring = transfer?.on;
     const skimming = state.trains[side].skimming;
     const t2Level = tanks[a ? "t2a" : "t2b"];
@@ -1413,7 +1426,7 @@ export function FlowDiagram({
           square
         />
         <text
-          x={(a ? 57 : 943) + dx}
+          x={drainX + (a ? 27 : -27)}
           y={228}
           textAnchor="middle"
           className="hl-diagram-label"
@@ -1450,9 +1463,9 @@ export function FlowDiagram({
           labelDy={24}
         />
         <text
-          x={drainEnd + (a ? -SEWER_LABEL_DX : SEWER_LABEL_DX)}
+          x={TRAIN_SEWER_LABEL_X[side]}
           y={wasteY + 4}
-          textAnchor={a ? "end" : "start"}
+          textAnchor={a ? "start" : "end"}
           className="hl-diagram-label"
         >
           Sewer
@@ -1728,7 +1741,7 @@ export function FlowDiagram({
         labelDy={-16}
       />
       <BackupTank
-        x={60}
+        x={T4_X}
         y={540}
         w={130}
         h={100}
