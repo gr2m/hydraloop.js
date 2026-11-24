@@ -1265,6 +1265,19 @@ export function FlowDiagram({
     const circulating = bubbling === true && exchangeFilled(exchangeYs[0]);
     // Otherwise, the upper pipe's way down holds water up to T2's surface, as
     // its lower end is always below it
+    /** The exchange pipe at `exchangeYs[i]`, from where it leaves to where it enters */
+    const exchangePoints = (i: number): [number, number][] =>
+      i === 0
+        ? [
+            [t1Edge, exchangeYs[0]],
+            [exchangeX, exchangeYs[0]],
+            [exchangeX, exchangeYs[1]],
+            [t2FarEdge, exchangeYs[1]],
+          ]
+        : [
+            [t2Edge, exchangeYs[1]],
+            [t1Edge, exchangeYs[1]],
+          ];
     const exchangeSurface =
       t2Fill === undefined
         ? undefined
@@ -1409,11 +1422,7 @@ export function FlowDiagram({
                 className="hl-pipe-gap"
               />
               <Pipe
-                d={
-                  i === 0
-                    ? `M${t1Edge} ${y} H${exchangeX} V${exchangeYs[1]} H${t2FarEdge}`
-                    : `M${t2Edge} ${y} H${t1Edge}`
-                }
+                d={`M${exchangePoints(i).join(" L")}`}
                 kind="grey"
                 active={filled && bubbling === true}
                 filled={filled}
@@ -1487,6 +1496,51 @@ export function FlowDiagram({
           venting={release?.on ? releaseX : undefined}
           inlinePercent
         />
+        {/* The exchange pipes are open connections, so the tanks' walls
+        leave a gap where they meet: each pipe's end continues 1 px over the
+        wall on either side, its flow's dashes in step */}
+        {exchangeYs.map((y, i) => {
+          const filled = exchangeFilled(y);
+          const points = exchangePoints(i);
+          const length = points
+            .slice(1)
+            .reduce(
+              (sum, [x2, y2], j) =>
+                sum + Math.hypot(x2 - points[j][0], y2 - points[j][1]),
+              0,
+            );
+          /**
+           * 1 px on either side of `at`, in the pipe's direction from one
+           * point to the next
+           */
+          const across = (
+            at: [number, number],
+            [x1, y1]: [number, number],
+            [x2, y2]: [number, number],
+          ) => {
+            const d = Math.hypot(x2 - x1, y2 - y1);
+            const [dx, dy] = [(x2 - x1) / d, (y2 - y1) / d];
+            return `M${at[0] - dx} ${at[1] - dy} L${at[0] + dx} ${at[1] + dy}`;
+          };
+          const n = points.length;
+          return [
+            { d: across(points[0], points[0], points[1]), phase: -1 },
+            {
+              d: across(points[n - 1], points[n - 2], points[n - 1]),
+              phase: length - 1,
+            },
+          ].map(({ d, phase }) => (
+            <Pipe
+              key={`${y}-${phase}`}
+              d={d}
+              kind="grey"
+              active={filled && bubbling === true}
+              filled={filled}
+              square
+              phase={phase}
+            />
+          ));
+        })}
 
         {/* Skim overflow at the top of T1, down the drain line. It has no
             valve, so it is shown from the FILTH_REMOVAL routine. */}
