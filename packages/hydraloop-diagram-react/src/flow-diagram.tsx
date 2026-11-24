@@ -655,6 +655,7 @@ function Tank({
   circulation,
   pressurized,
   pressureHeld = false,
+  airX,
   venting,
   small,
   square = false,
@@ -684,6 +685,8 @@ function Tank({
   pressurized?: number | false;
   /** The air is no longer pumped in, but holds its pressure: the rings stand still */
   pressureHeld?: boolean;
+  /** The x where the air pipe enters the top of the tank, its center by default */
+  airX?: number;
   /**
    * Air leaves through a pipe at this x on the top of the tank: the rings
    * move in towards it, the reverse of `pressurized`
@@ -721,7 +724,7 @@ function Tank({
             : ""
         }. ${capacityNote(level!)}`.trimEnd();
   const clipId = `hl-pressure-${label}-${side ?? sub ?? ""}`;
-  const ringX = venting ?? x + w / 2;
+  const ringX = venting ?? airX ?? x + w / 2;
   // Enough rings to reach the far corners of the space above the water
   const rings =
     Math.ceil(
@@ -1035,7 +1038,9 @@ export function FlowDiagram({
     const t2x = a ? 214 : 614;
     const t1c = t1x + 10;
     const t1Bottom = 384;
-    const t2c = t2x + 86;
+    // The add air and release air pipes enter T2's top evenly spread across
+    // it, the release air pipe on the inner side
+    const t2c = a ? t2x + 57 : t2x + 172 - 57;
     const transfer = io[sideIo("transfer_path", side)];
     const waste = io[sideIo("waste_clean_tank", side)];
     const air = io[sideIo("air_pump", side)];
@@ -1050,7 +1055,7 @@ export function FlowDiagram({
     // The release air pipe leaves T2's top on the inner side and ends level
     // with the air pump's center, open to the room
     const release = io[sideIo("release_air", side)];
-    const releaseX = a ? t2x + 172 - 14 : t2x + 14;
+    const releaseX = a ? t2x + 172 - 57 : t2x + 57;
     // The air pipe into T1 branches off above the add air valve, runs down
     // between T1 and T2, and enters T1's bottom from below, next to the waste
     // pipe. The waste pipe leaves T1's bottom on the outer side
@@ -1154,8 +1159,9 @@ export function FlowDiagram({
           active={bubbling}
           name={sideIo("bubbles_block", side)}
           label="Bubbles block"
-          labelAnchor={a ? "start" : "end"}
-          labelDx={gapX + (a ? 10 : -10) - bubblesX}
+          // Above the pipe, ending short of the air pump
+          labelAnchor={a ? "end" : "start"}
+          labelDx={t2c + (a ? -21 : 21) - bubblesX}
           labelDy={-14}
         />
         <Pipe d={`M${t2c} ${airTop} V${addAirY}`} kind="air" active={air?.on} />
@@ -1175,8 +1181,8 @@ export function FlowDiagram({
           active={addingAir}
           name={sideIo("add_air_valve", side)}
           label="Add air"
-          labelAnchor={a ? "start" : "end"}
-          labelDx={a ? 16 : -16}
+          labelAnchor={a ? "end" : "start"}
+          labelDx={a ? -16 : 16}
         />
         <Pump
           x={t2c}
@@ -1311,6 +1317,7 @@ export function FlowDiagram({
           }
           pressurized={(addingAir || holdingAir) && 232 - addAirY}
           pressureHeld={holdingAir}
+          airX={t2c}
           venting={release?.on ? releaseX : undefined}
         />
 
