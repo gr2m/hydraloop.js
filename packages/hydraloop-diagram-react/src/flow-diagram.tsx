@@ -198,6 +198,10 @@ const PIPE = 3.5;
  * Each train's other parts are placed relative to it
  */
 const T2_X: Record<Side, number> = { A: 288, B: 540 };
+/** The mains pipe into T4, below train A's drain */
+const MAINS_Y = 490;
+/** Where the mains pipe enters T4's top */
+const T4_INLET_X = 167;
 /** The center of each T2, where its backwash pipe enters from below */
 const T2_CENTER: Record<Side, number> = { A: T2_X.A + 86, B: T2_X.B + 86 };
 /** Height of a distributor triangle, from its tip to its base */
@@ -965,12 +969,18 @@ function BackupTank({
   w,
   h,
   state,
+  inletX,
+  filling = false,
 }: {
   x: number;
   y: number;
   w: number;
   h: number;
   state: DeviceState;
+  /** Where the mains pipe enters the top of the tank */
+  inletX: number;
+  /** Mains water drips in from the inlet */
+  filling?: boolean;
 }) {
   const { t4, io } = state;
   const maxY = y + h * 0.55;
@@ -1037,6 +1047,15 @@ function BackupTank({
       <text x={x + 12} y={y + 40} className="hl-tank-meta">
         {t4.label}
       </text>
+      {/* Below the min float, the water's surface is unknown: the drops fall
+          to the bottom */}
+      <Drips
+        x={inletX}
+        y={y}
+        bottom={fillTop ?? y + h}
+        active={filling}
+        kind="mains"
+      />
     </g>
   );
 }
@@ -1470,6 +1489,7 @@ export function FlowDiagram({
   const trains = { A: train("A"), B: train("B") };
 
   const backup = io[IO.backupWater];
+  const preBackup = io[IO.preBackupWater];
   const recycledToPump = supply.pumping && supply.source !== "backup";
   const backupToPump = supply.pumping && supply.source === "backup";
   const circulatingThroughUv = t3.circulating && supply.pumping;
@@ -1670,7 +1690,36 @@ export function FlowDiagram({
       </text>
 
       {/* T4 backup */}
-      <BackupTank x={60} y={540} w={130} h={100} state={state} />
+      {/* Mains water into T4, through the pre backup water valve. The pipe
+          enters T4's top between the labels and the floats */}
+      <Pipe
+        d={`M30 ${MAINS_Y} H${T4_INLET_X} V540`}
+        kind="mains"
+        active={preBackup?.on}
+        open={preBackup?.on}
+        square
+      />
+      <Valve
+        x={98}
+        y={MAINS_Y}
+        kind="mains"
+        io={preBackup}
+        active={preBackup?.on}
+        name={IO.preBackupWater}
+        label="Mains"
+        labelAnchor="middle"
+        labelDx={0}
+        labelDy={-16}
+      />
+      <BackupTank
+        x={60}
+        y={540}
+        w={130}
+        h={100}
+        state={state}
+        inletX={T4_INLET_X}
+        filling={preBackup?.on}
+      />
 
       {/* Circulation: the distribution pump pushes T3 water (T4 water while
           the backup valve is set to T4) around the right of T3 into the top
@@ -1941,6 +1990,7 @@ export function activeFlows(state: DeviceState) {
   if (t3.circulating && supply.pumping) flows.push("T3 → UV → T3");
   if (io[IO.backFlush]?.on && supply.pumping) flows.push("Back flush → T3");
   if (t3.draining) flows.push("T3 → drain");
+  if (io[IO.preBackupWater]?.on) flows.push("Mains → T4");
   if (supply.toOutlets) {
     const to = [
       supply.toilet && "toilets",
