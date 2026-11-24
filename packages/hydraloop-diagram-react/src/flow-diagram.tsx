@@ -59,7 +59,7 @@ function Pipe({
   /** Square ends, for pipes that end at a distributor, tank or UV-C */
   square?: boolean;
   /** Draw an outlet arrow at this point, pointing in this direction */
-  arrow?: { x: number; y: number; dir: "down" | "right" | "left" };
+  arrow?: { x: number; y: number; dir: "up" | "down" | "right" | "left" };
   /** Tooltip, for pipes without a valve or pump */
   title?: string;
 }) {
@@ -87,9 +87,11 @@ function Pipe({
           d={
             arrow.dir === "down"
               ? `M${arrow.x - 7} ${arrow.y} L${arrow.x + 7} ${arrow.y} L${arrow.x} ${arrow.y + 9} Z`
-              : arrow.dir === "right"
-                ? `M${arrow.x} ${arrow.y - 7} L${arrow.x} ${arrow.y + 7} L${arrow.x + 9} ${arrow.y} Z`
-                : `M${arrow.x} ${arrow.y - 7} L${arrow.x} ${arrow.y + 7} L${arrow.x - 9} ${arrow.y} Z`
+              : arrow.dir === "up"
+                ? `M${arrow.x - 7} ${arrow.y} L${arrow.x + 7} ${arrow.y} L${arrow.x} ${arrow.y - 9} Z`
+                : arrow.dir === "right"
+                  ? `M${arrow.x} ${arrow.y - 7} L${arrow.x} ${arrow.y + 7} L${arrow.x + 9} ${arrow.y} Z`
+                  : `M${arrow.x} ${arrow.y - 7} L${arrow.x} ${arrow.y + 7} L${arrow.x - 9} ${arrow.y} Z`
           }
         />
       )}
@@ -1166,6 +1168,10 @@ export function FlowDiagram({
     // with the air pump's center, open to the room
     const release = io[sideIo("release_air", side)];
     const releaseX = a ? t2x + 172 - 57 : t2x + 57;
+    // The pipe ends in an arrow (9 px tall) whose tip is level with the air
+    // pump's center, where the released air's arcs grow from
+    const releaseTip = pumpY;
+    const releaseTop = releaseTip + 9;
     // The air pipe into T1 branches off above the add air valve, runs down
     // between T1 and T2, and enters T1's bottom from below, next to the waste
     // pipe. The waste pipe leaves T1's bottom on the outer side
@@ -1311,31 +1317,33 @@ export function FlowDiagram({
           labelDx={20}
         />
         {release?.on && (
-          // The air leaves the pipe's open end as circles that fade out at
-          // the size of the air pump. A circle starts where the pipe's dashes
-          // leave off, 96 px up the pipe, see the rings in Tank
-          <circle
-            cx={releaseX}
-            cy={136}
-            r={14}
+          // The air leaves past the arrow's tip as arcs that fade out at the
+          // size of the air pump. Each arc spans 270°, open towards the
+          // arrow, so its ends run out from the tip at 45° on either side. An
+          // arc starts where the pipe's dashes would leave off, continued
+          // through the arrow, see the rings in Tank
+          <path
+            d={`M${releaseX - 14 * Math.SQRT1_2} ${releaseTip + 14 * Math.SQRT1_2} A14 14 0 1 1 ${releaseX + 14 * Math.SQRT1_2} ${releaseTip + 14 * Math.SQRT1_2}`}
             className="hl-vent-ring"
             style={{
-              animationDelay: `${(-((14 - (96 % 14)) % 14) / 14) * 0.9}s`,
+              transformOrigin: `${releaseX}px ${releaseTip}px`,
+              animationDelay: `${(-((14 - ((232 - releaseTip) % 14)) % 14) / 14) * 0.9}s`,
             }}
             aria-hidden
           />
         )}
         <Pipe
-          d={`M${releaseX} 232 V136`}
+          d={`M${releaseX} 232 V${releaseTop}`}
           kind="air"
           active={release?.on}
           open={release?.on}
           square
+          arrow={{ x: releaseX, y: releaseTop, dir: "up" }}
         />
         <Valve
           x={releaseX}
-          // Level with the top run of the air pipe into T1
-          y={teeY}
+          // Level with the add air valve
+          y={addAirY}
           vertical
           kind="air"
           io={release}
