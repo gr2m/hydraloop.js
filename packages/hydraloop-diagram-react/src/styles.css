@@ -504,15 +504,15 @@
     transform: scale(1);
   }
 }
-/* Air leaving the release air pipe's open end, at the rings' pace. It fades
-   out by the air pump's radius, 13 of the circle's 14 px */
+/* Air leaving past the release air arrow's tip, at the rings' pace. It
+   fades out by the air pump's radius, 13 of the arc's 14 px. It grows from
+   the tip, set as its transform-origin inline */
 .hl-vent-ring {
   fill: none;
   stroke: var(--hl-air);
   stroke-width: 1.5;
   vector-effect: non-scaling-stroke;
-  transform-box: fill-box;
-  transform-origin: center;
+  transform-box: view-box;
   animation: hl-vent 0.9s linear infinite;
 }
 @keyframes hl-vent {

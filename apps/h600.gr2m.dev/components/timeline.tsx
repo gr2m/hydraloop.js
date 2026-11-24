@@ -27,6 +27,7 @@ import {
   type Dataset,
   type Point,
   type RoutineSide,
+  type Side,
   type TankId,
 } from "@/lib/model";
 
@@ -134,6 +135,28 @@ const SIDE_LABEL: Record<RoutineSide, string> = {
   SYSTEM: "System",
 };
 
+/** What a train does during a routine segment, for its tooltip */
+function routineActivity(s: {
+  side: RoutineSide;
+  phase: string;
+  valve?: Side;
+}) {
+  if (s.side === "SYSTEM") return undefined;
+  if (s.valve) return `Not receiving water, A/B valve set to ${s.valve}`;
+  switch (s.phase) {
+    case "receiving":
+      return "Receiving water";
+    case "cleaning":
+      return "Filth removal, not receiving water";
+    case "transferring":
+      return "Transferring to T3, not receiving water";
+    case "idle":
+      return "Not receiving water, ready for incoming water";
+    default:
+      return "Not receiving water";
+  }
+}
+
 function buildLanes(ds: Dataset) {
   const { from, until } = ds;
   const ioLane = (name: string, label: string, kind: string): Lane => ({
@@ -187,13 +210,15 @@ function buildLanes(ds: Dataset) {
         .map((s) => {
           const text = humanize(s.name);
           const states = [...new Set(s.states.map((x) => humanize(x.state)))];
+          // Not selected by the A/B valve, so the train takes no water
+          const inactive = !!s.valve && s.phase === "idle";
           return {
             start: s.start,
             end: s.end,
-            text,
-            // Not selected by the A/B valve, so the train takes no water
-            kind: s.valve && s.phase === "idle" ? "inactive" : s.phase,
-            title: `${SIDE_LABEL[side]}: ${text}${s.valve ? `, A/B valve set to ${s.valve}` : ""}, ${formatTime(s.start, "datetime")} – ${s.open ? "now" : formatTime(s.end, "datetime")}\n${states.join(", ")}`,
+            // Standby is the default, so only other routines are labeled
+            text: inactive || s.name === "STANDBY" ? undefined : text,
+            kind: inactive ? "inactive" : s.phase,
+            title: `${SIDE_LABEL[side]}: ${[routineActivity(s), text].filter(Boolean).join("\n")}, ${formatTime(s.start, "datetime")} – ${s.open ? "now" : formatTime(s.end, "datetime")}\n${states.join(", ")}`,
           };
         }),
     }))
