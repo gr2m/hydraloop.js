@@ -251,6 +251,11 @@ const SEWER_END = {
 const MAINS_Y = UV_Y;
 /** Where the mains pipe enters T4's top */
 const T4_INLET_X = 167;
+/**
+ * The air gap between the end of the mains pipe and T4's top, which keeps
+ * mains water from flowing back into the pipe. The water drips across it
+ */
+const T4_AIR_GAP = 14;
 /** The center of each T2, where its backwash pipe enters from below */
 const T2_CENTER: Record<Side, number> = { A: T2_X.A + 86, B: T2_X.B + 86 };
 /** Height of a distributor triangle, from its tip to its base */
@@ -788,10 +793,10 @@ function Tank({
    */
   venting?: number;
   /**
-   * A tank too narrow for its text: the label and the level in percent go
-   * next to it, before (`start`) or after (`end`) it
+   * A tank too narrow for its text: only the label, centered at the top as in
+   * other tanks. The level is in the tooltip
    */
-  small?: "start" | "end";
+  small?: boolean;
   /** Square corners */
   square?: boolean;
   /**
@@ -833,8 +838,8 @@ function Tank({
   // Venting rings vanish where the pipe's dashes start, at its beginning
   const phase =
     venting === undefined && pressurized ? flowDelay(pressurized) : 0;
-  const textX = small === "end" ? x + w + 10 : small ? x - 10 : x + 12;
-  const anchor = small === "start" ? "end" : "start";
+  const textX = small ? x + w / 2 : x + 12;
+  const anchor = small ? "middle" : "start";
   return (
     <g
       className={`hl-tank hl-kind-${kind}`}
@@ -983,12 +988,7 @@ function Tank({
             </g>
           </g>
         )}
-      <text
-        x={textX}
-        y={small ? y + h / 2 - 6 : y + 22}
-        textAnchor={anchor}
-        className="hl-tank-label"
-      >
+      <text x={textX} y={y + 22} textAnchor={anchor} className="hl-tank-label">
         {label}
         {sub && (
           <tspan className="hl-tank-sub" dx={6}>
@@ -1006,16 +1006,6 @@ function Tank({
           className="hl-tank-meta"
         >
           pressurized
-        </text>
-      )}
-      {known && small && (
-        <text
-          x={textX}
-          y={y + h / 2 + 20}
-          textAnchor={anchor}
-          className="hl-tank-value"
-        >
-          {percent}
         </text>
       )}
       {known && !small && inlinePercent && (
@@ -1053,6 +1043,7 @@ function BackupTank({
   h,
   state,
   inletX,
+  inletY,
   filling = false,
 }: {
   x: number;
@@ -1060,8 +1051,12 @@ function BackupTank({
   w: number;
   h: number;
   state: DeviceState;
-  /** Where the mains pipe enters the top of the tank */
+  /**
+   * Where the mains pipe ends above the tank. The tank's top is open below
+   * it, as wide as the pipe
+   */
   inletX: number;
+  inletY: number;
   /** Mains water drips in from the inlet */
   filling?: boolean;
 }) {
@@ -1082,6 +1077,10 @@ function BackupTank({
             ? "hl-tank-shell is-unknown"
             : "hl-tank-shell"
         }
+      />
+      <path
+        d={`M${inletX - PIPE} ${y} H${inletX + PIPE}`}
+        className="hl-tank-gap"
       />
       {fillTop !== undefined && (
         <>
@@ -1130,11 +1129,12 @@ function BackupTank({
       <text x={x + 12} y={y + 40} className="hl-tank-meta">
         {t4.label}
       </text>
-      {/* Below the min float, the water's surface is unknown: the drops fall
-          to the bottom */}
+      {/* The drops fall from the pipe's end through the opening in the top.
+          Below the min float, the water's surface is unknown: they fall to
+          the bottom */}
       <Drips
         x={inletX}
-        y={y}
+        y={inletY}
         bottom={fillTop ?? y + h}
         active={filling}
         kind="mains"
@@ -1280,6 +1280,19 @@ export function FlowDiagram({
     const circulating = bubbling === true && exchangeFilled(exchangeYs[0]);
     // Otherwise, the upper pipe's way down holds water up to T2's surface, as
     // its lower end is always below it
+    /** The exchange pipe at `exchangeYs[i]`, from where it leaves to where it enters */
+    const exchangePoints = (i: number): [number, number][] =>
+      i === 0
+        ? [
+            [t1Edge, exchangeYs[0]],
+            [exchangeX, exchangeYs[0]],
+            [exchangeX, exchangeYs[1]],
+            [t2FarEdge, exchangeYs[1]],
+          ]
+        : [
+            [t2Edge, exchangeYs[1]],
+            [t1Edge, exchangeYs[1]],
+          ];
     const exchangeSurface =
       t2Fill === undefined
         ? undefined
@@ -1315,13 +1328,15 @@ export function FlowDiagram({
           phase={trainInletPhase}
         />
 
-        {/* Air pump into T2, through the add air valve */}
+        {/* Air pump into T2, through the add air valve. A pipe after a valve
+        only shows it open while the air pump runs, so it doesn't stand out
+        while no air can move through it */}
         <Pipe d={`M${t2c} ${teeY} H${bubblesX}`} kind="air" active={air?.on} />
         <Pipe
           d={`M${bubblesX} ${teeY} H${gapX} V${airBelowY} H${airX} V${t1Bottom}`}
           kind="air"
           active={bubbling}
-          open={bubblesValve?.on}
+          open={air?.on && bubblesValve?.on}
           square
         />
         <Valve
@@ -1343,7 +1358,7 @@ export function FlowDiagram({
           kind="air"
           active={addingAir || holdingAir}
           still={holdingAir}
-          open={addAir?.on}
+          open={air?.on && addAir?.on}
           square
         />
         <Valve
@@ -1422,11 +1437,7 @@ export function FlowDiagram({
                 className="hl-pipe-gap"
               />
               <Pipe
-                d={
-                  i === 0
-                    ? `M${t1Edge} ${y} H${exchangeX} V${exchangeYs[1]} H${t2FarEdge}`
-                    : `M${t2Edge} ${y} H${t1Edge}`
-                }
+                d={`M${exchangePoints(i).join(" L")}`}
                 kind="grey"
                 active={filled && bubbling === true}
                 filled={filled}
@@ -1465,7 +1476,7 @@ export function FlowDiagram({
           label="T1"
           side={side}
           aeration={bubbling}
-          small={a ? "start" : "end"}
+          small
           square
           base={t1Bottom - 360}
         />
@@ -1500,6 +1511,51 @@ export function FlowDiagram({
           venting={release?.on ? releaseX : undefined}
           inlinePercent
         />
+        {/* The exchange pipes are open connections, so the tanks' walls
+        leave a gap where they meet: each pipe's end continues 1 px over the
+        wall on either side, its flow's dashes in step */}
+        {exchangeYs.map((y, i) => {
+          const filled = exchangeFilled(y);
+          const points = exchangePoints(i);
+          const length = points
+            .slice(1)
+            .reduce(
+              (sum, [x2, y2], j) =>
+                sum + Math.hypot(x2 - points[j][0], y2 - points[j][1]),
+              0,
+            );
+          /**
+           * 1 px on either side of `at`, in the pipe's direction from one
+           * point to the next
+           */
+          const across = (
+            at: [number, number],
+            [x1, y1]: [number, number],
+            [x2, y2]: [number, number],
+          ) => {
+            const d = Math.hypot(x2 - x1, y2 - y1);
+            const [dx, dy] = [(x2 - x1) / d, (y2 - y1) / d];
+            return `M${at[0] - dx} ${at[1] - dy} L${at[0] + dx} ${at[1] + dy}`;
+          };
+          const n = points.length;
+          return [
+            { d: across(points[0], points[0], points[1]), phase: -1 },
+            {
+              d: across(points[n - 1], points[n - 2], points[n - 1]),
+              phase: length - 1,
+            },
+          ].map(({ d, phase }) => (
+            <Pipe
+              key={`${y}-${phase}`}
+              d={d}
+              kind="grey"
+              active={filled && bubbling === true}
+              filled={filled}
+              square
+              phase={phase}
+            />
+          ));
+        })}
 
         {/* Skim overflow at the top of T1, down the drain line. It has no
             valve, so it is shown from the FILTH_REMOVAL routine. */}
@@ -1567,14 +1623,14 @@ export function FlowDiagram({
     const transferPipe = (
       <g key={`transfer-${side}`}>
         {/* Transfer from T1 through UV into T3. The air pipe into T1 passes
-            behind it */}
+            behind it. The water is still greywater until UV-C treats it */}
         <path
           d={`M${gapX - 4} ${transferY} H${gapX + 4}`}
           className="hl-pipe-gap"
         />
         <Pipe
           d={`M${t1Edge} ${transferY} H${transferX} V${UV_Y} H${a ? 460 : 540}`}
-          kind="clean"
+          kind="grey"
           active={transferring}
           open={transferring}
           square
@@ -1582,7 +1638,7 @@ export function FlowDiagram({
         <Valve
           x={T2_CENTER[side]}
           y={UV_Y}
-          kind="clean"
+          kind="grey"
           io={transfer}
           active={transferring}
           name={sideIo("transfer_path", side)}
@@ -1824,9 +1880,10 @@ export function FlowDiagram({
 
       {/* T4 backup */}
       {/* Mains water into T4, through the pre backup water valve. The pipe
-          enters T4's top between the labels and the floats */}
+          ends above T4's top between the labels and the floats, the water
+          drips in across the air gap */}
       <Pipe
-        d={`M${T4_X} ${MAINS_Y} H${T4_INLET_X} V${TANK_Y}`}
+        d={`M${T4_X} ${MAINS_Y} H${T4_INLET_X} V${TANK_Y - T4_AIR_GAP}`}
         kind="mains"
         active={preBackup?.on}
         open={preBackup?.on}
@@ -1851,6 +1908,7 @@ export function FlowDiagram({
         h={TANK_H}
         state={state}
         inletX={T4_INLET_X}
+        inletY={TANK_Y - T4_AIR_GAP}
         filling={preBackup?.on}
       />
 
