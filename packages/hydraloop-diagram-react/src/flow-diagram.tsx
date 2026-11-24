@@ -1305,7 +1305,8 @@ export function FlowDiagram({
         />
         <Valve
           x={releaseX}
-          y={162}
+          // Level with the top run of the air pipe into T1
+          y={teeY}
           vertical
           kind="air"
           io={release}
