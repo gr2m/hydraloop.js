@@ -788,11 +788,10 @@ function Tank({
    */
   venting?: number;
   /**
-   * A tank too narrow for its text: the label and the level in percent are
-   * centered in it, the label at the top as in other tanks, the level in
-   * percent small enough to fit, centered vertically on `percentY`
+   * A tank too narrow for its text: only the label, centered at the top as in
+   * other tanks. The level is in the tooltip
    */
-  small?: { percentY: number };
+  small?: boolean;
   /** Square corners */
   square?: boolean;
   /**
@@ -1002,18 +1001,6 @@ function Tank({
           className="hl-tank-meta"
         >
           pressurized
-        </text>
-      )}
-      {known && small && (
-        <text
-          x={textX}
-          // Centered on percentY: half the cap height (0.71 of the font size,
-          // see .hl-tank-value.is-small) below it
-          y={small.percentY + (6.5 * 0.71) / 2}
-          textAnchor={anchor}
-          className="hl-tank-value is-small"
-        >
-          {percent}
         </text>
       )}
       {known && !small && inlinePercent && (
@@ -1465,8 +1452,7 @@ export function FlowDiagram({
           label="T1"
           side={side}
           aeration={bubbling}
-          // The level in percent lines up with the transfer pipe leaving T1
-          small={{ percentY: transferY }}
+          small
           square
           base={t1Bottom - 360}
         />

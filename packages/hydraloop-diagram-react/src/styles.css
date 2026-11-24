@@ -427,12 +427,6 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
-/* Fits "100%" into T1, 21 px wide. Proportional digits are narrower */
-.hl-tank-value.is-small {
-  font-size: 6.5px;
-  font-variant-numeric: normal;
-  letter-spacing: 0;
-}
 .hl-tank-trend {
   font-weight: 400;
   fill: var(--hl-muted);
