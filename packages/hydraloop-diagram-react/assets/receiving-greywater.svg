@@ -225,7 +225,8 @@
   fill: var(--hl-bg);
   stroke: var(--hl-muted);
   stroke-width: 1.5;
-  stroke-linejoin: round;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 10;
 }
 .hl-valve-body {
   transition: transform 0.3s ease;
@@ -248,7 +249,8 @@
   fill: var(--hl-bg);
   stroke: var(--hl-border-strong);
   stroke-width: 1.5;
-  stroke-linejoin: round;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 10;
 }
 .hl-distributor polygon.is-closed {
   stroke: var(--hl-pipe-idle);
