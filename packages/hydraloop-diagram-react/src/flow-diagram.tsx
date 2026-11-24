@@ -1139,7 +1139,7 @@ export function FlowDiagram({
     // exchange pipe and T1's bottom. It crosses the air pipe, turns down
     // between T1 and T2, passes below T2 and enters UV-C from the side
     const transferY = (exchangeYs[1] + PIPE + t1Bottom) / 2;
-    return (
+    const body = (
       <g key={side}>
         <text
           x={(a ? 20 : 980) + dx}
@@ -1397,7 +1397,13 @@ export function FlowDiagram({
         >
           Drain
         </text>
+      </g>
+    );
 
+    // Drawn after the circulation pipes, so the transfer pipe passes in
+    // front of them
+    const transferPipe = (
+      <g key={side}>
         {/* Transfer from T1 through UV into T3. The air pipe into T1 passes
             behind it */}
         <path
@@ -1424,7 +1430,9 @@ export function FlowDiagram({
         />
       </g>
     );
+    return { body, transferPipe };
   };
+  const trains = { A: train("A"), B: train("B") };
 
   const backup = io[IO.backupWater];
   const recycledToPump = supply.pumping && supply.source !== "backup";
@@ -1523,8 +1531,8 @@ export function FlowDiagram({
         Sewer
       </text>
 
-      {train("A")}
-      {train("B")}
+      {trains.A.body}
+      {trains.B.body}
 
       <Distributor
         x={500}
@@ -1630,11 +1638,10 @@ export function FlowDiagram({
 
       {/* Circulation: the distribution pump pushes T3 water (T4 water while
           the backup valve is set to T4) around the right of T3 into the top
-          of UV. The T3 drain and train B's transfer pipe
-          pass behind it. Along its top run, the backwash pipes branch off up
+          of UV. The T3 drain passes behind it, train B's transfer pipe in
+          front of it. Along its top run, the backwash pipes branch off up
           into the center of each T2's bottom */}
       <path d={`M700 ${backupY - 4} V${backupY + 4}`} className="hl-pipe-gap" />
-      <path d={`M700 ${UV_Y - 4} V${UV_Y + 4}`} className="hl-pipe-gap" />
       <Pipe
         d={`M560 740 H700 V${RUN_Y} H${T2_CENTER.B}`}
         kind={outletKind}
@@ -1694,6 +1701,11 @@ export function FlowDiagram({
         labelAnchor="end"
         labelDx={-14}
       />
+
+      {/* Train B's transfer pipe passes in front of the circulation pipe */}
+      <path d={`M696 ${UV_Y} H704`} className="hl-pipe-gap" />
+      {trains.A.transferPipe}
+      {trains.B.transferPipe}
 
       {/* T4 and T3 join in the backup valve, which feeds the distribution
           pump from one of them. The pipes leave the tanks' sides at their
