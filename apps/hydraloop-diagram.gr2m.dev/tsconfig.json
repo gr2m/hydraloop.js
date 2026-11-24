@@ -11,11 +11,15 @@
     "noEmit": true,
     "types": ["vite/client"],
     "paths": {
-      "hydraloop-diagram-react": ["../../packages/diagram-react/src/index.ts"],
-      "hydraloop-diagram-react/model": [
-        "../../packages/diagram-react/src/model.ts"
+      "hydraloop-diagram-react": [
+        "../../packages/hydraloop-diagram-react/src/index.ts"
       ],
-      "hydraloop-diagram-react/test/*": ["../../packages/diagram-react/test/*"],
+      "hydraloop-diagram-react/model": [
+        "../../packages/hydraloop-diagram-react/src/model.ts"
+      ],
+      "hydraloop-diagram-react/test/*": [
+        "../../packages/hydraloop-diagram-react/test/*"
+      ],
       "react": ["./node_modules/@types/react"],
       "react/*": ["./node_modules/@types/react/*"]
     }

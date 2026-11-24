@@ -2,7 +2,7 @@
 
 https://hydraloop-diagram.gr2m.dev
 
-A playground for [`hydraloop-diagram-react`](../../packages/diagram-react/readme.md). It sets the signals, tank levels, routines and connected outlets of an H600 at one moment, and renders the diagram for the state that `stateAt()` derives from them. Presets load states of the simulated H600 of the [H600 dashboard](../h600.gr2m.dev/README.md), like a transfer to T3 or filth removal. It keeps its settings across reloads.
+A playground for [`hydraloop-diagram-react`](../../packages/hydraloop-diagram-react/readme.md). It sets the signals, tank levels, routines and connected outlets of an H600 at one moment, and renders the diagram for the state that `stateAt()` derives from them. Presets load states of the simulated H600 of the [H600 dashboard](../h600.gr2m.dev/README.md), like a transfer to T3 or filth removal. It keeps its settings across reloads.
 
 ## Run
 
@@ -15,7 +15,7 @@ npm run dev
 
 Open http://localhost:5173.
 
-The app uses `hydraloop-diagram-react` from its source in [`packages/diagram-react/src`](../../packages/diagram-react/src), through aliases in [`vite.config.ts`](vite.config.ts) and [`tsconfig.json`](tsconfig.json). Changes to the component show up right away, without building the package.
+The app uses `hydraloop-diagram-react` from its source in [`packages/hydraloop-diagram-react/src`](../../packages/hydraloop-diagram-react/src), through aliases in [`vite.config.ts`](vite.config.ts) and [`tsconfig.json`](tsconfig.json). Changes to the component show up right away, without building the package.
 
 ## Readme image
 
@@ -23,7 +23,7 @@ The app uses `hydraloop-diagram-react` from its source in [`packages/diagram-rea
 npm run readme-svg
 ```
 
-renders the "Receiving greywater" preset to [`packages/diagram-react/assets/receiving-greywater.svg`](../../packages/diagram-react/assets/receiving-greywater.svg), the image in the package's readme. The SVG includes the package's styles, so it shows the same colors and animations as an image, light or dark.
+renders the "Receiving greywater" preset to [`packages/hydraloop-diagram-react/assets/receiving-greywater.svg`](../../packages/hydraloop-diagram-react/assets/receiving-greywater.svg), the image in the package's readme. The SVG includes the package's styles, so it shows the same colors and animations as an image, light or dark.
 
 ## Deployment
 

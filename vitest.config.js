@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     include: [
       "packages/*/test/**/*.test.js",
-      "packages/diagram-react/test/**/*.test.{ts,tsx}",
+      "packages/hydraloop-diagram-react/test/**/*.test.{ts,tsx}",
     ],
     resolveSnapshotPath: (testPath, snapExtension) => testPath + snapExtension,
     coverage: {

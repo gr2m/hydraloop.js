@@ -38,7 +38,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gr2m/hydraloop.git",
-    "directory": "packages/diagram-react"
+    "directory": "packages/hydraloop-diagram-react"
   },
   "license": "ISC",
   "peerDependencies": {

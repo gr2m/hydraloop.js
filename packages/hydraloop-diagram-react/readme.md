@@ -2,7 +2,7 @@
 
 > React flow diagram of a [Hydraloop](https://www.hydraloop.com) H600, and the model that works out what the device is doing from its signals
 
-[![The flow diagram while train A receives greywater, T3 circulates through UV-C and the distribution pump supplies the toilets](https://raw.githubusercontent.com/gr2m/hydraloop/main/packages/diagram-react/assets/receiving-greywater.svg)](https://hydraloop-diagram.gr2m.dev/)
+[![The flow diagram while train A receives greywater, T3 circulates through UV-C and the distribution pump supplies the toilets](https://raw.githubusercontent.com/gr2m/hydraloop/main/packages/hydraloop-diagram-react/assets/receiving-greywater.svg)](https://hydraloop-diagram.gr2m.dev/)
 
 Try it with any state in the playground: https://hydraloop-diagram.gr2m.dev/
 

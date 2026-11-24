@@ -1,4 +1,4 @@
-// Writes packages/diagram-react/assets/receiving-greywater.svg, the image of
+// Writes packages/hydraloop-diagram-react/assets/receiving-greywater.svg, the image of
 // the package's readme: `npm run readme-svg`
 
 import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
@@ -7,7 +7,10 @@ import { createServer } from "vite";
 // Tooltip times are formatted in the local time zone
 process.env.TZ = "UTC";
 
-const pkg = new URL("../../../packages/diagram-react/", import.meta.url);
+const pkg = new URL(
+  "../../../packages/hydraloop-diagram-react/",
+  import.meta.url,
+);
 const out = new URL("assets/receiving-greywater.svg", pkg);
 
 const server = await createServer({

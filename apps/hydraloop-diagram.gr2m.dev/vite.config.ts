@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 
 const pkg = fileURLToPath(
-  new URL("../../packages/diagram-react/", import.meta.url),
+  new URL("../../packages/hydraloop-diagram-react/", import.meta.url),
 );
 
 // Uses hydraloop-diagram-react from its source in this repository, so that

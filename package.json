@@ -11,7 +11,7 @@
     "lint:fix": "prettier --write .",
     "test": "vitest run --coverage",
     "test:coverage": "vitest run --coverage --coverage.reporter=html && open coverage/index.html",
-    "test:tsc": "tsc && tsc -p packages/diagram-react",
+    "test:tsc": "tsc && tsc -p packages/hydraloop-diagram-react",
     "test:types": "vitest --typecheck.only run",
     "prepare": "husky || true",
     "generate:internal": "node scripts/generate-internal.js && prettier --write packages/hydraloop-internal/lib packages/hydraloop-internal/readme.md",
