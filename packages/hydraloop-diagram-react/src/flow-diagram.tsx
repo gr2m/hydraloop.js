@@ -1554,14 +1554,14 @@ export function FlowDiagram({
     const transferPipe = (
       <g key={`transfer-${side}`}>
         {/* Transfer from T1 through UV into T3. The air pipe into T1 passes
-            behind it */}
+            behind it. The water is still greywater until UV-C treats it */}
         <path
           d={`M${gapX - 4} ${transferY} H${gapX + 4}`}
           className="hl-pipe-gap"
         />
         <Pipe
           d={`M${t1Edge} ${transferY} H${transferX} V${UV_Y} H${a ? 460 : 540}`}
-          kind="clean"
+          kind="grey"
           active={transferring}
           open={transferring}
           square
@@ -1569,7 +1569,7 @@ export function FlowDiagram({
         <Valve
           x={T2_CENTER[side]}
           y={UV_Y}
-          kind="clean"
+          kind="grey"
           io={transfer}
           active={transferring}
           name={sideIo("transfer_path", side)}
