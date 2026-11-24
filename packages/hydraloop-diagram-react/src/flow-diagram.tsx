@@ -251,6 +251,11 @@ const SEWER_END = {
 const MAINS_Y = UV_Y;
 /** Where the mains pipe enters T4's top */
 const T4_INLET_X = 167;
+/**
+ * The air gap between the end of the mains pipe and T4's top, which keeps
+ * mains water from flowing back into the pipe. The water drips across it
+ */
+const T4_AIR_GAP = 14;
 /** The center of each T2, where its backwash pipe enters from below */
 const T2_CENTER: Record<Side, number> = { A: T2_X.A + 86, B: T2_X.B + 86 };
 /** Height of a distributor triangle, from its tip to its base */
@@ -1038,6 +1043,7 @@ function BackupTank({
   h,
   state,
   inletX,
+  inletY,
   filling = false,
 }: {
   x: number;
@@ -1045,8 +1051,12 @@ function BackupTank({
   w: number;
   h: number;
   state: DeviceState;
-  /** Where the mains pipe enters the top of the tank */
+  /**
+   * Where the mains pipe ends above the tank. The tank's top is open below
+   * it, as wide as the pipe
+   */
   inletX: number;
+  inletY: number;
   /** Mains water drips in from the inlet */
   filling?: boolean;
 }) {
@@ -1067,6 +1077,10 @@ function BackupTank({
             ? "hl-tank-shell is-unknown"
             : "hl-tank-shell"
         }
+      />
+      <path
+        d={`M${inletX - PIPE} ${y} H${inletX + PIPE}`}
+        className="hl-tank-gap"
       />
       {fillTop !== undefined && (
         <>
@@ -1115,11 +1129,12 @@ function BackupTank({
       <text x={x + 12} y={y + 40} className="hl-tank-meta">
         {t4.label}
       </text>
-      {/* Below the min float, the water's surface is unknown: the drops fall
-          to the bottom */}
+      {/* The drops fall from the pipe's end through the opening in the top.
+          Below the min float, the water's surface is unknown: they fall to
+          the bottom */}
       <Drips
         x={inletX}
-        y={y}
+        y={inletY}
         bottom={fillTop ?? y + h}
         active={filling}
         kind="mains"
@@ -1865,9 +1880,10 @@ export function FlowDiagram({
 
       {/* T4 backup */}
       {/* Mains water into T4, through the pre backup water valve. The pipe
-          enters T4's top between the labels and the floats */}
+          ends above T4's top between the labels and the floats, the water
+          drips in across the air gap */}
       <Pipe
-        d={`M${T4_X} ${MAINS_Y} H${T4_INLET_X} V${TANK_Y}`}
+        d={`M${T4_X} ${MAINS_Y} H${T4_INLET_X} V${TANK_Y - T4_AIR_GAP}`}
         kind="mains"
         active={preBackup?.on}
         open={preBackup?.on}
@@ -1892,6 +1908,7 @@ export function FlowDiagram({
         h={TANK_H}
         state={state}
         inletX={T4_INLET_X}
+        inletY={TANK_Y - T4_AIR_GAP}
         filling={preBackup?.on}
       />
 

@@ -380,6 +380,11 @@
   stroke: var(--hl-tank-border);
   stroke-width: 1.5;
 }
+/* An opening in a tank's wall, covering its outline */
+.hl-tank-gap {
+  stroke: var(--hl-bg);
+  stroke-width: 3;
+}
 .hl-tank-shell.is-unknown {
   fill: url(#hl-hatch);
 }
