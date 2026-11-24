@@ -8,7 +8,7 @@ Request an Hydroloop API key by contacting them:
 https://info.hydraloop.com/docs/how-to-use-the-hydraloop-api/
 
 > [!NOTE]
-> For the internal API that the Hydraloop Device Manager web app uses, which requires an HDM login instead of an API key, see [`hydraloop-internal`](../internal/readme.md). It is not meant for integrations.
+> For the internal API that the Hydraloop Device Manager web app uses, which requires an HDM login instead of an API key, see [`hydraloop-internal`](../hydraloop-internal/readme.md). It is not meant for integrations.
 
 ## Usage
 

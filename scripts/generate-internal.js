@@ -8,15 +8,15 @@
 // Run with: node scripts/generate-internal.js
 //
 // Writes, for each of the two APIs ("root" and "local"):
-//   packages/internal/lib/<api>/<tag>.js    one function per operation of the tag
-//   packages/internal/lib/<api>/index.js    binds all functions to the SDK state
-//   packages/internal/lib/<api>-types.d.ts  schema types and the method signatures
+//   packages/hydraloop-internal/lib/<api>/<tag>.js    one function per operation of the tag
+//   packages/hydraloop-internal/lib/<api>/index.js    binds all functions to the SDK state
+//   packages/hydraloop-internal/lib/<api>-types.d.ts  schema types and the method signatures
 //
-// It also writes the list of all methods into packages/internal/readme.md.
+// It also writes the list of all methods into packages/hydraloop-internal/readme.md.
 //
 // From the AsyncAPI document of the socket API in spec/socket/asyncapi.json,
-// written by hand, it generates packages/internal/lib/socket-types.d.ts and the list of
-// socket messages in packages/internal/readme.md. Everything else in packages/internal/lib/ is
+// written by hand, it generates packages/hydraloop-internal/lib/socket-types.d.ts and the list of
+// socket messages in packages/hydraloop-internal/readme.md. Everything else in packages/hydraloop-internal/lib/ is
 // written by hand.
 
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";

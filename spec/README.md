@@ -10,7 +10,7 @@ HDM has two backends, each with its own spec:
 Each backend publishes two specs:
 
 - **External** — only the `/external-api/*` endpoints, which are the ones Hydraloop offers for integrations. This library is built on these.
-- **Internal** — every endpoint, including the ones the HDM web app at `https://hdm.hydraloop.com/hdm/` uses internally. The [`hydraloop-internal`](../packages/internal/readme.md) SDK is generated from these.
+- **Internal** — every endpoint, including the ones the HDM web app at `https://hdm.hydraloop.com/hdm/` uses internally. The [`hydraloop-internal`](../packages/hydraloop-internal/readme.md) SDK is generated from these.
 
 ## Files
 
@@ -38,7 +38,7 @@ The web app doesn't use a generated client. Its JavaScript builds request URLs b
 
 The internal specs are incomplete in places. Many root API operations have no summary, and about half of the operations in both specs have no response schema. Some schemas are wrong as well, e.g. many fields that can be `null` are not marked as nullable. To fill in a missing response type, call the endpoint with a logged-in session and record what comes back.
 
-Corrections found that way are kept in [`internal-patches/`](internal-patches/) as [JSON merge patches](https://www.rfc-editor.org/rfc/rfc7386). They are applied to the internal specs when generating the [`hydraloop-internal`](../packages/internal/readme.md) SDK. The update script doesn't touch them.
+Corrections found that way are kept in [`internal-patches/`](internal-patches/) as [JSON merge patches](https://www.rfc-editor.org/rfc/rfc7386). They are applied to the internal specs when generating the [`hydraloop-internal`](../packages/hydraloop-internal/readme.md) SDK. The update script doesn't touch them.
 
 ## Socket API
 
@@ -49,7 +49,7 @@ Besides the REST APIs, HDM pushes real-time messages over [socket.io](https://so
 
 There are three sockets, each with its own rooms: one per device on the local API (`/api-local/socket.io`, with the device token), and two on the root API for notifications (`/api-root/person-notifications-socket.io`, with the device token) and for the logged-in person (`/api-root/root-socket.io`, with the user token).
 
-The [`hydraloop-internal`](../packages/internal/readme.md) SDK generates the types of the messages from it, and connects to the device socket with `hydraloop.local.subscribe()`. The update script doesn't touch it.
+The [`hydraloop-internal`](../packages/hydraloop-internal/readme.md) SDK generates the types of the messages from it, and connects to the device socket with `hydraloop.local.subscribe()`. The update script doesn't touch it.
 
 To find messages the spec doesn't know or describes differently, run [`scripts/listen-socket.js`](../scripts/listen-socket.js) in the background, e.g. all day:
 
@@ -65,7 +65,7 @@ The **external API** is the one Hydraloop provides for integrations. The main `h
 
 The **internal API** behind the internal specs is meant for personal use only. The API is prune to change at any moment to support Hydraloop's needs for their own applications.
 
-It authenticates with a login session (JWT bearer token), not the `X-API-KEY` used by the external API. The [`hydraloop-internal`](../packages/internal/readme.md) SDK is provided for personal use and exploration, not for integrations.
+It authenticates with a login session (JWT bearer token), not the `X-API-KEY` used by the external API. The [`hydraloop-internal`](../packages/hydraloop-internal/readme.md) SDK is provided for personal use and exploration, not for integrations.
 
 Hydraloop also asked that the local API base URL not be hardcoded. Each device's `localApiUrl` (from `/api-root/external-api/list-coupled-devices`) "might change depending on load balancing and or privacy laws of your country".
 
@@ -77,4 +77,4 @@ Run the following command from the repository root:
 node scripts/update-spec.js
 ```
 
-This fetches all four sources and overwrites the JSON files in this folder. Afterwards, regenerate the [`hydraloop-internal`](../packages/internal/readme.md) SDK with `npm run generate:internal`. The [Update OpenAPI Specs](../.github/workflows/update-spec.yml) workflow runs it daily and opens a pull request when anything other than `info.version` changes.
+This fetches all four sources and overwrites the JSON files in this folder. Afterwards, regenerate the [`hydraloop-internal`](../packages/hydraloop-internal/readme.md) SDK with `npm run generate:internal`. The [Update OpenAPI Specs](../.github/workflows/update-spec.yml) workflow runs it daily and opens a pull request when anything other than `info.version` changes.

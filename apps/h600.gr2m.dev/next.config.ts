@@ -44,7 +44,7 @@ const nextConfig: NextConfig = {
     // which needs to include them.
     root: path.join(__dirname, "../.."),
     resolveAlias: {
-      // hydraloop-internal imports hydraloop. From packages/internal/, that
+      // hydraloop-internal imports hydraloop. From packages/hydraloop-internal/, that
       // only resolves when the repository root is installed, which it isn't
       // when only this app is installed, e.g. on Vercel. Resolve it from this
       // app's node_modules instead.

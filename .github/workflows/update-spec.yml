@@ -57,7 +57,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b $BRANCH
-          git add spec/ packages/internal/lib/ packages/internal/readme.md
+          git add spec/ packages/hydraloop-internal/lib/ packages/hydraloop-internal/readme.md
           git commit -m "chore: update OpenAPI specs"
           git push origin $BRANCH --force
 

@@ -2,7 +2,7 @@
 
 https://h600.gr2m.dev
 
-A Next.js app that shows the live and historic status of a Hydraloop H600, using the internal HDM API through [`hydraloop-internal`](../../packages/internal/readme.md).
+A Next.js app that shows the live and historic status of a Hydraloop H600, using the internal HDM API through [`hydraloop-internal`](../../packages/hydraloop-internal/readme.md).
 
 > [!WARNING]
 > Hydraloop does not intend the internal API for external use. It may change at any time without notice. See [`spec/README.md`](../../spec/README.md#stability). The app only reads data and never changes settings on the device.
@@ -162,7 +162,7 @@ HDM tokens expire after 30 minutes. [`proxy.ts`](proxy.ts) exchanges the token f
 
 ### Live updates
 
-The overview and the live view load the last 8 hours over REST, then keep them current with the real-time messages of the device ([`components/use-live-dataset.tsx`](components/use-live-dataset.tsx), [`lib/live.ts`](lib/live.ts)). The browser opens the socket to HDM itself, with [`hydraloop-internal/socket`](../../packages/internal/readme.md#real-time-messages), so the messages don't go through the server:
+The overview and the live view load the last 8 hours over REST, then keep them current with the real-time messages of the device ([`components/use-live-dataset.tsx`](components/use-live-dataset.tsx), [`lib/live.ts`](lib/live.ts)). The browser opens the socket to HDM itself, with [`hydraloop-internal/socket`](../../packages/hydraloop-internal/readme.md#real-time-messages), so the messages don't go through the server:
 
 - Before each connection attempt, it gets the local API URL and a new device token from [`/api/socket`](app/api/socket/route.ts).
 - It calls [`/api/heartbeat`](app/api/heartbeat/route.ts) every 90 seconds while the page is visible, as the HDM web app does while it shows the graph. Readings also arrived within about a second without it, but it may be what makes the H600 report in real time instead of about once a minute.

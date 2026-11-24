@@ -14,7 +14,7 @@
     "test:tsc": "tsc && tsc -p packages/diagram-react",
     "test:types": "vitest --typecheck.only run",
     "prepare": "husky || true",
-    "generate:internal": "node scripts/generate-internal.js && prettier --write packages/internal/lib packages/internal/readme.md",
+    "generate:internal": "node scripts/generate-internal.js && prettier --write packages/hydraloop-internal/lib packages/hydraloop-internal/readme.md",
     "build": "npm run build --workspace hydraloop-diagram-react"
   },
   "repository": "github:gr2m/hydraloop",
