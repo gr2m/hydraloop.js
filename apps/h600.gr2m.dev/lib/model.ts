@@ -364,12 +364,20 @@ export function routineSegments(ds: Dataset): RoutineSegment[] {
 }
 
 /**
- * Routine segments where STANDBY and INCOMING_WATER are split at A/B valve
- * switches. The parts while the valve selects the other train get `valve`
- * set to that train, as no greywater enters, and INCOMING_WATER gets the
- * "idle" phase (see `stateAt`).
+ * Routine segments where STANDBY, INCOMING_WATER and SKIM_LEVEL_DETERMINATION
+ * are split at A/B valve switches. The parts while the valve selects the other
+ * train get `valve` set to that train, as no greywater enters, and get the
+ * "idle" phase (see `stateAt`). The firmware runs INCOMING_WATER and the
+ * SKIM_LEVEL_DETERMINATION after it on both trains, but on the train that
+ * takes no water it only closes the release air valve again. Unless it checks
+ * the level of a full train (FIND_HIGHEST_WATER_POINT), which starts filth
+ * removal.
  */
-const VALVE_ROUTINES = new Set(["STANDBY", "INCOMING_WATER"]);
+const VALVE_ROUTINES = new Set([
+  "STANDBY",
+  "INCOMING_WATER",
+  "SKIM_LEVEL_DETERMINATION",
+]);
 
 export function valveRoutineSegments(
   ds: Dataset,
@@ -377,6 +385,9 @@ export function valveRoutineSegments(
   const switches = (ds.io[IO.abSelector] ?? []).map((p) => p.t);
   return routineSegments(ds).flatMap((s) => {
     if (!VALVE_ROUTINES.has(s.name) || s.side === "SYSTEM") return [s];
+    if (s.states.some((x) => x.state === "FIND_HIGHEST_WATER_POINT")) {
+      return [s];
+    }
     const cuts = [s.start, ...switches.filter((t) => t > s.start && t < s.end)];
     const parts: (RoutineSegment & { valve?: Side })[] = [];
     cuts.forEach((start, i) => {
