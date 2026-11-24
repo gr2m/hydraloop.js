@@ -189,10 +189,25 @@ type Branch = {
  * The pipe between the backwash valves, level with the waste pipes below T1
  */
 const RUN_Y = 404;
-/** The vertical center of UV-C */
-const UV_Y = 466;
 /** Half the width of a pipe */
 const PIPE = 3.5;
+/** Half the height of UV-C */
+const UV_H = 17;
+/**
+ * The space above and below UV-C: from the bottom edge of the circulation
+ * pipe's top run to UV-C's top, and from UV-C's bottom to the top of T3
+ */
+const UV_GAP = 57;
+/** The vertical center of UV-C */
+const UV_Y = RUN_Y + PIPE + UV_GAP + UV_H;
+/** The top of T3 and T4 */
+const TANK_Y = UV_Y + UV_H + UV_GAP;
+/** The height of T3 and T4 */
+const TANK_H = 100;
+/** The bottom of T3 and T4 */
+const TANK_BOTTOM = TANK_Y + TANK_H;
+/** The distribution pump and the pipe to the outlets */
+const PUMP_Y = TANK_BOTTOM + 100;
 /**
  * The x of each train's T2, which leaves 30 px between the release air labels.
  * Each train's other parts are placed relative to it
@@ -1114,7 +1129,7 @@ export function FlowDiagram({
   const bypassEnds = distributorEnds(500, inletY, "left");
   const abEnds = distributorEnds(500, abY, "up");
   // The backup valve lines up with the bottom of T3 and T4
-  const backupY = 640 - PIPE;
+  const backupY = TANK_BOTTOM - PIPE;
   const backupEnds = distributorEnds(260, backupY, "down");
 
   const train = (side: Side) => {
@@ -1552,7 +1567,7 @@ export function FlowDiagram({
 
   return (
     <svg
-      viewBox="0 -15 1000 840"
+      viewBox={`0 -15 1000 ${PUMP_Y + 100}`}
       className="hl-flow-diagram"
       role="group"
       aria-label="Water flow through the H600"
@@ -1657,7 +1672,7 @@ export function FlowDiagram({
 
       {/* UV and into T3 */}
       <Pipe
-        d={`M500 ${UV_Y + 17} V540`}
+        d={`M500 ${UV_Y + UV_H} V${TANK_Y}`}
         kind={uvOutletKind}
         active={t3ReceivingFromUv}
         open={io[IO.uvValve]?.on}
@@ -1672,14 +1687,14 @@ export function FlowDiagram({
         <title suppressHydrationWarning>
           {ioTitle("UV-C", IO.uvPower, io[IO.uvPower], ["on", "off"])}
         </title>
-        <rect x={460} y={UV_Y - 17} width={80} height={34} rx={6} />
+        <rect x={460} y={UV_Y - UV_H} width={80} height={2 * UV_H} rx={6} />
         <text x={500} y={UV_Y + 5} textAnchor="middle">
           UV-C
         </text>
       </g>
       <Valve
         x={500}
-        y={(UV_Y + 17 + 540) / 2}
+        y={(UV_Y + UV_H + TANK_Y) / 2}
         vertical
         kind={uvOutletKind}
         io={io[IO.uvValve]}
@@ -1690,9 +1705,9 @@ export function FlowDiagram({
 
       <Tank
         x={346}
-        y={540}
+        y={TANK_Y}
         w={309}
-        h={100}
+        h={TANK_H}
         level={tanks.t3}
         kind="clean"
         label="T3"
@@ -1702,8 +1717,10 @@ export function FlowDiagram({
       {/* Water from UV-C drips onto T3's surface */}
       <Drips
         x={500}
-        y={540}
-        bottom={t3Fill === undefined ? undefined : 640 - 100 * t3Fill}
+        y={TANK_Y}
+        bottom={
+          t3Fill === undefined ? undefined : TANK_BOTTOM - TANK_H * t3Fill
+        }
         active={!!t3ReceivingFromUv}
         kind={uvOutletKind}
       />
@@ -1744,7 +1761,7 @@ export function FlowDiagram({
       {/* Mains water into T4, through the pre backup water valve. The pipe
           enters T4's top between the labels and the floats */}
       <Pipe
-        d={`M${T4_X} ${MAINS_Y} H${T4_INLET_X} V540`}
+        d={`M${T4_X} ${MAINS_Y} H${T4_INLET_X} V${TANK_Y}`}
         kind="mains"
         active={preBackup?.on}
         open={preBackup?.on}
@@ -1764,9 +1781,9 @@ export function FlowDiagram({
       />
       <BackupTank
         x={T4_X}
-        y={540}
+        y={TANK_Y}
         w={130}
-        h={100}
+        h={TANK_H}
         state={state}
         inletX={T4_INLET_X}
         filling={preBackup?.on}
@@ -1779,7 +1796,7 @@ export function FlowDiagram({
           into the center of each T2's bottom */}
       <path d={`M700 ${backupY - 4} V${backupY + 4}`} className="hl-pipe-gap" />
       <Pipe
-        d={`M560 740 H700 V${RUN_Y} H${T2_CENTER.B}`}
+        d={`M560 ${PUMP_Y} H700 V${RUN_Y} H${T2_CENTER.B}`}
         kind={outletKind}
         active={circulatingThroughUv || backwashing.A || backwashing.B}
         open={t3.circulating || backwash.A?.on || backwash.B?.on}
@@ -1791,7 +1808,7 @@ export function FlowDiagram({
         open={t3.circulating || backwash.A?.on}
       />
       <Pipe
-        d={`M500 ${RUN_Y} V${UV_Y - 17}`}
+        d={`M500 ${RUN_Y} V${UV_Y - UV_H}`}
         kind={outletKind}
         active={circulatingThroughUv}
         open={t3.circulating}
@@ -1829,7 +1846,7 @@ export function FlowDiagram({
       })}
       <Valve
         x={500}
-        y={(RUN_Y + UV_Y - 17) / 2}
+        y={(RUN_Y + UV_Y - UV_H) / 2}
         vertical
         kind={outletKind}
         io={io[IO.circulation]}
@@ -1863,7 +1880,7 @@ export function FlowDiagram({
         square
       />
       <Pipe
-        d={`M260 ${backupEnds.common} V724`}
+        d={`M260 ${backupEnds.common} V${PUMP_Y - 16}`}
         kind={outletKind}
         active={supply.pumping}
         open={backup !== undefined}
@@ -1887,7 +1904,7 @@ export function FlowDiagram({
 
       <Pump
         x={260}
-        y={740}
+        y={PUMP_Y}
         r={16}
         kind={outletKind}
         io={io[IO.distributionPump]}
@@ -1899,7 +1916,7 @@ export function FlowDiagram({
       {/* Back flush: the distribution pump pushes water back up into the
           center of T3's bottom */}
       <Pipe
-        d="M500 740 V640"
+        d={`M500 ${PUMP_Y} V${TANK_BOTTOM}`}
         kind={outletKind}
         active={backFlushing}
         open={io[IO.backFlush]?.on}
@@ -1907,7 +1924,7 @@ export function FlowDiagram({
       />
       <Valve
         x={500}
-        y={690}
+        y={(PUMP_Y + TANK_BOTTOM) / 2}
         vertical
         kind={outletKind}
         io={io[IO.backFlush]}
@@ -1919,62 +1936,72 @@ export function FlowDiagram({
       {/* Outlets, active by their demand sensor. The pipes to them are always
           pressurized, from T3 or T4, so they are open even without a reading */}
       <Pipe
-        d="M276 740 H560"
+        d={`M276 ${PUMP_Y} H560`}
         kind={outletKind}
         active={supply.toOutlets ?? false}
         open
       />
       <g className={`hl-outlet${off(device.outlets.toilet)}`}>
         <Pipe
-          d="M360 740 V790"
+          d={`M360 ${PUMP_Y} V${PUMP_Y + 50}`}
           kind={outletKind}
           active={supply.toilet ?? false}
           open
-          arrow={{ x: 360, y: 790, dir: "down" }}
+          arrow={{ x: 360, y: PUMP_Y + 50, dir: "down" }}
         />
         <Sensor
           x={360}
-          y={765}
+          y={PUMP_Y + 25}
           kind={outletKind}
           io={io[IO.toilet]}
           name={IO.toilet}
           label=""
         />
-        <text x={360} y={815} textAnchor="middle" className="hl-diagram-label">
+        <text
+          x={360}
+          y={PUMP_Y + 75}
+          textAnchor="middle"
+          className="hl-diagram-label"
+        >
           Toilets
         </text>
       </g>
       <g className={`hl-outlet${off(device.outlets.washingMachine)}`}>
         <Pipe
-          d="M460 740 V790"
+          d={`M460 ${PUMP_Y} V${PUMP_Y + 50}`}
           kind={outletKind}
           active={supply.wash ?? false}
           open
-          arrow={{ x: 460, y: 790, dir: "down" }}
+          arrow={{ x: 460, y: PUMP_Y + 50, dir: "down" }}
         />
         <Sensor
           x={460}
-          y={765}
+          y={PUMP_Y + 25}
           kind={outletKind}
           io={io[IO.wash]}
           name={IO.wash}
           label=""
         />
-        <text x={460} y={815} textAnchor="middle" className="hl-diagram-label">
+        <text
+          x={460}
+          y={PUMP_Y + 75}
+          textAnchor="middle"
+          className="hl-diagram-label"
+        >
           Washer
         </text>
       </g>
       <g className={`hl-outlet${off(device.outlets.auxiliary)}`}>
         <Pipe
-          d="M560 740 V790"
+          d={`M560 ${PUMP_Y} V${PUMP_Y + 50}`}
           kind={outletKind}
           active={supply.auxiliary}
           open={io[IO.auxiliary]?.on}
-          arrow={{ x: 560, y: 790, dir: "down" }}
+          arrow={{ x: 560, y: PUMP_Y + 50, dir: "down" }}
         />
         <Valve
           x={560}
-          y={765}
+          y={PUMP_Y + 25}
           vertical
           kind={outletKind}
           io={io[IO.auxiliary]}
@@ -1982,7 +2009,12 @@ export function FlowDiagram({
           name={IO.auxiliary}
           label=""
         />
-        <text x={560} y={815} textAnchor="middle" className="hl-diagram-label">
+        <text
+          x={560}
+          y={PUMP_Y + 75}
+          textAnchor="middle"
+          className="hl-diagram-label"
+        >
           Auxiliary
         </text>
       </g>
