@@ -1108,8 +1108,6 @@ export function FlowDiagram({
     // Tank areas are to scale: T1 ~24 L, T2 ~200 L, T3 ~280 L (TANK_CAPACITY),
     // except that T1 reaches further down, to fit the transfer pipe on its side
     const t2x = T2_X[side];
-    // The train's offset from its first layout, for the parts outside its tanks
-    const dx = a ? t2x - 214 : t2x - 614;
     const t1x = t2x + (a ? -74 : 225);
     const t1c = t1x + 10;
     const t1Bottom = 384;
@@ -1206,8 +1204,10 @@ export function FlowDiagram({
     const body = (
       <g key={side}>
         <text
-          x={(a ? 20 : 980) + dx}
-          y={146}
+          x={a ? SEWER_LABEL_X.left : SEWER_LABEL_X.right}
+          // The top of the capitals lines up with the top edge of the A/B
+          // inlet pipes (the label's cap height is 0.72 of its 15 px)
+          y={abY - PIPE + 15 * 0.72}
           textAnchor={a ? "start" : "end"}
           className="hl-train-label"
         >
