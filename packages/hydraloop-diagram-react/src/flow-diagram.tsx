@@ -1722,14 +1722,14 @@ export function FlowDiagram({
       {/* Mains water into T4, through the pre backup water valve. The pipe
           enters T4's top between the labels and the floats */}
       <Pipe
-        d={`M30 ${MAINS_Y} H${T4_INLET_X} V540`}
+        d={`M${T4_X} ${MAINS_Y} H${T4_INLET_X} V540`}
         kind="mains"
         active={preBackup?.on}
         open={preBackup?.on}
         square
       />
       <Valve
-        x={98}
+        x={(T4_X + T4_INLET_X) / 2}
         y={MAINS_Y}
         kind="mains"
         io={preBackup}
