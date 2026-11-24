@@ -909,6 +909,18 @@ function Tank({
           </tspan>
         )}
       </text>
+      {pressureHeld && (
+        // Air pumped in before holds its pressure, in the top right corner,
+        // level with the label
+        <text
+          x={x + w - 12}
+          y={y + 22}
+          textAnchor="end"
+          className="hl-tank-meta"
+        >
+          pressurized
+        </text>
+      )}
       {known && small && (
         <text
           x={textX}
