@@ -108,7 +108,8 @@ The colors are custom properties on `:root` without specificity, so the page can
 | `--hl-bg`                                                                    | Background of tanks, valves and pumps, and the gaps where pipes cross. Must match the page's background |
 | `--hl-fg`, `--hl-muted`, `--hl-subtle`                                       | Text, outlines and unknown states                                                                       |
 | `--hl-border`                                                                | Hatching of tanks without level data                                                                    |
-| `--hl-border-strong`                                                         | Tank outlines, and pipes with unknown state                                                             |
+| `--hl-border-strong`                                                         | UV-C's outline, and pipes with unknown state                                                            |
+| `--hl-tank-border`                                                           | Outlines of tanks and of the pipes between T1 and T2 while they hold water                              |
 | `--hl-focus`                                                                 | Focused valves, pumps and tanks                                                                         |
 | `--hl-grey`, `--hl-clean`, `--hl-mains`, `--hl-waste`, `--hl-air`, `--hl-uv` | The kinds of water, air and UV-C                                                                        |
 | `--hl-pipe-idle`, `--hl-pipe-open`                                           | Pipes without water moving, closed and open                                                             |

@@ -22,6 +22,7 @@
   --hl-subtle: #8f8f8f;
   --hl-border: #ebebeb;
   --hl-border-strong: #d4d4d4;
+  --hl-tank-border: #999999;
   --hl-focus: #0070f3;
 
   --hl-grey: #b26a00;
@@ -42,6 +43,7 @@
     --hl-subtle: #707070;
     --hl-border: #262626;
     --hl-border-strong: #3d3d3d;
+    --hl-tank-border: #6b6b6b;
     --hl-focus: #52a8ff;
 
     --hl-grey: #f0a43a;
@@ -62,6 +64,7 @@
   --hl-subtle: #707070;
   --hl-border: #262626;
   --hl-border-strong: #3d3d3d;
+  --hl-tank-border: #6b6b6b;
   --hl-focus: #52a8ff;
 
   --hl-grey: #f0a43a;
@@ -169,8 +172,9 @@
 .hl-pipe.is-open .hl-pipe-base {
   stroke: var(--hl-pipe-open);
 }
+/* A pipe full of standing water, drawn like a tank, with its outline */
 .hl-pipe.is-filled .hl-pipe-base {
-  stroke: var(--hl-border-strong);
+  stroke: var(--hl-tank-border);
 }
 /* The same color as .hl-tank-fill over the tank's background */
 .hl-pipe-water {
@@ -373,7 +377,7 @@
 
 .hl-tank-shell {
   fill: var(--hl-bg);
-  stroke: var(--hl-border-strong);
+  stroke: var(--hl-tank-border);
   stroke-width: 1.5;
 }
 .hl-tank-shell.is-unknown {
