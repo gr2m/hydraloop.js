@@ -1448,7 +1448,7 @@ export function FlowDiagram({
           textAnchor="middle"
           className="hl-diagram-label"
         >
-          Drain
+          Sewer
         </text>
       </g>
     );
@@ -1686,7 +1686,7 @@ export function FlowDiagram({
         labelDy={-16}
       />
       <text x={970} y={763} textAnchor="middle" className="hl-diagram-label">
-        Drain
+        Sewer
       </text>
 
       {/* T4 backup */}
