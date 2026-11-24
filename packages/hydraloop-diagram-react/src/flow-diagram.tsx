@@ -193,6 +193,13 @@ const RUN_Y = 404;
 const UV_Y = 466;
 /** Half the width of a pipe */
 const PIPE = 3.5;
+/**
+ * The x of each train's T2, which leaves 30 px between the release air labels.
+ * Each train's other parts are placed relative to it
+ */
+const T2_X: Record<Side, number> = { A: 288, B: 540 };
+/** The center of each T2, where its backwash pipe enters from below */
+const T2_CENTER: Record<Side, number> = { A: T2_X.A + 86, B: T2_X.B + 86 };
 /** Height of a distributor triangle, from its tip to its base */
 const DISTRIBUTOR = 24;
 /** Stroke width of a distributor's outline, as in .distributor polygon */
@@ -1034,8 +1041,10 @@ export function FlowDiagram({
     const a = side === "A";
     // Tank areas are to scale: T1 ~24 L, T2 ~200 L, T3 ~280 L (TANK_CAPACITY),
     // except that T1 reaches further down, to fit the transfer pipe on its side
-    const t1x = a ? 140 : 839;
-    const t2x = a ? 214 : 614;
+    const t2x = T2_X[side];
+    // The train's offset from its first layout, for the parts outside its tanks
+    const dx = a ? t2x - 214 : t2x - 614;
+    const t1x = t2x + (a ? -74 : 225);
     const t1c = t1x + 10;
     const t1Bottom = 384;
     // The add air and release air pipes enter T2's top evenly spread across
@@ -1091,7 +1100,7 @@ export function FlowDiagram({
     const bubblesX = a ? t2c - 4 * 14 : t2c + 4 * 14;
     const bubbling = air?.on && bubblesValve?.on !== false;
     const receiving = inlet.receiving.includes(side);
-    const drainX = a ? 30 : 970;
+    const drainX = (a ? 30 : 970) + dx;
     const transferring = transfer?.on;
     const skimming = state.trains[side].skimming;
     const t2Level = tanks[a ? "t2a" : "t2b"];
@@ -1127,7 +1136,7 @@ export function FlowDiagram({
     return (
       <g key={side}>
         <text
-          x={a ? 20 : 980}
+          x={(a ? 20 : 980) + dx}
           y={146}
           textAnchor={a ? "start" : "end"}
           className="hl-train-label"
@@ -1331,15 +1340,15 @@ export function FlowDiagram({
         <Pipe
           d={
             a
-              ? `M140 237 H${drainX} V${wasteY}`
-              : `M860 237 H${drainX} V${wasteY}`
+              ? `M${t1x} 237 H${drainX} V${wasteY}`
+              : `M${t1x + 21} 237 H${drainX} V${wasteY}`
           }
           kind="waste"
           active={skimming}
           title={`Skim overflow of T1 ${side}${skimming ? ": filth spilling over to the drain (inferred from the FILTH_REMOVAL routine)" : ""}`}
         />
         <text
-          x={a ? 57 : 943}
+          x={(a ? 57 : 943) + dx}
           y={228}
           textAnchor="middle"
           className="hl-diagram-label"
@@ -1616,18 +1625,18 @@ export function FlowDiagram({
       {/* Circulation: the distribution pump pushes T3 water (T4 water while
           the backup valve is set to T4) around the right of T3 into the top
           of UV. The T3 drain and train B's transfer pipe
-          pass behind it. At the top corners, the backwash pipes branch off up
+          pass behind it. Along its top run, the backwash pipes branch off up
           into the center of each T2's bottom */}
       <path d={`M700 ${backupY - 4} V${backupY + 4}`} className="hl-pipe-gap" />
       <path d={`M700 ${UV_Y - 4} V${UV_Y + 4}`} className="hl-pipe-gap" />
       <Pipe
-        d={`M560 740 H700 V${RUN_Y}`}
+        d={`M560 740 H700 V${RUN_Y} H${T2_CENTER.B}`}
         kind={outletKind}
         active={circulatingThroughUv || backwashing.A || backwashing.B}
         open={t3.circulating || backwash.A?.on || backwash.B?.on}
       />
       <Pipe
-        d={`M700 ${RUN_Y} H500`}
+        d={`M${T2_CENTER.B} ${RUN_Y} H500`}
         kind={outletKind}
         active={circulatingThroughUv || backwashing.A}
         open={t3.circulating || backwash.A?.on}
@@ -1643,13 +1652,17 @@ export function FlowDiagram({
         return (
           <g key={side}>
             <Pipe
-              d={a ? `M500 ${RUN_Y} H300 V360` : `M700 ${RUN_Y} V360`}
+              d={
+                a
+                  ? `M500 ${RUN_Y} H${T2_CENTER.A} V360`
+                  : `M${T2_CENTER.B} ${RUN_Y} V360`
+              }
               kind={outletKind}
               active={backwashing[side]}
               open={backwash[side]?.on}
             />
             <Valve
-              x={a ? 300 : 700}
+              x={T2_CENTER[side]}
               y={(RUN_Y + 360) / 2}
               vertical
               kind={outletKind}
