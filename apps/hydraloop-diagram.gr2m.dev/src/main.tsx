@@ -58,7 +58,11 @@ function Playground() {
   useEffect(() => {
     const search = toSearch(inputs, preset);
     if (search !== location.search) {
-      history.replaceState(null, "", `${location.pathname}${search}${location.hash}`);
+      history.replaceState(
+        null,
+        "",
+        `${location.pathname}${search}${location.hash}`,
+      );
     }
   }, [inputs, preset]);
 
