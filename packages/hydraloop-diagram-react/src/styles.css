@@ -268,7 +268,8 @@
   fill: var(--hl-bg);
   stroke: var(--hl-muted);
   stroke-width: 1.5;
-  stroke-linejoin: round;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 10;
 }
 .hl-valve-body {
   transition: transform 0.3s ease;
@@ -295,7 +296,8 @@
   fill: var(--hl-bg);
   stroke: var(--hl-border-strong);
   stroke-width: 1.5;
-  stroke-linejoin: round;
+  stroke-linejoin: miter;
+  stroke-miterlimit: 10;
 }
 .hl-distributor polygon.is-closed {
   stroke: var(--hl-pipe-idle);
@@ -303,6 +305,10 @@
 }
 .hl-distributor polygon.is-open {
   fill: var(--hl-pipe-open);
+  stroke: none;
+}
+.hl-distributor polygon.is-idle {
+  fill: var(--hl-pipe-idle);
   stroke: none;
 }
 .hl-distributor polygon.is-flowing {
@@ -429,6 +435,10 @@
   font-size: 12.5px;
   fill: var(--hl-muted);
   font-variant-numeric: tabular-nums;
+}
+.hl-tank-value .hl-tank-meta {
+  font-weight: 400;
+  letter-spacing: 0;
 }
 
 .hl-bubbles circle {

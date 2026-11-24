@@ -56,7 +56,7 @@ function Pipe({
   filled?: boolean;
   /** An active pipe's pattern stands still, for air held under pressure */
   still?: boolean;
-  /** Square ends, for pipes that end at a distributor */
+  /** Square ends, for pipes that end at a distributor, tank or UV-C */
   square?: boolean;
   /** Draw an outlet arrow at this point, pointing in this direction */
   arrow?: { x: number; y: number; dir: "down" | "right" | "left" };
@@ -193,6 +193,33 @@ const RUN_Y = 404;
 const UV_Y = 466;
 /** Half the width of a pipe */
 const PIPE = 3.5;
+/**
+ * The x of each train's T2, which leaves 30 px between the release air labels.
+ * Each train's other parts are placed relative to it
+ */
+const T2_X: Record<Side, number> = { A: 288, B: 540 };
+/** T4's left edge */
+const T4_X = 60;
+/**
+ * The outer edge of the "Sewer" labels: on the left lined up with T4's left
+ * edge, mirrored on the right
+ */
+const SEWER_LABEL_X = { left: T4_X, right: 1000 - T4_X };
+/** The width of a "Sewer" label */
+const SEWER_LABEL_W = 38;
+/** The space between the end of a pipe to the sewer and its label */
+const SEWER_LABEL_DX = 13;
+/** Where the pipes to the sewer end, in an arrow pointing at their label */
+const SEWER_END = {
+  left: SEWER_LABEL_X.left + SEWER_LABEL_W + SEWER_LABEL_DX,
+  right: SEWER_LABEL_X.right - SEWER_LABEL_W - SEWER_LABEL_DX,
+};
+/** The mains pipe into T4, level with the transfer pipes into UV-C */
+const MAINS_Y = UV_Y;
+/** Where the mains pipe enters T4's top */
+const T4_INLET_X = 167;
+/** The center of each T2, where its backwash pipe enters from below */
+const T2_CENTER: Record<Side, number> = { A: T2_X.A + 86, B: T2_X.B + 86 };
 /** Height of a distributor triangle, from its tip to its base */
 const DISTRIBUTOR = 24;
 /** Stroke width of a distributor's outline, as in .distributor polygon */
@@ -260,6 +287,7 @@ function Distributor({
   labelDx = 0,
   labelDy = 4,
   strong = false,
+  idle = false,
 }: {
   x: number;
   y: number;
@@ -278,6 +306,11 @@ function Distributor({
   labelDy?: number;
   /** Bold label, e.g. for a user override */
   strong?: boolean;
+  /**
+   * No water can reach the valve: the open side is filled in the color of an
+   * idle pipe, so it shows the valve's setting without standing out
+   */
+  idle?: boolean;
 }) {
   const p = PIPE;
   const w = DISTRIBUTOR;
@@ -301,9 +334,11 @@ function Distributor({
       ? "unknown"
       : !branch.open
         ? "closed"
-        : branch.active
-          ? "flowing"
-          : "open";
+        : idle
+          ? "idle"
+          : branch.active
+            ? "flowing"
+            : "open";
   const open = left.open ? -1 : right.open ? 1 : 0;
   const title = ioTitle(label, name, io, words);
   return (
@@ -513,7 +548,7 @@ function Bubbles({
             r={i % 3 === 0 ? 2.5 : 1.8}
             style={{
               animationDelay: `${delay}s`,
-              ["--rise" as string]: `${-(h - 24)}px`,
+              ["--hl-rise" as string]: `${-(h - 24)}px`,
             }}
           />
         );
@@ -548,7 +583,7 @@ function Drips({
           r={1.6}
           style={{
             animationDelay: `${delay}s`,
-            ["--fall" as string]: `${bottom - y}px`,
+            ["--hl-fall" as string]: `${bottom - y}px`,
           }}
         />
       ))}
@@ -655,10 +690,12 @@ function Tank({
   circulation,
   pressurized,
   pressureHeld = false,
+  airX,
   venting,
   small,
   square = false,
   base = 0,
+  inlinePercent = false,
 }: {
   x: number;
   y: number;
@@ -684,6 +721,8 @@ function Tank({
   pressurized?: number | false;
   /** The air is no longer pumped in, but holds its pressure: the rings stand still */
   pressureHeld?: boolean;
+  /** The x where the air pipe enters the top of the tank, its center by default */
+  airX?: number;
   /**
    * Air leaves through a pipe at this x on the top of the tank: the rings
    * move in towards it, the reverse of `pressurized`
@@ -701,6 +740,11 @@ function Tank({
    * on top of it
    */
   base?: number;
+  /**
+   * The level in percent goes after the liters, in place of the line with
+   * the tank's size below them
+   */
+  inlinePercent?: boolean;
 }) {
   const known = fillOf(level) !== undefined;
   const size = level?.capacity ?? level?.max ?? 0;
@@ -721,7 +765,7 @@ function Tank({
             : ""
         }. ${capacityNote(level!)}`.trimEnd();
   const clipId = `hl-pressure-${label}-${side ?? sub ?? ""}`;
-  const ringX = venting ?? x + w / 2;
+  const ringX = venting ?? airX ?? x + w / 2;
   // Enough rings to reach the far corners of the space above the water
   const rings =
     Math.ceil(
@@ -893,6 +937,18 @@ function Tank({
           </tspan>
         )}
       </text>
+      {pressureHeld && (
+        // Air pumped in before holds its pressure, in the top right corner,
+        // level with the label
+        <text
+          x={x + w - 12}
+          y={y + 22}
+          textAnchor="end"
+          className="hl-tank-meta"
+        >
+          pressurized
+        </text>
+      )}
       {known && small && (
         <text
           x={textX}
@@ -903,7 +959,14 @@ function Tank({
           {percent}
         </text>
       )}
-      {known && !small && (
+      {known && !small && inlinePercent && (
+        <text x={x + 12} y={y + h - 14} className="hl-tank-value">
+          {Math.round(level!.liters!)} L{" "}
+          {arrow && <tspan className="hl-tank-trend">{arrow} </tspan>}
+          <tspan className="hl-tank-meta">{percent}</tspan>
+        </text>
+      )}
+      {known && !small && !inlinePercent && (
         <>
           <text
             x={x + 12}
@@ -930,12 +993,18 @@ function BackupTank({
   w,
   h,
   state,
+  inletX,
+  filling = false,
 }: {
   x: number;
   y: number;
   w: number;
   h: number;
   state: DeviceState;
+  /** Where the mains pipe enters the top of the tank */
+  inletX: number;
+  /** Mains water drips in from the inlet */
+  filling?: boolean;
 }) {
   const { t4, io } = state;
   const maxY = y + h * 0.55;
@@ -1002,6 +1071,15 @@ function BackupTank({
       <text x={x + 12} y={y + 40} className="hl-tank-meta">
         {t4.label}
       </text>
+      {/* Below the min float, the water's surface is unknown: the drops fall
+          to the bottom */}
+      <Drips
+        x={inletX}
+        y={y}
+        bottom={fillTop ?? y + h}
+        active={filling}
+        kind="mains"
+      />
     </g>
   );
 }
@@ -1015,14 +1093,26 @@ export function FlowDiagram({
 }) {
   const { io, tanks, inlet, supply, t3 } = state;
   const ab = io[IO.abSelector];
-  const selected: Side | undefined = ab ? (ab.on ? "B" : "A") : undefined;
   const bypass = io[IO.bypass];
+  // While the bypass is open, it's not known whether greywater comes in: its
+  // way to the sewer is drawn open, without flow, and the way to the trains
+  // neither open nor flowing. The A/B valve still shows its setting
+  const bypassOpen = bypass?.on === true;
+  const receivingSides = bypassOpen ? [] : inlet.receiving;
+  const abSide: Side | undefined = ab ? (ab.on ? "B" : "A") : undefined;
+  const selected = bypassOpen ? undefined : abSide;
   // Switched on in the app
   const bypassOverride = state.systemBehaviors.some(
     (b) => b.name === "bypassByAppBypassValve",
   );
-  const bypassEnds = distributorEnds(500, 24, "left");
-  const abEnds = distributorEnds(500, 100, "up");
+  // The greywater inlet runs evenly spaced between the sewer pipe above it
+  // and the pipes to the trains below it, far enough apart to leave 5 px
+  // between the bypass and A/B valves
+  const abY = 100;
+  const inletY = abY - 49.5;
+  const sewerY = inletY - 49.5;
+  const bypassEnds = distributorEnds(500, inletY, "left");
+  const abEnds = distributorEnds(500, abY, "up");
   // The backup valve lines up with the bottom of T3 and T4
   const backupY = 640 - PIPE;
   const backupEnds = distributorEnds(260, backupY, "down");
@@ -1031,17 +1121,27 @@ export function FlowDiagram({
     const a = side === "A";
     // Tank areas are to scale: T1 ~24 L, T2 ~200 L, T3 ~280 L (TANK_CAPACITY),
     // except that T1 reaches further down, to fit the transfer pipe on its side
-    const t1x = a ? 140 : 839;
-    const t2x = a ? 214 : 614;
+    const t2x = T2_X[side];
+    const t1x = t2x + (a ? -74 : 225);
     const t1c = t1x + 10;
     const t1Bottom = 384;
-    const t2c = t2x + 86;
+    // The add air and release air pipes enter T2's top evenly spread across
+    // it, the release air pipe on the inner side
+    const t2c = a ? t2x + 57 : t2x + 172 - 57;
     const transfer = io[sideIo("transfer_path", side)];
     const waste = io[sideIo("waste_clean_tank", side)];
     const air = io[sideIo("air_pump", side)];
-    const airTop = 151;
+    const pumpY = 136;
+    const pumpR = 13;
     const addAir = io[sideIo("add_air_valve", side)];
-    const addAirY = airTop + 3 * 14;
+    // The top run of the pipe into T1 and the add air valve are evenly spread
+    // between the air pump's bottom and T2's top
+    const airStep = (232 - (pumpY + pumpR)) / 3;
+    const teeY = pumpY + pumpR + airStep;
+    const addAirY = pumpY + pumpR + 2 * airStep;
+    // The pipe starts behind the pump, a multiple of 14 px above the valve,
+    // so the dashes of both parts line up, see .pipe-flow
+    const airTop = addAirY - 5 * 14;
     // Air only reaches T2 while the add air valve isn't closed
     const addingAir = air?.on && addAir?.on !== false;
     // After air was added, T2 holds the pressure until the release air valve
@@ -1050,11 +1150,10 @@ export function FlowDiagram({
     // The release air pipe leaves T2's top on the inner side and ends level
     // with the air pump's center, open to the room
     const release = io[sideIo("release_air", side)];
-    const releaseX = a ? t2x + 172 - 14 : t2x + 14;
+    const releaseX = a ? t2x + 172 - 57 : t2x + 57;
     // The air pipe into T1 branches off above the add air valve, runs down
     // between T1 and T2, and enters T1's bottom from below, next to the waste
     // pipe. The waste pipe leaves T1's bottom on the outer side
-    const teeY = 166;
     const airX = a ? t1x + 21 - 5 : t1x + 5;
     const wasteX = a ? t1x + 5.5 : t1x + 21 - 5.5;
     const wasteY = t1Bottom + 20;
@@ -1078,8 +1177,12 @@ export function FlowDiagram({
     // does. Air only reaches T1 while it isn't closed
     const bubblesX = a ? t2c - 4 * 14 : t2c + 4 * 14;
     const bubbling = air?.on && bubblesValve?.on !== false;
-    const receiving = inlet.receiving.includes(side);
-    const drainX = a ? 30 : 970;
+    const receiving = receivingSides.includes(side);
+    // The drain leaves to the outside, its arrow pointing at its label
+    const drainEnd = a ? SEWER_END.left : SEWER_END.right;
+    // The skim overflow joins the drain 23 px before its end, which keeps it
+    // clear of T1's level in percent ("100%") next to T1
+    const drainX = drainEnd + (a ? 23 : -23);
     const transferring = transfer?.on;
     const skimming = state.trains[side].skimming;
     const t2Level = tanks[a ? "t2a" : "t2b"];
@@ -1112,11 +1215,13 @@ export function FlowDiagram({
     // exchange pipe and T1's bottom. It crosses the air pipe, turns down
     // between T1 and T2, passes below T2 and enters UV-C from the side
     const transferY = (exchangeYs[1] + PIPE + t1Bottom) / 2;
-    return (
+    const body = (
       <g key={side}>
         <text
-          x={a ? 20 : 980}
-          y={146}
+          x={a ? SEWER_LABEL_X.left : SEWER_LABEL_X.right}
+          // The top of the capitals lines up with the top edge of the A/B
+          // inlet pipes (the label's cap height is 0.72 of its 15 px)
+          y={abY - PIPE + 15 * 0.72}
           textAnchor={a ? "start" : "end"}
           className="hl-train-label"
         >
@@ -1127,8 +1232,8 @@ export function FlowDiagram({
         <Pipe
           d={
             a
-              ? `M${abEnds.branches[0]} 100 H${t1c} V232`
-              : `M${abEnds.branches[1]} 100 H${t1c} V232`
+              ? `M${abEnds.branches[0]} ${abY} H${t1c} V232`
+              : `M${abEnds.branches[1]} ${abY} H${t1c} V232`
           }
           kind="grey"
           active={receiving}
@@ -1136,15 +1241,14 @@ export function FlowDiagram({
           square
         />
 
-        {/* Air pump into T2, through the add air valve. The valve sits a
-            multiple of 14 px down the pipe, so the dashes of both parts line
-            up, see .pipe-flow */}
+        {/* Air pump into T2, through the add air valve */}
         <Pipe d={`M${t2c} ${teeY} H${bubblesX}`} kind="air" active={air?.on} />
         <Pipe
           d={`M${bubblesX} ${teeY} H${gapX} V${airBelowY} H${airX} V${t1Bottom}`}
           kind="air"
           active={bubbling}
           open={bubblesValve?.on}
+          square
         />
         <Valve
           x={bubblesX}
@@ -1154,8 +1258,9 @@ export function FlowDiagram({
           active={bubbling}
           name={sideIo("bubbles_block", side)}
           label="Bubbles block"
-          labelAnchor={a ? "start" : "end"}
-          labelDx={gapX + (a ? 10 : -10) - bubblesX}
+          // Above the pipe, ending short of the air pump
+          labelAnchor={a ? "end" : "start"}
+          labelDx={t2c + (a ? -21 : 21) - bubblesX}
           labelDy={-14}
         />
         <Pipe d={`M${t2c} ${airTop} V${addAirY}`} kind="air" active={air?.on} />
@@ -1165,6 +1270,7 @@ export function FlowDiagram({
           active={addingAir || holdingAir}
           still={holdingAir}
           open={addAir?.on}
+          square
         />
         <Valve
           x={t2c}
@@ -1175,13 +1281,13 @@ export function FlowDiagram({
           active={addingAir}
           name={sideIo("add_air_valve", side)}
           label="Add air"
-          labelAnchor={a ? "start" : "end"}
-          labelDx={a ? 16 : -16}
+          labelAnchor={a ? "end" : "start"}
+          labelDx={a ? -16 : 16}
         />
         <Pump
           x={t2c}
-          y={136}
-          r={13}
+          y={pumpY}
+          r={pumpR}
           kind="air"
           io={air}
           name={sideIo("air_pump", side)}
@@ -1209,10 +1315,12 @@ export function FlowDiagram({
           kind="air"
           active={release?.on}
           open={release?.on}
+          square
         />
         <Valve
           x={releaseX}
-          y={162}
+          // Level with the top run of the air pipe into T1
+          y={teeY}
           vertical
           kind="air"
           io={release}
@@ -1246,6 +1354,7 @@ export function FlowDiagram({
                 kind="grey"
                 active={filled && bubbling === true}
                 filled={filled}
+                square
               />
               {i === 0 &&
                 !filled &&
@@ -1311,7 +1420,9 @@ export function FlowDiagram({
           }
           pressurized={(addingAir || holdingAir) && 232 - addAirY}
           pressureHeld={holdingAir}
+          airX={t2c}
           venting={release?.on ? releaseX : undefined}
+          inlinePercent
         />
 
         {/* Skim overflow at the top of T1, down the drain line. It has no
@@ -1319,15 +1430,16 @@ export function FlowDiagram({
         <Pipe
           d={
             a
-              ? `M140 237 H${drainX} V${wasteY}`
-              : `M860 237 H${drainX} V${wasteY}`
+              ? `M${t1x} 237 H${drainX} V${wasteY}`
+              : `M${t1x + 21} 237 H${drainX} V${wasteY}`
           }
           kind="waste"
           active={skimming}
           title={`Skim overflow of T1 ${side}${skimming ? ": filth spilling over to the drain (inferred from the FILTH_REMOVAL routine)" : ""}`}
+          square
         />
         <text
-          x={a ? 57 : 943}
+          x={drainX + (a ? 27 : -27)}
           y={228}
           textAnchor="middle"
           className="hl-diagram-label"
@@ -1341,14 +1453,15 @@ export function FlowDiagram({
           kind="waste"
           active={waste?.on}
           open={waste?.on}
+          square
         />
         {/* Shared by the skim overflow and the waste valve */}
         <Pipe
-          d={`M${drainX} ${wasteY} V470`}
+          d={`M${drainX} ${wasteY} H${drainEnd}`}
           kind="waste"
           active={skimming || waste?.on}
           open={waste?.on}
-          arrow={{ x: drainX, y: 470, dir: "down" }}
+          arrow={{ x: drainEnd, y: wasteY, dir: a ? "left" : "right" }}
         />
         <Valve
           x={(wasteX + drainX) / 2}
@@ -1363,14 +1476,20 @@ export function FlowDiagram({
           labelDy={24}
         />
         <text
-          x={drainX}
-          y={498}
-          textAnchor="middle"
+          x={a ? SEWER_LABEL_X.left : SEWER_LABEL_X.right}
+          y={wasteY + 4}
+          textAnchor={a ? "start" : "end"}
           className="hl-diagram-label"
         >
-          Drain
+          Sewer
         </text>
+      </g>
+    );
 
+    // Drawn after the circulation pipes, so the transfer pipe passes in
+    // front of them
+    const transferPipe = (
+      <g key={side}>
         {/* Transfer from T1 through UV into T3. The air pipe into T1 passes
             behind it */}
         <path
@@ -1382,9 +1501,10 @@ export function FlowDiagram({
           kind="clean"
           active={transferring}
           open={transferring}
+          square
         />
         <Valve
-          x={a ? 380 : 620}
+          x={T2_CENTER[side]}
           y={UV_Y}
           kind="clean"
           io={transfer}
@@ -1397,9 +1517,12 @@ export function FlowDiagram({
         />
       </g>
     );
+    return { body, transferPipe };
   };
+  const trains = { A: train("A"), B: train("B") };
 
   const backup = io[IO.backupWater];
+  const preBackup = io[IO.preBackupWater];
   const recycledToPump = supply.pumping && supply.source !== "backup";
   const backupToPump = supply.pumping && supply.source === "backup";
   const circulatingThroughUv = t3.circulating && supply.pumping;
@@ -1429,7 +1552,7 @@ export function FlowDiagram({
 
   return (
     <svg
-      viewBox="0 -38 1000 863"
+      viewBox="0 -15 1000 840"
       className="hl-flow-diagram"
       role="group"
       aria-label="Water flow through the H600"
@@ -1447,34 +1570,40 @@ export function FlowDiagram({
       </defs>
 
       {/* Inlet and bypass */}
-      <text x={60} y={10} className="hl-diagram-label is-strong">
+      <text x={60} y={inletY - 14} className="hl-diagram-label is-strong">
         Greywater from showers and baths
       </text>
       <Pipe
-        d={`M60 24 H${bypassEnds.common}`}
+        d={`M60 ${inletY} H${bypassEnds.common}`}
         kind="grey"
-        active={inlet.receiving.length > 0 || inlet.bypass}
-        open={bypass?.on || (bypass?.on === false && selected !== undefined)}
+        active={
+          receivingSides.length > 0
+            ? true
+            : inlet.bypass === undefined
+              ? undefined
+              : false
+        }
+        open={bypassOpen || (bypass?.on === false && selected !== undefined)}
         square
       />
       <Pipe
         d={`M500 ${bypassEnds.branches[0]} V${abEnds.common}`}
         kind="grey"
-        active={inlet.receiving.length > 0}
+        active={receivingSides.length > 0}
         open={bypass?.on === false && selected !== undefined}
         square
       />
       <Pipe
-        d={`M500 ${bypassEnds.branches[1]} V-22 H935`}
+        d={`M500 ${bypassEnds.branches[1]} V${sewerY} H${SEWER_END.right}`}
         kind="grey"
-        active={inlet.bypass}
-        open={bypass?.on}
+        active={inlet.bypass === undefined ? undefined : false}
+        open={bypassOpen}
         square
-        arrow={{ x: 935, y: -22, dir: "right" }}
+        arrow={{ x: SEWER_END.right, y: sewerY, dir: "right" }}
       />
       <Distributor
         x={500}
-        y={24}
+        y={inletY}
         tip="left"
         kind="grey"
         io={bypass}
@@ -1483,38 +1612,44 @@ export function FlowDiagram({
         strong={bypassOverride}
         words={["to the sewer", "to the trains"]}
         branches={[
-          { open: bypass?.on, active: inlet.bypass === true },
+          { open: bypass?.on, active: false },
           {
             open: bypass && !bypass.on,
-            active: inlet.receiving.length > 0,
+            active: receivingSides.length > 0,
           },
         ]}
         labelAnchor="start"
         labelDx={14}
       />
-      <text x={948} y={-18} className="hl-diagram-label">
+      <text
+        x={SEWER_LABEL_X.right}
+        y={sewerY + 4}
+        textAnchor="end"
+        className="hl-diagram-label"
+      >
         Sewer
       </text>
 
-      {train("A")}
-      {train("B")}
+      {trains.A.body}
+      {trains.B.body}
 
       <Distributor
         x={500}
-        y={100}
+        y={abY}
         kind="grey"
         io={ab}
         name={IO.abSelector}
         label="A/B valve"
+        idle={bypassOpen}
         words={["to train B", "to train A"]}
         branches={[
           {
-            open: selected && selected === "A",
-            active: inlet.receiving.includes("A"),
+            open: abSide && abSide === "A",
+            active: receivingSides.includes("A"),
           },
           {
-            open: selected && selected === "B",
-            active: inlet.receiving.includes("B"),
+            open: abSide && abSide === "B",
+            active: receivingSides.includes("B"),
           },
         ]}
         labelDy={24}
@@ -1526,6 +1661,7 @@ export function FlowDiagram({
         kind={uvOutletKind}
         active={t3ReceivingFromUv}
         open={io[IO.uvValve]?.on}
+        square
       />
       <g
         className={`hl-uv is-${t3.uv === undefined ? "unknown" : t3.uv ? "on" : "off"}`}
@@ -1573,14 +1709,15 @@ export function FlowDiagram({
       />
 
       {/* T3 drain, out of T3's right side at its bottom, across from the
-          pipe to the backup valve */}
+          pipe to the backup valve, straight out to the right like the T1
+          drains */}
       <Pipe
-        d={`M655 ${backupY} H970 V735`}
+        d={`M655 ${backupY} H${SEWER_END.right}`}
         kind="waste"
         active={t3.draining}
         open={io[IO.wasteStorageTank]?.on}
         square
-        arrow={{ x: 970, y: 735, dir: "down" }}
+        arrow={{ x: SEWER_END.right, y: backupY, dir: "right" }}
       />
       <Valve
         x={790}
@@ -1594,28 +1731,61 @@ export function FlowDiagram({
         labelDx={0}
         labelDy={-16}
       />
-      <text x={970} y={763} textAnchor="middle" className="hl-diagram-label">
-        Drain
+      <text
+        x={SEWER_LABEL_X.right}
+        y={backupY + 4}
+        textAnchor="end"
+        className="hl-diagram-label"
+      >
+        Sewer
       </text>
 
       {/* T4 backup */}
-      <BackupTank x={60} y={540} w={130} h={100} state={state} />
+      {/* Mains water into T4, through the pre backup water valve. The pipe
+          enters T4's top between the labels and the floats */}
+      <Pipe
+        d={`M${T4_X} ${MAINS_Y} H${T4_INLET_X} V540`}
+        kind="mains"
+        active={preBackup?.on}
+        open={preBackup?.on}
+        square
+      />
+      <Valve
+        x={(T4_X + T4_INLET_X) / 2}
+        y={MAINS_Y}
+        kind="mains"
+        io={preBackup}
+        active={preBackup?.on}
+        name={IO.preBackupWater}
+        label="Mains"
+        labelAnchor="middle"
+        labelDx={0}
+        labelDy={-16}
+      />
+      <BackupTank
+        x={T4_X}
+        y={540}
+        w={130}
+        h={100}
+        state={state}
+        inletX={T4_INLET_X}
+        filling={preBackup?.on}
+      />
 
       {/* Circulation: the distribution pump pushes T3 water (T4 water while
           the backup valve is set to T4) around the right of T3 into the top
-          of UV. The T3 drain and train B's transfer pipe
-          pass behind it. At the top corners, the backwash pipes branch off up
+          of UV. The T3 drain passes behind it, train B's transfer pipe in
+          front of it. Along its top run, the backwash pipes branch off up
           into the center of each T2's bottom */}
       <path d={`M700 ${backupY - 4} V${backupY + 4}`} className="hl-pipe-gap" />
-      <path d={`M700 ${UV_Y - 4} V${UV_Y + 4}`} className="hl-pipe-gap" />
       <Pipe
-        d={`M560 740 H700 V${RUN_Y}`}
+        d={`M560 740 H700 V${RUN_Y} H${T2_CENTER.B}`}
         kind={outletKind}
         active={circulatingThroughUv || backwashing.A || backwashing.B}
         open={t3.circulating || backwash.A?.on || backwash.B?.on}
       />
       <Pipe
-        d={`M700 ${RUN_Y} H500`}
+        d={`M${T2_CENTER.B} ${RUN_Y} H500`}
         kind={outletKind}
         active={circulatingThroughUv || backwashing.A}
         open={t3.circulating || backwash.A?.on}
@@ -1625,19 +1795,25 @@ export function FlowDiagram({
         kind={outletKind}
         active={circulatingThroughUv}
         open={t3.circulating}
+        square
       />
       {(["A", "B"] as Side[]).map((side) => {
         const a = side === "A";
         return (
           <g key={side}>
             <Pipe
-              d={a ? `M500 ${RUN_Y} H300 V360` : `M700 ${RUN_Y} V360`}
+              d={
+                a
+                  ? `M500 ${RUN_Y} H${T2_CENTER.A} V360`
+                  : `M${T2_CENTER.B} ${RUN_Y} V360`
+              }
               kind={outletKind}
               active={backwashing[side]}
               open={backwash[side]?.on}
+              square
             />
             <Valve
-              x={a ? 300 : 700}
+              x={T2_CENTER[side]}
               y={(RUN_Y + 360) / 2}
               vertical
               kind={outletKind}
@@ -1663,6 +1839,11 @@ export function FlowDiagram({
         labelAnchor="end"
         labelDx={-14}
       />
+
+      {/* Train B's transfer pipe passes in front of the circulation pipe */}
+      <path d={`M696 ${UV_Y} H704`} className="hl-pipe-gap" />
+      {trains.A.transferPipe}
+      {trains.B.transferPipe}
 
       {/* T4 and T3 join in the backup valve, which feeds the distribution
           pump from one of them. The pipes leave the tanks' sides at their
@@ -1722,6 +1903,7 @@ export function FlowDiagram({
         kind={outletKind}
         active={backFlushing}
         open={io[IO.backFlush]?.on}
+        square
       />
       <Valve
         x={500}
@@ -1839,8 +2021,12 @@ export function DiagramLegend() {
 export function activeFlows(state: DeviceState) {
   const { inlet, trains, io, t3, supply } = state;
   const flows: string[] = [];
-  for (const side of inlet.receiving) flows.push(`Greywater → train ${side}`);
-  if (inlet.bypass) flows.push("Greywater → sewer (bypass)");
+  // While the bypass is open, it's not known whether greywater comes in
+  if (!inlet.bypass) {
+    for (const side of inlet.receiving) {
+      flows.push(`Greywater → train ${side}`);
+    }
+  }
   for (const side of ["A", "B"] as Side[]) {
     if (trains[side].t2ToT1) flows.push(`T2 ${side} → T1 ${side}`);
     if (trains[side].skimming) {
@@ -1859,6 +2045,7 @@ export function activeFlows(state: DeviceState) {
   if (t3.circulating && supply.pumping) flows.push("T3 → UV → T3");
   if (io[IO.backFlush]?.on && supply.pumping) flows.push("Back flush → T3");
   if (t3.draining) flows.push("T3 → drain");
+  if (io[IO.preBackupWater]?.on) flows.push("Mains → T4");
   if (supply.toOutlets) {
     const to = [
       supply.toilet && "toilets",
