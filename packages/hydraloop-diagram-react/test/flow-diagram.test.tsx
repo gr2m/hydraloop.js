@@ -66,7 +66,6 @@ describe("FlowDiagram", () => {
 describe("activeFlows", () => {
   test.each([
     ["receiving", /^Greywater → train [AB]$/],
-    ["bypass", /^Greywater → sewer \(bypass\)$/],
     ["filth-removal", /^T1 [AB] → skim overflow → drain \(inferred\)$/],
     ["transfer", /^Train [AB] → UV → T3$/],
     ["circulation", /^T3 → UV → T3$/],
@@ -75,6 +74,12 @@ describe("activeFlows", () => {
   ])("%s", (name, flow) => {
     expect(activeFlows(states[name])).toContainEqual(
       expect.stringMatching(flow),
+    );
+  });
+  // It's not known whether greywater comes in while the bypass is open
+  test("bypass", () => {
+    expect(activeFlows(states.bypass)).not.toContainEqual(
+      expect.stringMatching(/^Greywater/),
     );
   });
 });

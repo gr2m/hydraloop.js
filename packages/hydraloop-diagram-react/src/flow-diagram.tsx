@@ -287,6 +287,7 @@ function Distributor({
   labelDx = 0,
   labelDy = 4,
   strong = false,
+  idle = false,
 }: {
   x: number;
   y: number;
@@ -305,6 +306,11 @@ function Distributor({
   labelDy?: number;
   /** Bold label, e.g. for a user override */
   strong?: boolean;
+  /**
+   * No water can reach the valve: the open side is filled in the color of an
+   * idle pipe, so it shows the valve's setting without standing out
+   */
+  idle?: boolean;
 }) {
   const p = PIPE;
   const w = DISTRIBUTOR;
@@ -328,9 +334,11 @@ function Distributor({
       ? "unknown"
       : !branch.open
         ? "closed"
-        : branch.active
-          ? "flowing"
-          : "open";
+        : idle
+          ? "idle"
+          : branch.active
+            ? "flowing"
+            : "open";
   const open = left.open ? -1 : right.open ? 1 : 0;
   const title = ioTitle(label, name, io, words);
   return (
@@ -1085,8 +1093,14 @@ export function FlowDiagram({
 }) {
   const { io, tanks, inlet, supply, t3 } = state;
   const ab = io[IO.abSelector];
-  const selected: Side | undefined = ab ? (ab.on ? "B" : "A") : undefined;
   const bypass = io[IO.bypass];
+  // While the bypass is open, it's not known whether greywater comes in: its
+  // way to the sewer is drawn open, without flow, and the way to the trains
+  // neither open nor flowing. The A/B valve still shows its setting
+  const bypassOpen = bypass?.on === true;
+  const receivingSides = bypassOpen ? [] : inlet.receiving;
+  const abSide: Side | undefined = ab ? (ab.on ? "B" : "A") : undefined;
+  const selected = bypassOpen ? undefined : abSide;
   // Switched on in the app
   const bypassOverride = state.systemBehaviors.some(
     (b) => b.name === "bypassByAppBypassValve",
@@ -1163,7 +1177,7 @@ export function FlowDiagram({
     // does. Air only reaches T1 while it isn't closed
     const bubblesX = a ? t2c - 4 * 14 : t2c + 4 * 14;
     const bubbling = air?.on && bubblesValve?.on !== false;
-    const receiving = inlet.receiving.includes(side);
+    const receiving = receivingSides.includes(side);
     // The drain leaves to the outside, its arrow pointing at its label
     const drainEnd = a ? SEWER_END.left : SEWER_END.right;
     // The skim overflow joins the drain 23 px before its end, which keeps it
@@ -1562,22 +1576,28 @@ export function FlowDiagram({
       <Pipe
         d={`M60 ${inletY} H${bypassEnds.common}`}
         kind="grey"
-        active={inlet.receiving.length > 0 || inlet.bypass}
-        open={bypass?.on || (bypass?.on === false && selected !== undefined)}
+        active={
+          receivingSides.length > 0
+            ? true
+            : inlet.bypass === undefined
+              ? undefined
+              : false
+        }
+        open={bypassOpen || (bypass?.on === false && selected !== undefined)}
         square
       />
       <Pipe
         d={`M500 ${bypassEnds.branches[0]} V${abEnds.common}`}
         kind="grey"
-        active={inlet.receiving.length > 0}
+        active={receivingSides.length > 0}
         open={bypass?.on === false && selected !== undefined}
         square
       />
       <Pipe
         d={`M500 ${bypassEnds.branches[1]} V${sewerY} H${SEWER_END.right}`}
         kind="grey"
-        active={inlet.bypass}
-        open={bypass?.on}
+        active={inlet.bypass === undefined ? undefined : false}
+        open={bypassOpen}
         square
         arrow={{ x: SEWER_END.right, y: sewerY, dir: "right" }}
       />
@@ -1592,10 +1612,10 @@ export function FlowDiagram({
         strong={bypassOverride}
         words={["to the sewer", "to the trains"]}
         branches={[
-          { open: bypass?.on, active: inlet.bypass === true },
+          { open: bypass?.on, active: false },
           {
             open: bypass && !bypass.on,
-            active: inlet.receiving.length > 0,
+            active: receivingSides.length > 0,
           },
         ]}
         labelAnchor="start"
@@ -1620,15 +1640,16 @@ export function FlowDiagram({
         io={ab}
         name={IO.abSelector}
         label="A/B valve"
+        idle={bypassOpen}
         words={["to train B", "to train A"]}
         branches={[
           {
-            open: selected && selected === "A",
-            active: inlet.receiving.includes("A"),
+            open: abSide && abSide === "A",
+            active: receivingSides.includes("A"),
           },
           {
-            open: selected && selected === "B",
-            active: inlet.receiving.includes("B"),
+            open: abSide && abSide === "B",
+            active: receivingSides.includes("B"),
           },
         ]}
         labelDy={24}
@@ -2000,8 +2021,12 @@ export function DiagramLegend() {
 export function activeFlows(state: DeviceState) {
   const { inlet, trains, io, t3, supply } = state;
   const flows: string[] = [];
-  for (const side of inlet.receiving) flows.push(`Greywater → train ${side}`);
-  if (inlet.bypass) flows.push("Greywater → sewer (bypass)");
+  // While the bypass is open, it's not known whether greywater comes in
+  if (!inlet.bypass) {
+    for (const side of inlet.receiving) {
+      flows.push(`Greywater → train ${side}`);
+    }
+  }
   for (const side of ["A", "B"] as Side[]) {
     if (trains[side].t2ToT1) flows.push(`T2 ${side} → T1 ${side}`);
     if (trains[side].skimming) {

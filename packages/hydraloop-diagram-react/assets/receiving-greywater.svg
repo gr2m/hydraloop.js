@@ -258,6 +258,10 @@
   fill: var(--hl-pipe-open);
   stroke: none;
 }
+.hl-distributor polygon.is-idle {
+  fill: var(--hl-pipe-idle);
+  stroke: none;
+}
 .hl-distributor polygon.is-flowing {
   fill: var(--hl-k);
   stroke: none;
