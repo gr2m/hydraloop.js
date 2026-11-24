@@ -430,6 +430,10 @@
   fill: var(--hl-muted);
   font-variant-numeric: tabular-nums;
 }
+.hl-tank-value .hl-tank-meta {
+  font-weight: 400;
+  letter-spacing: 0;
+}
 
 .hl-bubbles circle {
   fill: var(--hl-air);

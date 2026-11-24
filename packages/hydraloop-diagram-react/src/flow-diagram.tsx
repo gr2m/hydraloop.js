@@ -667,6 +667,7 @@ function Tank({
   small,
   square = false,
   base = 0,
+  inlinePercent = false,
 }: {
   x: number;
   y: number;
@@ -711,6 +712,11 @@ function Tank({
    * on top of it
    */
   base?: number;
+  /**
+   * The level in percent goes after the liters, in place of the line with
+   * the tank's size below them
+   */
+  inlinePercent?: boolean;
 }) {
   const known = fillOf(level) !== undefined;
   const size = level?.capacity ?? level?.max ?? 0;
@@ -913,7 +919,14 @@ function Tank({
           {percent}
         </text>
       )}
-      {known && !small && (
+      {known && !small && inlinePercent && (
+        <text x={x + 12} y={y + h - 14} className="hl-tank-value">
+          {Math.round(level!.liters!)} L{" "}
+          {arrow && <tspan className="hl-tank-trend">{arrow} </tspan>}
+          <tspan className="hl-tank-meta">{percent}</tspan>
+        </text>
+      )}
+      {known && !small && !inlinePercent && (
         <>
           <text
             x={x + 12}
@@ -1343,6 +1356,7 @@ export function FlowDiagram({
           pressureHeld={holdingAir}
           airX={t2c}
           venting={release?.on ? releaseX : undefined}
+          inlinePercent
         />
 
         {/* Skim overflow at the top of T1, down the drain line. It has no
