@@ -17,7 +17,6 @@ import {
   type TankId,
 } from "hydraloop-diagram-react/model";
 import {
-  emptyInputs,
   IO_GROUPS,
   PRESETS,
   ROUTINES,
@@ -26,8 +25,8 @@ import {
   toDataset,
   type Inputs,
 } from "./inputs.js";
+import { fromSearch, toSearch } from "./url.js";
 
-const STORAGE_KEY = "hydraloop-diagram-playground";
 const TANK_NAMES: Record<TankId, string> = {
   t1a: "T1 A",
   t2a: "T2 A",
@@ -38,14 +37,14 @@ const TANK_NAMES: Record<TankId, string> = {
 
 type Theme = "system" | "light" | "dark";
 
-/** The last inputs, so they survive reloads while editing the component */
+/** The inputs from the URL, so they survive reloads and can be shared */
 function load(): { inputs: Inputs; preset: string } {
-  try {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null");
-    if (saved?.inputs)
-      return { ...saved, inputs: { ...emptyInputs(), ...saved.inputs } };
-  } catch {}
-  return { inputs: PRESETS[0].inputs(), preset: PRESETS[0].key };
+  return (
+    fromSearch(location.search) ?? {
+      inputs: PRESETS[0].inputs(),
+      preset: PRESETS[0].key,
+    }
+  );
 }
 
 function Playground() {
@@ -57,9 +56,10 @@ function Playground() {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ inputs, preset }));
-    } catch {}
+    const search = toSearch(inputs, preset);
+    if (search !== location.search) {
+      history.replaceState(null, "", `${location.pathname}${search}${location.hash}`);
+    }
   }, [inputs, preset]);
 
   useEffect(() => {

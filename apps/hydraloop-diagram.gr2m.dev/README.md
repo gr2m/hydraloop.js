@@ -2,7 +2,7 @@
 
 https://hydraloop-diagram.gr2m.dev
 
-A playground for [`hydraloop-diagram-react`](../../packages/hydraloop-diagram-react/readme.md). It sets the signals, tank levels, routines and connected outlets of an H600 at one moment, and renders the diagram for the state that `stateAt()` derives from them. Presets load states of the simulated H600 of the [H600 dashboard](../h600.gr2m.dev/README.md), like a transfer to T3 or filth removal. It keeps its settings across reloads.
+A playground for [`hydraloop-diagram-react`](../../packages/hydraloop-diagram-react/readme.md). It sets the signals, tank levels, routines and connected outlets of an H600 at one moment, and renders the diagram for the state that `stateAt()` derives from them. Presets load states of the simulated H600 of the [H600 dashboard](../h600.gr2m.dev/README.md), like a transfer to T3 or filth removal. The URL holds its settings, so they survive reloads and a link opens the same diagram: `?preset=transfer` for an unchanged preset, or each setting as a query parameter once edited (see [`src/url.ts`](src/url.ts)).
 
 ## Run
 
