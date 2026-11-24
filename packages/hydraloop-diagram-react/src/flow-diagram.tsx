@@ -513,7 +513,7 @@ function Bubbles({
             r={i % 3 === 0 ? 2.5 : 1.8}
             style={{
               animationDelay: `${delay}s`,
-              ["--rise" as string]: `${-(h - 24)}px`,
+              ["--hl-rise" as string]: `${-(h - 24)}px`,
             }}
           />
         );
@@ -548,7 +548,7 @@ function Drips({
           r={1.6}
           style={{
             animationDelay: `${delay}s`,
-            ["--fall" as string]: `${bottom - y}px`,
+            ["--hl-fall" as string]: `${bottom - y}px`,
           }}
         />
       ))}
