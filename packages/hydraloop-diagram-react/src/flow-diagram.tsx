@@ -43,6 +43,7 @@ function Pipe({
   square = false,
   arrow,
   title,
+  phase,
 }: {
   d: string;
   kind: Kind;
@@ -62,6 +63,11 @@ function Pipe({
   arrow?: { x: number; y: number; dir: "up" | "down" | "right" | "left" };
   /** Tooltip, for pipes without a valve or pump */
   title?: string;
+  /**
+   * How far the water came through the pipes before this one, so its dashes
+   * continue theirs, see flowDelay
+   */
+  phase?: number;
 }) {
   const state =
     active === undefined
@@ -80,7 +86,17 @@ function Pipe({
       {title && <title>{title}</title>}
       <path d={d} className="hl-pipe-base" />
       {state === "filled" && <path d={d} className="hl-pipe-water" />}
-      {active && <path d={d} className="hl-pipe-flow" />}
+      {active && (
+        <path
+          d={d}
+          className="hl-pipe-flow"
+          style={
+            phase === undefined
+              ? undefined
+              : { animationDelay: `${flowDelay(phase)}s` }
+          }
+        />
+      )}
       {arrow && (
         <path
           className="hl-pipe-arrow"
@@ -305,6 +321,7 @@ function Distributor({
   labelDy = 4,
   strong = false,
   idle = false,
+  phase = 0,
 }: {
   x: number;
   y: number;
@@ -328,6 +345,11 @@ function Distributor({
    * idle pipe, so it shows the valve's setting without standing out
    */
   idle?: boolean;
+  /**
+   * How far the water came through the pipes before it reaches the valve,
+   * so the dashes through it continue theirs, see flowDelay
+   */
+  phase?: number;
 }) {
   const p = PIPE;
   const w = DISTRIBUTOR;
@@ -357,6 +379,17 @@ function Distributor({
             ? "flowing"
             : "open";
   const open = left.open ? -1 : right.open ? 1 : 0;
+  // The flow's dashes continue through the open side, along the pipes'
+  // center lines: from the common pipe's end to where the pipes cross and on
+  // to the branch's end. Into an outlet below, they run the other way
+  const flowing = open !== 0 && state(open < 0 ? left : right) === "flowing";
+  const d = w - 2 * p;
+  const flowPoints: [number, number][] = [
+    [0, -d],
+    [0, 0],
+    [open * d, 0],
+  ];
+  if (tip === "down") flowPoints.reverse();
   const title = ioTitle(label, name, io, words);
   return (
     <g
@@ -415,6 +448,15 @@ function Distributor({
           </>
         )}
       </g>
+      {flowing && (
+        <g className="hl-pipe is-active is-square">
+          <path
+            d={`M${flowPoints.map(at).join(" L")}`}
+            className="hl-pipe-flow"
+            style={{ animationDelay: `${flowDelay(phase)}s` }}
+          />
+        </g>
+      )}
       <text
         x={x + labelDx}
         y={y + labelDy}
@@ -1133,6 +1175,16 @@ export function FlowDiagram({
   // The backup valve lines up with the bottom of T3 and T4
   const backupY = TANK_BOTTOM - PIPE;
   const backupEnds = distributorEnds(260, backupY, "down");
+  // How far the water has come at each pipe and valve along the way, so the
+  // flow's dashes continue from one into the next, see flowDelay. The way
+  // through a distributor runs along the pipes' center lines
+  const throughDistributor = 2 * (DISTRIBUTOR - 2 * PIPE);
+  const bypassPhase = bypassEnds.common - 60;
+  const toAbPhase = bypassPhase + throughDistributor;
+  const abPhase = toAbPhase + abEnds.common - bypassEnds.branches[0];
+  const trainInletPhase = abPhase + throughDistributor;
+  const fromT4Length = backupEnds.branches[0] - 190;
+  const fromT3Length = 346 - backupEnds.branches[1];
 
   const train = (side: Side) => {
     const a = side === "A";
@@ -1260,6 +1312,7 @@ export function FlowDiagram({
           active={receiving}
           open={selected === side}
           square
+          phase={trainInletPhase}
         />
 
         {/* Air pump into T2, through the add air valve */}
@@ -1327,7 +1380,7 @@ export function FlowDiagram({
             className="hl-vent-ring"
             style={{
               transformOrigin: `${releaseX}px ${releaseTip}px`,
-              animationDelay: `${(-((14 - ((232 - releaseTip) % 14)) % 14) / 14) * 0.9}s`,
+              animationDelay: `${flowDelay(232 - releaseTip)}s`,
             }}
             aria-hidden
           />
@@ -1615,6 +1668,7 @@ export function FlowDiagram({
         active={receivingSides.length > 0}
         open={bypass?.on === false && selected !== undefined}
         square
+        phase={toAbPhase}
       />
       <Pipe
         d={`M500 ${bypassEnds.branches[1]} V${sewerY} H${SEWER_END.right}`}
@@ -1623,6 +1677,7 @@ export function FlowDiagram({
         open={bypassOpen}
         square
         arrow={{ x: SEWER_END.right, y: sewerY, dir: "right" }}
+        phase={toAbPhase}
       />
       <Distributor
         x={500}
@@ -1643,6 +1698,7 @@ export function FlowDiagram({
         ]}
         labelAnchor="start"
         labelDx={14}
+        phase={bypassPhase}
       />
       <text
         x={SEWER_LABEL_X.right}
@@ -1676,6 +1732,7 @@ export function FlowDiagram({
           },
         ]}
         labelDy={24}
+        phase={abPhase}
       />
 
       {/* UV and into T3 */}
@@ -1893,6 +1950,7 @@ export function FlowDiagram({
         active={supply.pumping}
         open={backup !== undefined}
         square
+        phase={(backup?.on ? fromT4Length : fromT3Length) + throughDistributor}
       />
       <Distributor
         x={260}
@@ -1908,6 +1966,7 @@ export function FlowDiagram({
           { open: backup && !backup.on, active: recycledToPump === true },
         ]}
         labelDy={-14}
+        phase={backup?.on ? fromT4Length : fromT3Length}
       />
 
       <Pump
