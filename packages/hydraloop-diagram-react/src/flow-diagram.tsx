@@ -1216,7 +1216,7 @@ export function FlowDiagram({
     // between T1 and T2, passes below T2 and enters UV-C from the side
     const transferY = (exchangeYs[1] + PIPE + t1Bottom) / 2;
     const body = (
-      <g key={side}>
+      <g key={`body-${side}`}>
         <text
           x={a ? SEWER_LABEL_X.left : SEWER_LABEL_X.right}
           // The top of the capitals lines up with the top edge of the A/B
@@ -1489,7 +1489,7 @@ export function FlowDiagram({
     // Drawn after the circulation pipes, so the transfer pipe passes in
     // front of them
     const transferPipe = (
-      <g key={side}>
+      <g key={`transfer-${side}`}>
         {/* Transfer from T1 through UV into T3. The air pipe into T1 passes
             behind it */}
         <path
