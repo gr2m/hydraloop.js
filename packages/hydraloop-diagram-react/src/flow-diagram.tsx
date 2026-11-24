@@ -1044,9 +1044,17 @@ export function FlowDiagram({
     const transfer = io[sideIo("transfer_path", side)];
     const waste = io[sideIo("waste_clean_tank", side)];
     const air = io[sideIo("air_pump", side)];
-    const airTop = 151;
+    const pumpY = 136;
+    const pumpR = 13;
     const addAir = io[sideIo("add_air_valve", side)];
-    const addAirY = airTop + 3 * 14;
+    // The top run of the pipe into T1 and the add air valve are evenly spread
+    // between the air pump's bottom and T2's top
+    const airStep = (232 - (pumpY + pumpR)) / 3;
+    const teeY = pumpY + pumpR + airStep;
+    const addAirY = pumpY + pumpR + 2 * airStep;
+    // The pipe starts behind the pump, a multiple of 14 px above the valve,
+    // so the dashes of both parts line up, see .pipe-flow
+    const airTop = addAirY - 5 * 14;
     // Air only reaches T2 while the add air valve isn't closed
     const addingAir = air?.on && addAir?.on !== false;
     // After air was added, T2 holds the pressure until the release air valve
@@ -1059,7 +1067,6 @@ export function FlowDiagram({
     // The air pipe into T1 branches off above the add air valve, runs down
     // between T1 and T2, and enters T1's bottom from below, next to the waste
     // pipe. The waste pipe leaves T1's bottom on the outer side
-    const teeY = 166;
     const airX = a ? t1x + 21 - 5 : t1x + 5;
     const wasteX = a ? t1x + 5.5 : t1x + 21 - 5.5;
     const wasteY = t1Bottom + 20;
@@ -1141,9 +1148,7 @@ export function FlowDiagram({
           square
         />
 
-        {/* Air pump into T2, through the add air valve. The valve sits a
-            multiple of 14 px down the pipe, so the dashes of both parts line
-            up, see .pipe-flow */}
+        {/* Air pump into T2, through the add air valve */}
         <Pipe d={`M${t2c} ${teeY} H${bubblesX}`} kind="air" active={air?.on} />
         <Pipe
           d={`M${bubblesX} ${teeY} H${gapX} V${airBelowY} H${airX} V${t1Bottom}`}
@@ -1186,8 +1191,8 @@ export function FlowDiagram({
         />
         <Pump
           x={t2c}
-          y={136}
-          r={13}
+          y={pumpY}
+          r={pumpR}
           kind="air"
           io={air}
           name={sideIo("air_pump", side)}
