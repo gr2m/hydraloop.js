@@ -25,8 +25,9 @@ export default {
     [
       "@semantic-release/github",
       {
-        "successComment": "<% const heading = issue && issue.pull_request ? 'PR is included' : 'issue has been resolved'; let availability = ''; if (releases && releases.length) { if (releases.length === 1) { const r = releases[0]; availability = '\\n\\nThe release is available on [' + r.name + '](' + (r.url || '') + ')'; } else { availability = '\\n\\nThe release is available on:\\n' + releases.map((r) => '- [' + r.name + '](' + (r.url || '') + ')').join('\\n'); } } %>:tada: This <%= heading %> in **<%= nextRelease.gitTag %>** :tada:<%= availability %>\n\nYour **[semantic-release](https://github.com/semantic-release/semantic-release)** bot :package::rocket:"
-      }
+        successComment:
+          "<% const heading = issue && issue.pull_request ? 'PR is included' : 'issue has been resolved'; let availability = ''; if (releases && releases.length) { if (releases.length === 1) { const r = releases[0]; availability = '\\n\\nThe release is available on [' + r.name + '](' + (r.url || '') + ')'; } else { availability = '\\n\\nThe release is available on:\\n' + releases.map((r) => '- [' + r.name + '](' + (r.url || '') + ')').join('\\n'); } } %>:tada: This <%= heading %> in **<%= nextRelease.gitTag %>** :tada:<%= availability %>\n\nYour **[semantic-release](https://github.com/semantic-release/semantic-release)** bot :package::rocket:",
+      },
     ],
     // relative to the package folder
     [
