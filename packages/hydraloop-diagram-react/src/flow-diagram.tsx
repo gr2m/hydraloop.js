@@ -198,22 +198,22 @@ const PIPE = 3.5;
  * Each train's other parts are placed relative to it
  */
 const T2_X: Record<Side, number> = { A: 288, B: 540 };
-/**
- * Where the pipes to the sewer end, in an arrow pointing at their label: on
- * the right, mirrored on the left
- */
-const SEWER_END = { left: 1000 - 935, right: 935 };
-/** The space between a sewer arrow's tip and its label */
-const SEWER_LABEL_DX = 13;
 /** T4's left edge */
 const T4_X = 60;
+/**
+ * The outer edge of the "Sewer" labels: on the left lined up with T4's left
+ * edge, mirrored on the right
+ */
+const SEWER_LABEL_X = { left: T4_X, right: 1000 - T4_X };
 /** The width of a "Sewer" label */
 const SEWER_LABEL_W = 38;
-/**
- * The outer edge of each train's sewer label, lined up with T4's left edge,
- * mirrored on the right
- */
-const TRAIN_SEWER_LABEL_X: Record<Side, number> = { A: T4_X, B: 1000 - T4_X };
+/** The space between the end of a pipe to the sewer and its label */
+const SEWER_LABEL_DX = 13;
+/** Where the pipes to the sewer end, in an arrow pointing at their label */
+const SEWER_END = {
+  left: SEWER_LABEL_X.left + SEWER_LABEL_W + SEWER_LABEL_DX,
+  right: SEWER_LABEL_X.right - SEWER_LABEL_W - SEWER_LABEL_DX,
+};
 /** The mains pipe into T4, level with the transfer pipes into UV-C */
 const MAINS_Y = UV_Y;
 /** Where the mains pipe enters T4's top */
@@ -1167,9 +1167,7 @@ export function FlowDiagram({
     const bubbling = air?.on && bubblesValve?.on !== false;
     const receiving = inlet.receiving.includes(side);
     // The drain leaves to the outside, its arrow pointing at its label
-    const drainEnd =
-      TRAIN_SEWER_LABEL_X[side] +
-      (a ? 1 : -1) * (SEWER_LABEL_W + SEWER_LABEL_DX);
+    const drainEnd = a ? SEWER_END.left : SEWER_END.right;
     // The skim overflow joins the drain 23 px before its end, which keeps it
     // clear of T1's level in percent ("100%") next to T1
     const drainX = drainEnd + (a ? 23 : -23);
@@ -1463,7 +1461,7 @@ export function FlowDiagram({
           labelDy={24}
         />
         <text
-          x={TRAIN_SEWER_LABEL_X[side]}
+          x={a ? SEWER_LABEL_X.left : SEWER_LABEL_X.right}
           y={wasteY + 4}
           textAnchor={a ? "start" : "end"}
           className="hl-diagram-label"
@@ -1603,8 +1601,9 @@ export function FlowDiagram({
         labelDx={14}
       />
       <text
-        x={SEWER_END.right + SEWER_LABEL_DX}
+        x={SEWER_LABEL_X.right}
         y={sewerY + 4}
+        textAnchor="end"
         className="hl-diagram-label"
       >
         Sewer
@@ -1711,8 +1710,9 @@ export function FlowDiagram({
         labelDy={-16}
       />
       <text
-        x={SEWER_END.right + SEWER_LABEL_DX}
+        x={SEWER_LABEL_X.right}
         y={backupY + 4}
+        textAnchor="end"
         className="hl-diagram-label"
       >
         Sewer
