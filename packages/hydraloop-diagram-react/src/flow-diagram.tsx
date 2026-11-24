@@ -1132,6 +1132,8 @@ export function FlowDiagram({
     const bubbling = air?.on && bubblesValve?.on !== false;
     const receiving = inlet.receiving.includes(side);
     const drainX = (a ? 30 : 970) + dx;
+    // The drain leaves to the outside, its arrow at the diagram's margin
+    const drainEnd = a ? 30 : 970;
     const transferring = transfer?.on;
     const skimming = state.trains[side].skimming;
     const t2Level = tanks[a ? "t2a" : "t2b"];
@@ -1403,11 +1405,11 @@ export function FlowDiagram({
         />
         {/* Shared by the skim overflow and the waste valve */}
         <Pipe
-          d={`M${drainX} ${wasteY} V470`}
+          d={`M${drainX} ${wasteY} H${drainEnd}`}
           kind="waste"
           active={skimming || waste?.on}
           open={waste?.on}
-          arrow={{ x: drainX, y: 470, dir: "down" }}
+          arrow={{ x: drainEnd, y: wasteY, dir: a ? "left" : "right" }}
         />
         <Valve
           x={(wasteX + drainX) / 2}
@@ -1422,8 +1424,8 @@ export function FlowDiagram({
           labelDy={24}
         />
         <text
-          x={drainX}
-          y={498}
+          x={(drainX + drainEnd) / 2}
+          y={wasteY + 24}
           textAnchor="middle"
           className="hl-diagram-label"
         >
