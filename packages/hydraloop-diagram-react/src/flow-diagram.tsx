@@ -198,6 +198,13 @@ const PIPE = 3.5;
  * Each train's other parts are placed relative to it
  */
 const T2_X: Record<Side, number> = { A: 288, B: 540 };
+/**
+ * Where the pipes to the sewer end, in an arrow pointing at their label: on
+ * the right, mirrored on the left
+ */
+const SEWER_END = { left: 1000 - 935, right: 935 };
+/** The space between a sewer arrow's tip and its label */
+const SEWER_LABEL_DX = 13;
 /** The mains pipe into T4, below train A's drain */
 const MAINS_Y = 490;
 /** Where the mains pipe enters T4's top */
@@ -1151,8 +1158,8 @@ export function FlowDiagram({
     const bubbling = air?.on && bubblesValve?.on !== false;
     const receiving = inlet.receiving.includes(side);
     const drainX = (a ? 30 : 970) + dx;
-    // The drain leaves to the outside, its arrow at the diagram's margin
-    const drainEnd = a ? 30 : 970;
+    // The drain leaves to the outside, its arrow pointing at its label
+    const drainEnd = a ? SEWER_END.left : SEWER_END.right;
     const transferring = transfer?.on;
     const skimming = state.trains[side].skimming;
     const t2Level = tanks[a ? "t2a" : "t2b"];
@@ -1443,9 +1450,9 @@ export function FlowDiagram({
           labelDy={24}
         />
         <text
-          x={(drainX + drainEnd) / 2}
-          y={wasteY + 24}
-          textAnchor="middle"
+          x={drainEnd + (a ? -SEWER_LABEL_DX : SEWER_LABEL_DX)}
+          y={wasteY + 4}
+          textAnchor={a ? "end" : "start"}
           className="hl-diagram-label"
         >
           Sewer
@@ -1484,7 +1491,7 @@ export function FlowDiagram({
         />
       </g>
     );
-    return { body, transferPipe, drainX };
+    return { body, transferPipe };
   };
   const trains = { A: train("A"), B: train("B") };
 
@@ -1555,12 +1562,12 @@ export function FlowDiagram({
         square
       />
       <Pipe
-        d={`M500 ${bypassEnds.branches[1]} V${sewerY} H935`}
+        d={`M500 ${bypassEnds.branches[1]} V${sewerY} H${SEWER_END.right}`}
         kind="grey"
         active={inlet.bypass}
         open={bypass?.on}
         square
-        arrow={{ x: 935, y: sewerY, dir: "right" }}
+        arrow={{ x: SEWER_END.right, y: sewerY, dir: "right" }}
       />
       <Distributor
         x={500}
@@ -1582,7 +1589,11 @@ export function FlowDiagram({
         labelAnchor="start"
         labelDx={14}
       />
-      <text x={948} y={sewerY + 4} className="hl-diagram-label">
+      <text
+        x={SEWER_END.right + SEWER_LABEL_DX}
+        y={sewerY + 4}
+        className="hl-diagram-label"
+      >
         Sewer
       </text>
 
@@ -1667,12 +1678,12 @@ export function FlowDiagram({
           pipe to the backup valve, straight out to the right like the T1
           drains */}
       <Pipe
-        d={`M655 ${backupY} H970`}
+        d={`M655 ${backupY} H${SEWER_END.right}`}
         kind="waste"
         active={t3.draining}
         open={io[IO.wasteStorageTank]?.on}
         square
-        arrow={{ x: 970, y: backupY, dir: "right" }}
+        arrow={{ x: SEWER_END.right, y: backupY, dir: "right" }}
       />
       <Valve
         x={790}
@@ -1686,11 +1697,9 @@ export function FlowDiagram({
         labelDx={0}
         labelDy={-16}
       />
-      {/* Below the pipe, lined up with train B's sewer label */}
       <text
-        x={(trains.B.drainX + 970) / 2}
-        y={backupY + 24}
-        textAnchor="middle"
+        x={SEWER_END.right + SEWER_LABEL_DX}
+        y={backupY + 4}
         className="hl-diagram-label"
       >
         Sewer
