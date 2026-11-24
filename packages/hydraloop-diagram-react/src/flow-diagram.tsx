@@ -1031,8 +1031,14 @@ export function FlowDiagram({
   const bypassOverride = state.systemBehaviors.some(
     (b) => b.name === "bypassByAppBypassValve",
   );
-  const bypassEnds = distributorEnds(500, 24, "left");
-  const abEnds = distributorEnds(500, 100, "up");
+  // The greywater inlet runs evenly spaced between the sewer pipe above it
+  // and the pipes to the trains below it, far enough apart to leave 5 px
+  // between the bypass and A/B valves
+  const abY = 100;
+  const inletY = abY - 49.5;
+  const sewerY = inletY - 49.5;
+  const bypassEnds = distributorEnds(500, inletY, "left");
+  const abEnds = distributorEnds(500, abY, "up");
   // The backup valve lines up with the bottom of T3 and T4
   const backupY = 640 - PIPE;
   const backupEnds = distributorEnds(260, backupY, "down");
@@ -1148,8 +1154,8 @@ export function FlowDiagram({
         <Pipe
           d={
             a
-              ? `M${abEnds.branches[0]} 100 H${t1c} V232`
-              : `M${abEnds.branches[1]} 100 H${t1c} V232`
+              ? `M${abEnds.branches[0]} ${abY} H${t1c} V232`
+              : `M${abEnds.branches[1]} ${abY} H${t1c} V232`
           }
           kind="grey"
           active={receiving}
@@ -1450,7 +1456,7 @@ export function FlowDiagram({
 
   return (
     <svg
-      viewBox="0 -38 1000 863"
+      viewBox="0 -15 1000 840"
       className="hl-flow-diagram"
       role="group"
       aria-label="Water flow through the H600"
@@ -1468,11 +1474,11 @@ export function FlowDiagram({
       </defs>
 
       {/* Inlet and bypass */}
-      <text x={60} y={10} className="hl-diagram-label is-strong">
+      <text x={60} y={inletY - 14} className="hl-diagram-label is-strong">
         Greywater from showers and baths
       </text>
       <Pipe
-        d={`M60 24 H${bypassEnds.common}`}
+        d={`M60 ${inletY} H${bypassEnds.common}`}
         kind="grey"
         active={inlet.receiving.length > 0 || inlet.bypass}
         open={bypass?.on || (bypass?.on === false && selected !== undefined)}
@@ -1486,16 +1492,16 @@ export function FlowDiagram({
         square
       />
       <Pipe
-        d={`M500 ${bypassEnds.branches[1]} V-22 H935`}
+        d={`M500 ${bypassEnds.branches[1]} V${sewerY} H935`}
         kind="grey"
         active={inlet.bypass}
         open={bypass?.on}
         square
-        arrow={{ x: 935, y: -22, dir: "right" }}
+        arrow={{ x: 935, y: sewerY, dir: "right" }}
       />
       <Distributor
         x={500}
-        y={24}
+        y={inletY}
         tip="left"
         kind="grey"
         io={bypass}
@@ -1513,7 +1519,7 @@ export function FlowDiagram({
         labelAnchor="start"
         labelDx={14}
       />
-      <text x={948} y={-18} className="hl-diagram-label">
+      <text x={948} y={sewerY + 4} className="hl-diagram-label">
         Sewer
       </text>
 
@@ -1522,7 +1528,7 @@ export function FlowDiagram({
 
       <Distributor
         x={500}
-        y={100}
+        y={abY}
         kind="grey"
         io={ab}
         name={IO.abSelector}
