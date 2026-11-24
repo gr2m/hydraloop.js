@@ -1484,7 +1484,7 @@ export function FlowDiagram({
         />
       </g>
     );
-    return { body, transferPipe };
+    return { body, transferPipe, drainX };
   };
   const trains = { A: train("A"), B: train("B") };
 
@@ -1664,14 +1664,15 @@ export function FlowDiagram({
       />
 
       {/* T3 drain, out of T3's right side at its bottom, across from the
-          pipe to the backup valve */}
+          pipe to the backup valve, straight out to the right like the T1
+          drains */}
       <Pipe
-        d={`M655 ${backupY} H970 V735`}
+        d={`M655 ${backupY} H970`}
         kind="waste"
         active={t3.draining}
         open={io[IO.wasteStorageTank]?.on}
         square
-        arrow={{ x: 970, y: 735, dir: "down" }}
+        arrow={{ x: 970, y: backupY, dir: "right" }}
       />
       <Valve
         x={790}
@@ -1685,7 +1686,13 @@ export function FlowDiagram({
         labelDx={0}
         labelDy={-16}
       />
-      <text x={970} y={763} textAnchor="middle" className="hl-diagram-label">
+      {/* Below the pipe, lined up with train B's sewer label */}
+      <text
+        x={(trains.B.drainX + 970) / 2}
+        y={backupY + 24}
+        textAnchor="middle"
+        className="hl-diagram-label"
+      >
         Sewer
       </text>
 
