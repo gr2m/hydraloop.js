@@ -205,8 +205,8 @@ const T2_X: Record<Side, number> = { A: 288, B: 540 };
 const SEWER_END = { left: 1000 - 935, right: 935 };
 /** The space between a sewer arrow's tip and its label */
 const SEWER_LABEL_DX = 13;
-/** The mains pipe into T4, below train A's drain */
-const MAINS_Y = 490;
+/** The mains pipe into T4, level with the transfer pipes into UV-C */
+const MAINS_Y = UV_Y;
 /** Where the mains pipe enters T4's top */
 const T4_INLET_X = 167;
 /** The center of each T2, where its backwash pipe enters from below */
