@@ -20,6 +20,10 @@ npm run dev     # http://localhost:5173
 npm run build   # static site in dist/
 ```
 
+## Deployment
+
+Vercel deploys the app from this folder of [`gr2m/hydraloop`](https://github.com/gr2m/hydraloop): pushes to `main` go to production, other branches to previews. [`vercel.json`](vercel.json) skips the build when nothing in this folder changed since the last deployment.
+
 ## Data
 
 - `3d-models/H600 Standard - Collection 25.stp` is converted to `public/models/h600.glb` (meshopt-compressed, about 4 MB) with `npm run convert`. The CAD source files are not in this repository: put the STEP file from Hydraloop in `3d-models/` (ignored by git) to run the conversion again. Part names, HYD part numbers and sub-assemblies from the STEP product tree are kept on each node.
