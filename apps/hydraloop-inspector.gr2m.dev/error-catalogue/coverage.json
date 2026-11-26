@@ -1,0 +1,56 @@
+[
+  {
+    "decision": "Included",
+    "item": "HL0001–HL0032 (published entries only)",
+    "explanation": "All currently published numbered troubleshooting articles applicable to shared architecture, plus H600-explicit HL0009",
+    "source_url": "https://info.hydraloop.com/troubleshooting/"
+  },
+  {
+    "decision": "Included",
+    "item": "QUALITY (non-code)",
+    "explanation": "Bad water quality general troubleshooting, operationally applicable to H600",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "decision": "Excluded",
+    "item": "Location of the Hydraloop Serial number",
+    "explanation": "Informational reference, not a problem/error",
+    "source_url": "https://info.hydraloop.com/manuals/location-of-the-hydraloop-serial-number/"
+  },
+  {
+    "decision": "Linked guide only",
+    "item": "Replace/clean the inside of a solenoid valve",
+    "explanation": "Service guide associated with HL0030 and HL0031, not an error",
+    "source_url": "https://info.hydraloop.com/manuals/replace-clean-the-inside-of-a-solenoid-valve/"
+  },
+  {
+    "decision": "No catalogue entry",
+    "item": "HL0005",
+    "explanation": "Code not published on catalogue page; not assumed to exist",
+    "source_url": "https://info.hydraloop.com/troubleshooting/"
+  },
+  {
+    "decision": "No catalogue entry",
+    "item": "HL0014",
+    "explanation": "Code not published on catalogue page; not assumed to exist",
+    "source_url": "https://info.hydraloop.com/troubleshooting/"
+  },
+  {
+    "decision": "No catalogue entry",
+    "item": "HL0022",
+    "explanation": "Code not published on catalogue page; not assumed to exist",
+    "source_url": "https://info.hydraloop.com/troubleshooting/"
+  },
+  {
+    "decision": "No catalogue entry",
+    "item": "HL0024",
+    "explanation": "Code not published on catalogue page; not assumed to exist",
+    "source_url": "https://info.hydraloop.com/troubleshooting/"
+  },
+  {
+    "decision": "No catalogue entry",
+    "item": "HL0026",
+    "explanation": "Code not published on catalogue page; not assumed to exist",
+    "source_url": "https://info.hydraloop.com/troubleshooting/"
+  }
+]

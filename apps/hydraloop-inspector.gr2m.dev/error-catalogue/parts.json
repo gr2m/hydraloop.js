@@ -1,0 +1,458 @@
+[
+  {
+    "part_id": "BIO",
+    "name": "Bioreactor / biological treatment film",
+    "system": "Treatment",
+    "revision": "All",
+    "notes": "Biological process, not a purchasable cartridge",
+    "linked_error_count": 3
+  },
+  {
+    "part_id": "DIFF",
+    "name": "Air diffuser",
+    "system": "Treatment",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "T1",
+    "name": "T1 cleaning tank",
+    "system": "Tanks",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 4
+  },
+  {
+    "part_id": "T2",
+    "name": "T2 cleaning tank",
+    "system": "Tanks",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 4
+  },
+  {
+    "part_id": "T3",
+    "name": "T3 treated-water storage tank",
+    "system": "Tanks",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 6
+  },
+  {
+    "part_id": "T4",
+    "name": "T4 backup-water tank",
+    "system": "Tanks",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 3
+  },
+  {
+    "part_id": "T1T2_BENDS",
+    "name": "T1–T2 connecting elbows / black 90° bends",
+    "system": "Treatment plumbing",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "TRANSFER_TUBE",
+    "name": "Transfer tubing / biofilm-prone tubing",
+    "system": "Transfer plumbing",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "INLET",
+    "name": "Greywater inlet / inlet piping",
+    "system": "Inlet",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 3
+  },
+  {
+    "part_id": "INLET_BYPASS",
+    "name": "Greywater bypass valve (top of device)",
+    "system": "Inlet",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "INLET_MANIFOLD",
+    "name": "Incoming greywater source connections / pipework",
+    "system": "Inlet",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 3
+  },
+  {
+    "part_id": "INLET_LIFT",
+    "name": "Upstream greywater lift pump",
+    "system": "Optional site equipment",
+    "revision": "Only if installed",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "INLET_CHECK",
+    "name": "Upstream lift-pump sewer backflow check valve",
+    "system": "Optional site equipment",
+    "revision": "Only if installed",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "PREBUFFER",
+    "name": "Upstream greywater pre-buffer tank",
+    "system": "Optional site equipment",
+    "revision": "Only if installed",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "DIST_PUMP",
+    "name": "Distribution / water delivery pump",
+    "system": "Distribution",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 6
+  },
+  {
+    "part_id": "DIST_CHECK",
+    "name": "Distribution check valve",
+    "system": "Distribution",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "PRESS_WCWM",
+    "name": "Toilet / washing-machine distribution pressure sensors",
+    "system": "Distribution",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "WC_OUT",
+    "name": "WC / toilet output line",
+    "system": "Distribution",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 3
+  },
+  {
+    "part_id": "WM_OUT",
+    "name": "Washing-machine output line",
+    "system": "Distribution",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "AUX_OUT",
+    "name": "Auxiliary output line",
+    "system": "Distribution",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "AUX_FLOAT",
+    "name": "External reservoir float valve",
+    "system": "Optional site equipment",
+    "revision": "Only if installed",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "TOILET",
+    "name": "External toilet flush/float mechanism",
+    "system": "Site plumbing",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 3
+  },
+  {
+    "part_id": "OUTLET_PIPES",
+    "name": "Reusable-water outlet pipework / restrictions",
+    "system": "Site plumbing",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "BACKUP_SUPPLY",
+    "name": "Backup/mains-water supply and shutoff",
+    "system": "Water supply",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 5
+  },
+  {
+    "part_id": "BACKUP_VALVE",
+    "name": "3-port backup-water selector valve",
+    "system": "Distribution",
+    "revision": "V1.x / V2.x locations differ",
+    "notes": "Also called backup water valve; separate from greywater bypass valve",
+    "linked_error_count": 3
+  },
+  {
+    "part_id": "X6",
+    "name": "Motorized transfer valve A — x6",
+    "system": "Transfer",
+    "revision": "H600 side A; H300 equivalent",
+    "notes": "Hydraloop component reference x6, not an ordering SKU",
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "X42",
+    "name": "Motorized transfer valve B — x42",
+    "system": "Transfer",
+    "revision": "H600 side B only",
+    "notes": "Hydraloop component reference x42, not an ordering SKU",
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "X10",
+    "name": "Backflush solenoid valve — x10",
+    "system": "Circulation",
+    "revision": "Check revision",
+    "notes": "Hydraloop component reference x10",
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "X12",
+    "name": "Circulation solenoid valve — x12",
+    "system": "Circulation",
+    "revision": "Check revision",
+    "notes": "Hydraloop component reference x12",
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "UV_V1",
+    "name": "UV mercury lamp",
+    "system": "Disinfection",
+    "revision": "V1.x only",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "UV_V2",
+    "name": "UV-C LED light module",
+    "system": "Disinfection",
+    "revision": "V2.x only",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "UV_BALLAST",
+    "name": "UV lamp ballast / separate PSU",
+    "system": "Disinfection",
+    "revision": "V1.x only",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "UV_SENSOR",
+    "name": "UV lamp status sensor / feedback",
+    "system": "Disinfection",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "UV_PATH",
+    "name": "UV water flow path",
+    "system": "Disinfection",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "CIRC_HOSES",
+    "name": "Circulation tubing / water hoses",
+    "system": "Circulation",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "ELECTRIC_WIRING",
+    "name": "Component wiring and electrical connectors",
+    "system": "Electronics",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 7
+  },
+  {
+    "part_id": "IO_BOARD",
+    "name": "Water I/O control board",
+    "system": "Electronics",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 6
+  },
+  {
+    "part_id": "ECU",
+    "name": "ECU / main controller",
+    "system": "Electronics",
+    "revision": "V1.x main ECU replaces pressure board for T3 sensing",
+    "notes": null,
+    "linked_error_count": 3
+  },
+  {
+    "part_id": "PRESS_BOARD",
+    "name": "Pressure sensor board",
+    "system": "Electronics",
+    "revision": "V2.x (T3 troubleshooting guide)",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "T3_SENSOR_TUBE",
+    "name": "T3 air-pressure sensing tube",
+    "system": "Sensors",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "T3_COUPLINGS",
+    "name": "T3 sensing-tube couplings",
+    "system": "Sensors",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "T1_WASTE",
+    "name": "T1/T2 tank waste valve",
+    "system": "Drainage",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "T3_WASTE",
+    "name": "T3 waste/drain valve",
+    "system": "Drainage",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "T1_UBEND",
+    "name": "T1 U-bend PVC drain section",
+    "system": "Drainage",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "SEWER",
+    "name": "Downstream wastewater drain / sewer line",
+    "system": "Site plumbing",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "SEWER_VENT",
+    "name": "Drain vent / air break / downstream water trap",
+    "system": "Site plumbing",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "OUTLET_LIFT",
+    "name": "Downstream wastewater lift pump",
+    "system": "Optional site equipment",
+    "revision": "Only if installed",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "WIFI",
+    "name": "Device Wi-Fi / Ethernet connectivity",
+    "system": "Communications",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "ROUTER",
+    "name": "Home router / internet connectivity",
+    "system": "Site networking",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "POWER",
+    "name": "Electrical supply / mains power",
+    "system": "Site electrical",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "BATTERY",
+    "name": "Device batteries",
+    "system": "Electronics",
+    "revision": "Confirm type from wiring diagram",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "BATTERY_LEAD",
+    "name": "Battery holder/wiring",
+    "system": "Electronics",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "BUZZER",
+    "name": "Audible buzzer / sounder",
+    "system": "Electronics",
+    "revision": "All / verify actual hardware",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "BUZZER_OBSTR",
+    "name": "Physical obstruction near buzzer",
+    "system": "Enclosure",
+    "revision": "e.g. protective paper shown in guide",
+    "notes": null,
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "SOLENOID_INSIDE",
+    "name": "Solenoid valve seal / spring / internal passages",
+    "system": "Valve internals",
+    "revision": "Relevant to x10 and x12",
+    "notes": "Service article shows seal, spring, passages and housing",
+    "linked_error_count": 2
+  },
+  {
+    "part_id": "AIR_CIRCUIT",
+    "name": "Air-pressure subsystem — unspecified",
+    "system": "Unidentified",
+    "revision": "Exact component not identified by published article",
+    "notes": "Do not confuse with aeration pump without verification",
+    "linked_error_count": 1
+  },
+  {
+    "part_id": "DEVICE",
+    "name": "Whole unit / scheduled service",
+    "system": "General",
+    "revision": "All",
+    "notes": "Preventive maintenance alert, not an individual failed part",
+    "linked_error_count": 2
+  }
+]
