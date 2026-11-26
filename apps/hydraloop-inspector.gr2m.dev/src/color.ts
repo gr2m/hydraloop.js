@@ -3,11 +3,22 @@
 // (older iOS Safari and oklch), which turned highlights black.
 
 const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
-const gamma = (v: number) => (v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055);
-const linear = (v: number) => (v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4));
+const gamma = (v: number) =>
+  v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+const linear = (v: number) =>
+  v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
 
 function hex(r: number, g: number, b: number) {
-  return "#" + [r, g, b].map((v) => Math.round(clamp01(v) * 255).toString(16).padStart(2, "0")).join("");
+  return (
+    "#" +
+    [r, g, b]
+      .map((v) =>
+        Math.round(clamp01(v) * 255)
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")
+  );
 }
 
 function oklabToHex(L: number, a: number, b: number) {
@@ -24,7 +35,9 @@ function oklabToHex(L: number, a: number, b: number) {
 /** Parses one component; `percentOf` scales "50%" (1 for L, 0.4 for oklch chroma). */
 function num(token: string | undefined, percentOf = 1) {
   if (!token || token === "none") return 0;
-  return token.endsWith("%") ? (parseFloat(token) / 100) * percentOf : parseFloat(token);
+  return token.endsWith("%")
+    ? (parseFloat(token) / 100) * percentOf
+    : parseFloat(token);
 }
 
 export function cssColorToHex(input: string): string | null {
@@ -36,7 +49,9 @@ export function cssColorToHex(input: string): string | null {
   const parts = body.replace(/,/g, " ").split("/")[0].trim().split(/\s+/);
 
   if (fn === "rgb" || fn === "rgba") {
-    const [r, g, b] = parts.map((p) => (p.endsWith("%") ? parseFloat(p) / 100 : parseFloat(p) / 255));
+    const [r, g, b] = parts.map((p) =>
+      p.endsWith("%") ? parseFloat(p) / 100 : parseFloat(p) / 255,
+    );
     return hex(r, g, b);
   }
   if (fn === "oklch") {
@@ -45,7 +60,8 @@ export function cssColorToHex(input: string): string | null {
     const h = (num(parts[2]) * Math.PI) / 180;
     return oklabToHex(L, C * Math.cos(h), C * Math.sin(h));
   }
-  if (fn === "oklab") return oklabToHex(num(parts[0]), num(parts[1], 0.4), num(parts[2], 0.4));
+  if (fn === "oklab")
+    return oklabToHex(num(parts[0]), num(parts[1], 0.4), num(parts[2], 0.4));
   if (fn === "color") {
     const [space, ...rest] = parts;
     const [r, g, b] = rest.map((p) => num(p));

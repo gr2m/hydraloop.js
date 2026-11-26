@@ -1,5 +1,7 @@
 # Hydraloop H600 inspector
 
+https://hydraloop-inspector.gr2m.dev
+
 A web app for exploring the Hydraloop H600 V2.1 in 3D and finding where each troubleshooting problem is located.
 
 - Search problems (`HL0018`, `18`, "overflow"), catalogue components and CAD parts (`HYD0477`, "fuse") from one search field
@@ -10,15 +12,17 @@ A web app for exploring the Hydraloop H600 V2.1 in 3D and finding where each tro
 
 ## Run
 
+From this folder:
+
 ```sh
-pnpm install
-pnpm dev        # http://localhost:5173
-pnpm build      # static site in dist/
+npm install
+npm run dev     # http://localhost:5173
+npm run build   # static site in dist/
 ```
 
 ## Data
 
-- `3d-models/H600 Standard - Collection 25.stp` is converted to `public/models/h600.glb` (meshopt-compressed, about 4 MB) with `pnpm convert`. Part names, HYD part numbers and sub-assemblies from the STEP product tree are kept on each node.
+- `3d-models/H600 Standard - Collection 25.stp` is converted to `public/models/h600.glb` (meshopt-compressed, about 4 MB) with `npm run convert`. The CAD source files are not in this repository: put the STEP file from Hydraloop in `3d-models/` (ignored by git) to run the conversion again. Part names, HYD part numbers and sub-assemblies from the STEP product tree are kept on each node.
 - `error-catalogue/*.json` is imported directly.
 - `src/mapping.ts` links catalogue components to CAD geometry. The CAD export is a simplified model: it has the tanks, plumbing, covers, distribution module and ECU housing, but no pumps, UV unit, boards, tubing or valve bodies. Each component therefore has a `fidelity`:
   - **Modeled**: the highlighted geometry is the component (blue)

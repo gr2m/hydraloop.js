@@ -41,7 +41,8 @@ interface AssemblyEntry {
 /** Assemblies that enclose the interior; hidden with the "covers" toggle. */
 const COVER_PNS = new Set(["HYD1012", "HYD1066", "HYD0983", "HYD0984"]);
 
-const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export class Viewer {
   readonly renderer: THREE.WebGLRenderer;
@@ -66,8 +67,16 @@ export class Viewer {
   private explode = 0;
   private markers: Marker[] = [];
   private markerEls = new Map<string, HTMLElement>();
-  private tween: { from: [THREE.Vector3, THREE.Vector3]; to: [THREE.Vector3, THREE.Vector3]; start: number; ms: number } | null = null;
-  private colors = { primary: new THREE.Color("#0a72ef"), secondary: new THREE.Color("#f5a524") };
+  private tween: {
+    from: [THREE.Vector3, THREE.Vector3];
+    to: [THREE.Vector3, THREE.Vector3];
+    start: number;
+    ms: number;
+  } | null = null;
+  private colors = {
+    primary: new THREE.Color("#0a72ef"),
+    secondary: new THREE.Color("#f5a524"),
+  };
   private resizeObserver: ResizeObserver;
   private frame = 0;
 
@@ -78,17 +87,27 @@ export class Viewer {
     private container: HTMLElement,
     private overlay: HTMLElement,
   ) {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true,
+      powerPreference: "high-performance",
+    });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.NeutralToneMapping;
     this.renderer.toneMappingExposure = 0.78;
-    this.renderer.domElement.setAttribute("aria-label", "3D model of the Hydraloop H600. Drag to rotate, pinch or scroll to zoom, two fingers or right-drag to pan.");
+    this.renderer.domElement.setAttribute(
+      "aria-label",
+      "3D model of the Hydraloop H600. Drag to rotate, pinch or scroll to zoom, two fingers or right-drag to pan.",
+    );
     this.renderer.domElement.setAttribute("role", "img");
     this.renderer.domElement.tabIndex = 0;
     container.appendChild(this.renderer.domElement);
 
     const pmrem = new THREE.PMREMGenerator(this.renderer);
-    this.scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    this.scene.environment = pmrem.fromScene(
+      new RoomEnvironment(),
+      0.04,
+    ).texture;
     this.scene.environmentIntensity = 0.55;
     // Key light from upper front-left, fill from the right: gives the white plastics readable form.
     const key = new THREE.DirectionalLight(0xffffff, 1.4);
@@ -104,14 +123,25 @@ export class Viewer {
     this.controls.minDistance = 150;
     this.controls.maxDistance = 12000;
     this.controls.zoomToCursor = true;
-    this.controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+    this.controls.touches = {
+      ONE: THREE.TOUCH.ROTATE,
+      TWO: THREE.TOUCH.DOLLY_PAN,
+    };
     this.controls.keyPanSpeed = 40;
     this.controls.listenToKeyEvents(this.renderer.domElement);
     this.controls.addEventListener("change", () => (this.dirty = true));
     this.controls.addEventListener("start", () => (this.tween = null));
 
     const el = this.renderer.domElement;
-    el.addEventListener("pointerdown", (e) => (this.pointerDown = { x: e.clientX, y: e.clientY, t: performance.now() }));
+    el.addEventListener(
+      "pointerdown",
+      (e) =>
+        (this.pointerDown = {
+          x: e.clientX,
+          y: e.clientY,
+          t: performance.now(),
+        }),
+    );
     el.addEventListener("pointerup", (e) => this.handlePointerUp(e));
     el.addEventListener("pointermove", (e) => {
       if (e.pointerType !== "mouse" || e.buttons) return;
@@ -137,17 +167,33 @@ export class Viewer {
     this.renderer.domElement.remove();
   }
 
-  async load(url: string, onProgress?: (fraction: number) => void): Promise<Solid[]> {
+  async load(
+    url: string,
+    onProgress?: (fraction: number) => void,
+  ): Promise<Solid[]> {
     const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
-    const gltf = await loader.loadAsync(url, (e) => e.total && onProgress?.(e.loaded / e.total));
-    const top = gltf.scene.getObjectByName("H600_Assembly_V21") ?? gltf.scene.children[0];
+    const gltf = await loader.loadAsync(
+      url,
+      (e) => e.total && onProgress?.(e.loaded / e.total),
+    );
+    const top =
+      gltf.scene.getObjectByName("H600_Assembly_V21") ?? gltf.scene.children[0];
     this.root.add(gltf.scene);
     gltf.scene.updateMatrixWorld(true);
 
     const out: Solid[] = [];
     for (const node of [...top.children]) {
-      const a = node.userData as { id: string; pn: string | null; name: string };
-      const entry: AssemblyEntry = { node, center: new THREE.Vector3(), basePosition: node.position.clone(), solids: [] };
+      const a = node.userData as {
+        id: string;
+        pn: string | null;
+        name: string;
+      };
+      const entry: AssemblyEntry = {
+        node,
+        center: new THREE.Vector3(),
+        basePosition: node.position.clone(),
+        solids: [],
+      };
       node.traverse((obj) => {
         if (!(obj as THREE.Mesh).isMesh) return;
         const mesh = obj as THREE.Mesh;
@@ -174,7 +220,9 @@ export class Viewer {
           material,
           baseColor: src.color.clone(),
           basePosition: holder.position.clone(),
-          center: new THREE.Box3().setFromObject(mesh).getCenter(new THREE.Vector3()),
+          center: new THREE.Box3()
+            .setFromObject(mesh)
+            .getCenter(new THREE.Vector3()),
         };
         this.solids.set(solid.id, se);
         entry.solids.push(se);
@@ -186,12 +234,18 @@ export class Viewer {
 
     this.modelBox.setFromObject(this.root);
     this.modelBox.getCenter(this.modelCenter);
-    const frontPlate = this.assemblies.find((a) => a.solids[0]?.solid.assemblyPn === "HYD1012");
+    const frontPlate = this.assemblies.find(
+      (a) => a.solids[0]?.solid.assemblyPn === "HYD1012",
+    );
     if (frontPlate) {
       this.front.copy(frontPlate.center).sub(this.modelCenter).setY(0);
       // Snap to the dominant axis so presets are square to the cabinet.
       const ax = Math.abs(this.front.x) > Math.abs(this.front.z);
-      this.front.set(ax ? Math.sign(this.front.x) : 0, 0, ax ? 0 : Math.sign(this.front.z));
+      this.front.set(
+        ax ? Math.sign(this.front.x) : 0,
+        0,
+        ax ? 0 : Math.sign(this.front.z),
+      );
     }
     this.view("iso", false);
     this.applyMaterials();
@@ -220,7 +274,8 @@ export class Viewer {
   setCoversHidden(hidden: boolean) {
     this.coversHidden = hidden;
     for (const a of this.assemblies) {
-      if (COVER_PNS.has(a.solids[0]?.solid.assemblyPn ?? "")) a.node.visible = !hidden;
+      if (COVER_PNS.has(a.solids[0]?.solid.assemblyPn ?? ""))
+        a.node.visible = !hidden;
     }
     this.dirty = true;
   }
@@ -232,13 +287,20 @@ export class Viewer {
       const d = a.center.clone().sub(this.modelCenter);
       const isCover = COVER_PNS.has(a.solids[0]?.solid.assemblyPn ?? "");
       // Spread horizontally more than vertically; covers fly further to clear the view.
-      const offset = new THREE.Vector3(d.x * 1.6, d.y * 0.9 + (a.center.y > height * 0.85 ? 250 : 0), d.z * 1.6).multiplyScalar(t);
+      const offset = new THREE.Vector3(
+        d.x * 1.6,
+        d.y * 0.9 + (a.center.y > height * 0.85 ? 250 : 0),
+        d.z * 1.6,
+      ).multiplyScalar(t);
       if (isCover) offset.multiplyScalar(1.6);
       a.node.position.copy(a.basePosition).add(offset);
       for (const s of a.solids) {
         const holder = s.mesh.userData.id ? s.mesh : s.mesh.parent!;
         if (holder === a.node) continue;
-        const local = s.center.clone().sub(a.center).multiplyScalar(t * 0.9);
+        const local = s.center
+          .clone()
+          .sub(a.center)
+          .multiplyScalar(t * 0.9);
         holder.position.copy(s.basePosition).add(local);
       }
     }
@@ -276,14 +338,24 @@ export class Viewer {
       const isP = primary.has(id);
       const isS = !isP && secondary.has(id);
       const ghost = this.xray && !isP && !isS;
-      m.color.copy(isP ? this.colors.primary : isS ? this.colors.secondary : s.baseColor);
-      m.emissive.copy(isP ? this.colors.primary : isS ? this.colors.secondary : new THREE.Color(0));
+      m.color.copy(
+        isP ? this.colors.primary : isS ? this.colors.secondary : s.baseColor,
+      );
+      m.emissive.copy(
+        isP
+          ? this.colors.primary
+          : isS
+            ? this.colors.secondary
+            : new THREE.Color(0),
+      );
       m.emissiveIntensity = isP || isS ? 0.35 : 0;
       m.transparent = ghost;
       m.opacity = ghost ? (focused ? 0.1 : 0.18) : 1;
       m.depthWrite = !ghost;
       s.mesh.renderOrder = ghost ? 1 : 0;
-      if (id === this.hoverId && !ghost) m.emissive.addScalar(0.12), (m.emissiveIntensity = Math.max(m.emissiveIntensity, 1));
+      if (id === this.hoverId && !ghost)
+        (m.emissive.addScalar(0.12),
+          (m.emissiveIntensity = Math.max(m.emissiveIntensity, 1)));
       m.needsUpdate = true;
     }
     this.dirty = true;
@@ -296,48 +368,78 @@ export class Viewer {
     const box = new THREE.Box3();
     for (const id of ids) {
       const s = this.solids.get(id);
-      if (s && s.mesh.visible && this.isVisible(s.mesh)) box.expandByObject(s.mesh);
+      if (s && s.mesh.visible && this.isVisible(s.mesh))
+        box.expandByObject(s.mesh);
     }
     return box;
   }
 
   private isVisible(obj: THREE.Object3D) {
-    for (let o: THREE.Object3D | null = obj; o; o = o.parent) if (!o.visible) return false;
+    for (let o: THREE.Object3D | null = obj; o; o = o.parent)
+      if (!o.visible) return false;
     return true;
   }
 
   focus(ids?: string[], animate = true) {
-    const box = ids?.length ? this.boxOf(ids) : new THREE.Box3().setFromObject(this.root);
+    const box = ids?.length
+      ? this.boxOf(ids)
+      : new THREE.Box3().setFromObject(this.root);
     if (box.isEmpty()) return;
     const sphere = box.getBoundingSphere(new THREE.Sphere());
     const radius = Math.max(sphere.radius, 120);
     const fov = THREE.MathUtils.degToRad(this.camera.fov);
-    const fit = Math.min(fov, 2 * Math.atan(Math.tan(fov / 2) * this.camera.aspect));
+    const fit = Math.min(
+      fov,
+      2 * Math.atan(Math.tan(fov / 2) * this.camera.aspect),
+    );
     const dist = (radius / Math.sin(fit / 2)) * 1.08;
-    const dir = this.camera.position.clone().sub(this.controls.target).normalize();
-    this.moveCamera(sphere.center, sphere.center.clone().add(dir.multiplyScalar(dist)), animate);
+    const dir = this.camera.position
+      .clone()
+      .sub(this.controls.target)
+      .normalize();
+    this.moveCamera(
+      sphere.center,
+      sphere.center.clone().add(dir.multiplyScalar(dist)),
+      animate,
+    );
   }
 
   view(preset: ViewPreset, animate = true) {
     const f = this.front;
-    const right = new THREE.Vector3().crossVectors(new THREE.Vector3(0, 1, 0), f).negate();
+    const right = new THREE.Vector3()
+      .crossVectors(new THREE.Vector3(0, 1, 0), f)
+      .negate();
     const dirs: Record<ViewPreset, THREE.Vector3> = {
       front: f.clone(),
       back: f.clone().negate(),
       left: right.clone().negate(),
       right: right.clone(),
       top: new THREE.Vector3(0, 1, 0).addScaledVector(f, 0.0001),
-      iso: f.clone().add(right.clone().multiplyScalar(0.75)).add(new THREE.Vector3(0, 0.55, 0)),
+      iso: f
+        .clone()
+        .add(right.clone().multiplyScalar(0.75))
+        .add(new THREE.Vector3(0, 0.55, 0)),
     };
     const box = new THREE.Box3().setFromObject(this.root);
     const sphere = box.getBoundingSphere(new THREE.Sphere());
     const fov = THREE.MathUtils.degToRad(this.camera.fov);
-    const fit = Math.min(fov, 2 * Math.atan(Math.tan(fov / 2) * this.camera.aspect));
+    const fit = Math.min(
+      fov,
+      2 * Math.atan(Math.tan(fov / 2) * this.camera.aspect),
+    );
     const dist = (sphere.radius / Math.sin(fit / 2)) * 0.95;
-    this.moveCamera(sphere.center, sphere.center.clone().add(dirs[preset].normalize().multiplyScalar(dist)), animate);
+    this.moveCamera(
+      sphere.center,
+      sphere.center.clone().add(dirs[preset].normalize().multiplyScalar(dist)),
+      animate,
+    );
   }
 
-  private moveCamera(target: THREE.Vector3, position: THREE.Vector3, animate: boolean) {
+  private moveCamera(
+    target: THREE.Vector3,
+    position: THREE.Vector3,
+    animate: boolean,
+  ) {
     if (!animate || reducedMotion()) {
       this.tween = null;
       this.controls.target.copy(target);
@@ -355,9 +457,20 @@ export class Viewer {
   }
 
   zoom(factor: number) {
-    const offset = this.camera.position.clone().sub(this.controls.target).multiplyScalar(factor);
-    const len = THREE.MathUtils.clamp(offset.length(), this.controls.minDistance, this.controls.maxDistance);
-    this.moveCamera(this.controls.target, this.controls.target.clone().add(offset.setLength(len)), true);
+    const offset = this.camera.position
+      .clone()
+      .sub(this.controls.target)
+      .multiplyScalar(factor);
+    const len = THREE.MathUtils.clamp(
+      offset.length(),
+      this.controls.minDistance,
+      this.controls.maxDistance,
+    );
+    this.moveCamera(
+      this.controls.target,
+      this.controls.target.clone().add(offset.setLength(len)),
+      true,
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -365,14 +478,21 @@ export class Viewer {
 
   private ndc(e: { clientX: number; clientY: number }) {
     const r = this.renderer.domElement.getBoundingClientRect();
-    return new THREE.Vector2(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    return new THREE.Vector2(
+      ((e.clientX - r.left) / r.width) * 2 - 1,
+      -((e.clientY - r.top) / r.height) * 2 + 1,
+    );
   }
 
   pick(e: { clientX: number; clientY: number }): string | null {
     this.raycaster.setFromCamera(this.ndc(e), this.camera);
-    const hits = this.raycaster.intersectObject(this.root, true).filter((h) => this.isVisible(h.object));
+    const hits = this.raycaster
+      .intersectObject(this.root, true)
+      .filter((h) => this.isVisible(h.object));
     // Prefer solid geometry over ghosted geometry in front of it.
-    const solidHit = hits.find((h) => !((h.object as THREE.Mesh).material as THREE.Material).transparent);
+    const solidHit = hits.find(
+      (h) => !((h.object as THREE.Mesh).material as THREE.Material).transparent,
+    );
     const hit = solidHit ?? hits[0];
     return (hit?.object.userData.solidId as string) ?? null;
   }
@@ -381,7 +501,11 @@ export class Viewer {
     const d = this.pointerDown;
     this.pointerDown = null;
     if (!d || e.button > 0) return;
-    if (Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6 || performance.now() - d.t > 600) return;
+    if (
+      Math.hypot(e.clientX - d.x, e.clientY - d.y) > 6 ||
+      performance.now() - d.t > 600
+    )
+      return;
     this.onPick(this.pick(e));
   }
 
@@ -409,10 +533,21 @@ export class Viewer {
   private loop = () => {
     this.frame = requestAnimationFrame(this.loop);
     if (this.tween) {
-      const k = Math.min(1, (performance.now() - this.tween.start) / this.tween.ms);
+      const k = Math.min(
+        1,
+        (performance.now() - this.tween.start) / this.tween.ms,
+      );
       const ease = 1 - Math.pow(1 - k, 3);
-      this.controls.target.lerpVectors(this.tween.from[0], this.tween.to[0], ease);
-      this.camera.position.lerpVectors(this.tween.from[1], this.tween.to[1], ease);
+      this.controls.target.lerpVectors(
+        this.tween.from[0],
+        this.tween.to[0],
+        ease,
+      );
+      this.camera.position.lerpVectors(
+        this.tween.from[1],
+        this.tween.to[1],
+        ease,
+      );
       if (k >= 1) this.tween = null;
       this.dirty = true;
     }

@@ -1,5 +1,5 @@
 {
-  "name": "hydraloop-h600-inspector",
+  "name": "hydraloop-inspector",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -10,21 +10,21 @@
     "convert": "node scripts/convert-step.mjs"
   },
   "dependencies": {
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "three": "0.170.0"
   },
   "devDependencies": {
     "@gltf-transform/core": "4.1.1",
     "@gltf-transform/extensions": "4.1.1",
     "@gltf-transform/functions": "4.1.1",
-    "@types/react": "18.3.12",
-    "@types/react-dom": "18.3.1",
+    "@types/react": "19.3.3",
+    "@types/react-dom": "19.3.0",
     "@types/three": "0.170.0",
-    "@vitejs/plugin-react": "4.3.4",
+    "@vitejs/plugin-react": "6.3.0",
     "meshoptimizer": "0.22.0",
     "occt-import-js": "0.0.23",
     "typescript": "5.7.2",
-    "vite": "6.0.7"
+    "vite": "8.4.0"
   }
 }

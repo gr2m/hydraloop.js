@@ -15,8 +15,21 @@
 
 :where(.vbg-report) {
   color-scheme: light;
-  --vbg-font-sans: var(--font-geist-sans, var(--font-sans, "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif));
-  --vbg-font-mono: var(--font-geist-mono, var(--font-mono, "Geist Mono", "SFMono-Regular", Consolas, monospace));
+  --vbg-font-sans: var(
+    --font-geist-sans,
+    var(
+      --font-sans,
+      "Geist",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif
+    )
+  );
+  --vbg-font-mono: var(
+    --font-geist-mono,
+    var(--font-mono, "Geist Mono", "SFMono-Regular", Consolas, monospace)
+  );
   --vbg-background-100: light-dark(oklch(1 0 0), oklch(0 0 0));
   --vbg-background-200: light-dark(oklch(0.984 0 0), oklch(0.027 0 0));
   --vbg-gray-100: light-dark(oklch(0.961 0 0), oklch(0.218 0 0));
@@ -39,26 +52,86 @@
   --vbg-gray-alpha-800: light-dark(oklch(0 0 0 / 0.51), oklch(1 0 0 / 0.47));
   --vbg-gray-alpha-900: light-dark(oklch(0 0 0 / 0.7), oklch(1 0 0 / 0.61));
   --vbg-gray-alpha-1000: light-dark(oklch(0 0 0 / 0.91), oklch(1 0 0 / 0.92));
-  --vbg-blue-100: light-dark(oklch(97.32% 0.0141 251.56), oklch(22.17% 0.069 259.89));
-  --vbg-blue-400: light-dark(oklch(91.58% 0.0473 245.116), oklch(34.1% 0.121 254.74));
-  --vbg-blue-700: light-dark(oklch(57.61% 0.2508 258.23), oklch(57.61% 0.2321 258.23));
-  --vbg-blue-900: light-dark(oklch(53.18% 0.2399 256.99), oklch(71.7% 0.1648 250.794));
-  --vbg-blue-1000: light-dark(oklch(26.67% 0.1099 254.34), oklch(96.75% 0.0179 242.423));
-  --vbg-green-100: light-dark(oklch(97.59% 0.0289 145.42), oklch(23.09% 0.0716 149.68));
-  --vbg-green-400: light-dark(oklch(91.49% 0.0976 146.24), oklch(34.39% 0.1039 147.78));
-  --vbg-green-700: light-dark(oklch(64.58% 0.1746 147.27), oklch(64.58% 0.199 147.27));
-  --vbg-green-900: light-dark(oklch(51.75% 0.1453 147.65), oklch(73.1% 0.2158 148.29));
-  --vbg-green-1000: light-dark(oklch(29.15% 0.1197 147.38), oklch(96.76% 0.056 154.18));
-  --vbg-amber-100: light-dark(oklch(97.48% 0.0331 85.79), oklch(22.46% 0.0538 76.04));
-  --vbg-amber-400: light-dark(oklch(91.02% 0.1322 88.25), oklch(35.53% 0.0903 66.297));
-  --vbg-amber-700: light-dark(oklch(81.87% 0.1969 76.46), oklch(81.87% 0.1969 76.46));
-  --vbg-amber-900: light-dark(oklch(52.79% 0.1496 54.65), oklch(77.21% 0.1991 64.28));
-  --vbg-amber-1000: light-dark(oklch(30.83% 0.099 45.48), oklch(96.7% 0.0418 84.59));
-  --vbg-red-100: light-dark(oklch(96.5% 0.0223 13.09), oklch(22.1% 0.0657 15.11));
-  --vbg-red-400: light-dark(oklch(91.51% 0.0471 19.8), oklch(35.27% 0.1273 21.23));
-  --vbg-red-700: light-dark(oklch(62.56% 0.2524 23.03), oklch(62.56% 0.2234 23.03));
-  --vbg-red-900: light-dark(oklch(54.99% 0.232 25.29), oklch(69.96% 0.2136 22.03));
-  --vbg-red-1000: light-dark(oklch(24.8% 0.1041 18.86), oklch(95.6% 0.0293 6.61));
+  --vbg-blue-100: light-dark(
+    oklch(97.32% 0.0141 251.56),
+    oklch(22.17% 0.069 259.89)
+  );
+  --vbg-blue-400: light-dark(
+    oklch(91.58% 0.0473 245.116),
+    oklch(34.1% 0.121 254.74)
+  );
+  --vbg-blue-700: light-dark(
+    oklch(57.61% 0.2508 258.23),
+    oklch(57.61% 0.2321 258.23)
+  );
+  --vbg-blue-900: light-dark(
+    oklch(53.18% 0.2399 256.99),
+    oklch(71.7% 0.1648 250.794)
+  );
+  --vbg-blue-1000: light-dark(
+    oklch(26.67% 0.1099 254.34),
+    oklch(96.75% 0.0179 242.423)
+  );
+  --vbg-green-100: light-dark(
+    oklch(97.59% 0.0289 145.42),
+    oklch(23.09% 0.0716 149.68)
+  );
+  --vbg-green-400: light-dark(
+    oklch(91.49% 0.0976 146.24),
+    oklch(34.39% 0.1039 147.78)
+  );
+  --vbg-green-700: light-dark(
+    oklch(64.58% 0.1746 147.27),
+    oklch(64.58% 0.199 147.27)
+  );
+  --vbg-green-900: light-dark(
+    oklch(51.75% 0.1453 147.65),
+    oklch(73.1% 0.2158 148.29)
+  );
+  --vbg-green-1000: light-dark(
+    oklch(29.15% 0.1197 147.38),
+    oklch(96.76% 0.056 154.18)
+  );
+  --vbg-amber-100: light-dark(
+    oklch(97.48% 0.0331 85.79),
+    oklch(22.46% 0.0538 76.04)
+  );
+  --vbg-amber-400: light-dark(
+    oklch(91.02% 0.1322 88.25),
+    oklch(35.53% 0.0903 66.297)
+  );
+  --vbg-amber-700: light-dark(
+    oklch(81.87% 0.1969 76.46),
+    oklch(81.87% 0.1969 76.46)
+  );
+  --vbg-amber-900: light-dark(
+    oklch(52.79% 0.1496 54.65),
+    oklch(77.21% 0.1991 64.28)
+  );
+  --vbg-amber-1000: light-dark(
+    oklch(30.83% 0.099 45.48),
+    oklch(96.7% 0.0418 84.59)
+  );
+  --vbg-red-100: light-dark(
+    oklch(96.5% 0.0223 13.09),
+    oklch(22.1% 0.0657 15.11)
+  );
+  --vbg-red-400: light-dark(
+    oklch(91.51% 0.0471 19.8),
+    oklch(35.27% 0.1273 21.23)
+  );
+  --vbg-red-700: light-dark(
+    oklch(62.56% 0.2524 23.03),
+    oklch(62.56% 0.2234 23.03)
+  );
+  --vbg-red-900: light-dark(
+    oklch(54.99% 0.232 25.29),
+    oklch(69.96% 0.2136 22.03)
+  );
+  --vbg-red-1000: light-dark(
+    oklch(24.8% 0.1041 18.86),
+    oklch(95.6% 0.0293 6.61)
+  );
   /* Category series are monochrome by default. Reserve chromatic tokens for meaning. */
   --vbg-chart-1: var(--vbg-gray-1000);
   --vbg-chart-2: var(--vbg-gray-900);
@@ -142,7 +215,10 @@
   line-height: var(--vbg-leading-body);
   font-kerning: normal;
   font-optical-sizing: auto;
-  font-feature-settings: "rlig" 1, "calt" 0, "ss11" 1;
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 0,
+    "ss11" 1;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -197,7 +273,8 @@
   color-scheme: dark;
 }
 
-:where(.vbg-report) :where(h1, h2, h3, h4, p, ul, ol, dl, figure, blockquote, pre) {
+:where(.vbg-report)
+  :where(h1, h2, h3, h4, p, ul, ol, dl, figure, blockquote, pre) {
   margin-block-start: 0;
 }
 
@@ -217,12 +294,26 @@
   text-wrap: balance;
 }
 
-:where(.vbg-report) :where(h1, h2, h3, h4, .vbg-display, .vbg-title, .vbg-heading-24, .vbg-heading-20, .vbg-heading-16) strong {
+:where(.vbg-report)
+  :where(
+    h1,
+    h2,
+    h3,
+    h4,
+    .vbg-display,
+    .vbg-title,
+    .vbg-heading-24,
+    .vbg-heading-20,
+    .vbg-heading-16
+  )
+  strong {
   color: inherit;
   font-weight: inherit;
 }
 
-:where(.vbg-report) :where(p, li, dd, blockquote, figcaption, .vbg-summary, .vbg-lede) strong {
+:where(.vbg-report)
+  :where(p, li, dd, blockquote, figcaption, .vbg-summary, .vbg-lede)
+  strong {
   color: var(--vbg-gray-1000);
   font-weight: var(--vbg-weight-medium);
 }
@@ -297,7 +388,10 @@
   margin-block-start: var(--vbg-flow-tight);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow, .vbg-list) li > :where(p, ul, ol) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow, .vbg-list)
+  li
+  > :where(p, ul, ol) {
   margin-block-end: 0;
 }
 
@@ -305,7 +399,10 @@
   margin-block-start: var(--vbg-flow-tight);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow, .vbg-list) li > :where(ul, ol) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow, .vbg-list)
+  li
+  > :where(ul, ol) {
   margin-block-start: var(--vbg-flow-tight);
 }
 
@@ -386,7 +483,8 @@
   color: var(--vbg-text-primary);
 }
 
-:where(.vbg-report) :where(a, button, input, select, textarea, summary):focus-visible {
+:where(.vbg-report)
+  :where(a, button, input, select, textarea, summary):focus-visible {
   outline: 2px solid var(--vbg-focus);
   outline-offset: 3px;
 }
@@ -413,13 +511,14 @@
 }
 
 /* Formula semantics always remain wrap-safe, including additive authored classes. */
-.vbg-report :is(
-  .vbg-formula,
-  [data-vbg-formula],
-  [data-formula],
-  [class*="vbg-" i][class*="formula" i],
-  [class*="vbg-" i][class*="equation" i]
-) {
+.vbg-report
+  :is(
+    .vbg-formula,
+    [data-vbg-formula],
+    [data-formula],
+    [class*="vbg-" i][class*="formula" i],
+    [class*="vbg-" i][class*="equation" i]
+  ) {
   min-inline-size: 0;
   overflow-wrap: anywhere;
   word-break: normal;
@@ -496,7 +595,10 @@
   margin-block-start: var(--vbg-flow-copy);
 }
 
-:where(.vbg-report) .vbg-header > .vbg-context + :where(h1, .vbg-title, .vbg-display) {
+:where(.vbg-report)
+  .vbg-header
+  > .vbg-context
+  + :where(h1, .vbg-title, .vbg-display) {
   margin-block-start: var(--vbg-space-3);
 }
 
@@ -514,18 +616,25 @@
 }
 
 @supports selector(.vbg-masthead:has(> .vbg-identity)) {
-  :where(.vbg-report) .vbg-masthead:has(> .vbg-identity):has(> .vbg-document-meta) > .vbg-identity {
+  :where(.vbg-report)
+    .vbg-masthead:has(> .vbg-identity):has(> .vbg-document-meta)
+    > .vbg-identity {
     grid-column: 1;
     grid-row: 1;
   }
 
-  :where(.vbg-report) .vbg-masthead:has(> .vbg-identity):has(> .vbg-document-meta) > .vbg-document-meta {
+  :where(.vbg-report)
+    .vbg-masthead:has(> .vbg-identity):has(> .vbg-document-meta)
+    > .vbg-document-meta {
     grid-column: 2;
     grid-row: 1;
   }
 }
 
-:where(.vbg-report) .vbg-header > .vbg-masthead + :where(h1, .vbg-title, .vbg-display) {
+:where(.vbg-report)
+  .vbg-header
+  > .vbg-masthead
+  + :where(h1, .vbg-title, .vbg-display) {
   margin-block-start: clamp(32px, 4vw, 48px);
 }
 
@@ -594,19 +703,22 @@
   line-height: var(--vbg-leading-compact);
 }
 
-:where(.vbg-report) :where(
-  .vbg-masthead,
-  .vbg-identity,
-  .vbg-document-meta,
-  .vbg-recipient,
-  .vbg-state,
-  .vbg-date,
-  .vbg-confidentiality
-) > * {
+:where(.vbg-report)
+  :where(
+    .vbg-masthead,
+    .vbg-identity,
+    .vbg-document-meta,
+    .vbg-recipient,
+    .vbg-state,
+    .vbg-date,
+    .vbg-confidentiality
+  )
+  > * {
   margin-block: 0;
 }
 
-:where(.vbg-report) :where(.vbg-recipient, .vbg-state, .vbg-date, .vbg-confidentiality) {
+:where(.vbg-report)
+  :where(.vbg-recipient, .vbg-state, .vbg-date, .vbg-confidentiality) {
   overflow-wrap: anywhere;
 }
 
@@ -628,7 +740,9 @@
 }
 
 /* Semantic wrappers keep their editorial leading when prose uses child elements. */
-:where(.vbg-report) :is(.vbg-summary, .vbg-lede) > :where(p, ul, ol, blockquote),
+:where(.vbg-report)
+  :is(.vbg-summary, .vbg-lede)
+  > :where(p, ul, ol, blockquote),
 :where(.vbg-report) :is(.vbg-summary, .vbg-lede) > :where(ul, ol) > li {
   font-size: inherit;
   line-height: inherit;
@@ -639,34 +753,39 @@
 }
 
 /* Intrinsic content may scroll locally, but published layout primitives must not widen the page. */
-:where(.vbg-report) :where(
-  .vbg-flow,
-  .vbg-grid,
-  .vbg-split,
-  .vbg-calculator,
-  .vbg-calculator-layout,
-  .vbg-table-wrap,
-  .vbg-chart,
-  .vbg-chart-viewport
-) {
+:where(.vbg-report)
+  :where(
+    .vbg-flow,
+    .vbg-grid,
+    .vbg-split,
+    .vbg-calculator,
+    .vbg-calculator-layout,
+    .vbg-table-wrap,
+    .vbg-chart,
+    .vbg-chart-viewport
+  ) {
   min-inline-size: 0;
   max-inline-size: 100%;
 }
 
-:where(.vbg-report) :where(
-  .vbg-flow,
-  .vbg-grid,
-  .vbg-split,
-  .vbg-calculator,
-  .vbg-calculator-layout
-) > * {
+:where(.vbg-report)
+  :where(
+    .vbg-flow,
+    .vbg-grid,
+    .vbg-split,
+    .vbg-calculator,
+    .vbg-calculator-layout
+  )
+  > * {
   min-inline-size: 0;
   max-inline-size: 100%;
 }
 
 /* Keep unwrapped narrative readable without narrowing tables, charts, or data regions. */
 :where(.vbg-report) .vbg-header > :where(p, ul, ol, dl, blockquote),
-:where(.vbg-report) .vbg-section > :where(h2, h3, h4, p, ul, ol, dl, blockquote),
+:where(.vbg-report)
+  .vbg-section
+  > :where(h2, h3, h4, p, ul, ol, dl, blockquote),
 :where(.vbg-report) .vbg-flow > :where(p, ul, ol, dl, blockquote) {
   max-width: var(--vbg-reading-width);
 }
@@ -679,32 +798,52 @@
   margin-block-start: var(--vbg-flow-copy);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow) > :where(h2):not(:first-child) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow)
+  > :where(h2):not(:first-child) {
   margin-block-start: var(--vbg-flow-section);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow) > :where(h3):not(:first-child) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow)
+  > :where(h3):not(:first-child) {
   margin-block-start: var(--vbg-space-8);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow) > :where(h4):not(:first-child) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow)
+  > :where(h4):not(:first-child) {
   margin-block-start: var(--vbg-flow-group);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow) > h1 + :where(p, ul, ol, dl, blockquote),
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow) > h2 + :where(p, ul, ol, dl, blockquote) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow)
+  > h1
+  + :where(p, ul, ol, dl, blockquote),
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow)
+  > h2
+  + :where(p, ul, ol, dl, blockquote) {
   margin-block-start: var(--vbg-flow-copy);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow) > h3 + :where(p, ul, ol, dl, blockquote) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow)
+  > h3
+  + :where(p, ul, ol, dl, blockquote) {
   margin-block-start: var(--vbg-space-3);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow) > h4 + :where(p, ul, ol, dl, blockquote) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow)
+  > h4
+  + :where(p, ul, ol, dl, blockquote) {
   margin-block-start: var(--vbg-flow-tight);
 }
 
-:where(.vbg-report) :where(.vbg-reading, .vbg-flow) > :where(figure, pre, .vbg-table-wrap, .vbg-figure, .vbg-chart) {
+:where(.vbg-report)
+  :where(.vbg-reading, .vbg-flow)
+  > :where(figure, pre, .vbg-table-wrap, .vbg-figure, .vbg-chart) {
   margin-block: var(--vbg-flow-group) var(--vbg-space-8);
 }
 
@@ -713,28 +852,48 @@
   gap: var(--vbg-flow-copy);
 }
 
-:where(.vbg-report) .vbg-stack[data-gap="tight"] { gap: var(--vbg-flow-tight); }
-:where(.vbg-report) .vbg-stack[data-gap="group"] { gap: var(--vbg-flow-group); }
-:where(.vbg-report) .vbg-stack[data-gap="section"] { gap: var(--vbg-flow-section); }
+:where(.vbg-report) .vbg-stack[data-gap="tight"] {
+  gap: var(--vbg-flow-tight);
+}
+:where(.vbg-report) .vbg-stack[data-gap="group"] {
+  gap: var(--vbg-flow-group);
+}
+:where(.vbg-report) .vbg-stack[data-gap="section"] {
+  gap: var(--vbg-flow-section);
+}
 
 :where(.vbg-report) .vbg-stack > * {
   min-width: 0;
   margin-block: 0;
 }
 
-:where(.vbg-report) :where(
-  .vbg-header,
-  .vbg-grid,
-  .vbg-metrics,
-  .vbg-comparison,
-  .vbg-metric,
-  .vbg-calculator,
-  .vbg-field
-) > :where(h1, h2, h3, h4, p, ul, ol, dl, figure, blockquote, pre) {
+:where(.vbg-report)
+  :where(
+    .vbg-header,
+    .vbg-grid,
+    .vbg-metrics,
+    .vbg-comparison,
+    .vbg-metric,
+    .vbg-calculator,
+    .vbg-field
+  )
+  > :where(h1, h2, h3, h4, p, ul, ol, dl, figure, blockquote, pre) {
   margin-block: 0;
 }
 
-:where(.vbg-report) :where(.vbg-section, .vbg-surface, .vbg-callout, .vbg-note, .vbg-decision, .vbg-recommendation, .vbg-next-step, .vbg-band, .vbg-footer) > :last-child {
+:where(.vbg-report)
+  :where(
+    .vbg-section,
+    .vbg-surface,
+    .vbg-callout,
+    .vbg-note,
+    .vbg-decision,
+    .vbg-recommendation,
+    .vbg-next-step,
+    .vbg-band,
+    .vbg-footer
+  )
+  > :last-child {
   margin-block-end: 0;
 }
 
@@ -751,7 +910,9 @@
   margin-block: 0;
 }
 
-:where(.vbg-report) .vbg-section > :where(h2, h3, h4, p, ul, ol, dl, blockquote, .vbg-reading) {
+:where(.vbg-report)
+  .vbg-section
+  > :where(h2, h3, h4, p, ul, ol, dl, blockquote, .vbg-reading) {
   grid-column: 1 / span 7;
 }
 
@@ -767,22 +928,27 @@
 /* A split section introduction aligns the first text baselines rather than
  * merely aligning unlike heading and paragraph boxes at their top edges. */
 @supports selector(.vbg-section:has(> h2.vbg-span-6 + p.vbg-span-6)) {
-  :where(.vbg-report) .vbg-section.vbg-grid:has(> h2.vbg-span-6 + p.vbg-span-6)
+  :where(.vbg-report)
+    .vbg-section.vbg-grid:has(> h2.vbg-span-6 + p.vbg-span-6)
     > :where(h2.vbg-span-6, p.vbg-span-6) {
     align-self: baseline;
   }
 }
 
 /* Plain narrative lists need readable item rhythm even without a flow wrapper. */
-:where(.vbg-report) .vbg-section > :where(ul, ol):not(
-  .vbg-legend,
-  .vbg-list-compact,
-  [role="listbox"],
-  [role="menu"],
-  [role="menubar"],
-  [role="navigation"],
-  [role="tablist"]
-) > li + li {
+:where(.vbg-report)
+  .vbg-section
+  > :where(ul, ol):not(
+    .vbg-legend,
+    .vbg-list-compact,
+    [role="listbox"],
+    [role="menu"],
+    [role="menubar"],
+    [role="navigation"],
+    [role="tablist"]
+  )
+  > li
+  + li {
   margin-block-start: var(--vbg-flow-tight);
 }
 
@@ -807,24 +973,26 @@
   margin-block-start: var(--vbg-flow-tight);
 }
 
-:where(.vbg-report) .vbg-section > :where(
-  figure,
-  pre,
-  .vbg-action,
-  .vbg-decision,
-  .vbg-recommendation,
-  .vbg-next-step,
-  .vbg-band,
-  .vbg-evidence,
-  .vbg-table-wrap,
-  .vbg-figure,
-  .vbg-chart,
-  .vbg-calculator,
-  .vbg-metrics,
-  .vbg-stat-strip,
-  .vbg-comparison,
-  .vbg-result-group
-) {
+:where(.vbg-report)
+  .vbg-section
+  > :where(
+    figure,
+    pre,
+    .vbg-action,
+    .vbg-decision,
+    .vbg-recommendation,
+    .vbg-next-step,
+    .vbg-band,
+    .vbg-evidence,
+    .vbg-table-wrap,
+    .vbg-figure,
+    .vbg-chart,
+    .vbg-calculator,
+    .vbg-metrics,
+    .vbg-stat-strip,
+    .vbg-comparison,
+    .vbg-result-group
+  ) {
   margin-block-start: var(--vbg-flow-group);
 }
 
@@ -857,27 +1025,30 @@
 /* A complete evidence component followed by narrative is a semantic boundary
  * only when its direct parent does not already own rhythm or placement. Keep
  * this after chapter resets so responsive peer stacking cannot erase the gap. */
-.vbg-report :is(
-  .vbg-section:not(.vbg-grid):not(.vbg-stack):not(.vbg-flow),
-  .vbg-chapter:not(.vbg-reading):not(.vbg-flow):not(.vbg-stack)
-) > :where(
-  figure,
-  pre,
-  .vbg-action,
-  .vbg-decision,
-  .vbg-recommendation,
-  .vbg-next-step,
-  .vbg-band,
-  .vbg-evidence,
-  .vbg-table-wrap,
-  .vbg-figure,
-  .vbg-chart,
-  .vbg-calculator,
-  .vbg-metrics,
-  .vbg-stat-strip,
-  .vbg-comparison,
-  .vbg-result-group
-) + :is(.vbg-reading, .vbg-flow, h2, h3) {
+.vbg-report
+  :is(
+    .vbg-section:not(.vbg-grid):not(.vbg-stack):not(.vbg-flow),
+    .vbg-chapter:not(.vbg-reading):not(.vbg-flow):not(.vbg-stack)
+  )
+  > :where(
+    figure,
+    pre,
+    .vbg-action,
+    .vbg-decision,
+    .vbg-recommendation,
+    .vbg-next-step,
+    .vbg-band,
+    .vbg-evidence,
+    .vbg-table-wrap,
+    .vbg-figure,
+    .vbg-chart,
+    .vbg-calculator,
+    .vbg-metrics,
+    .vbg-stat-strip,
+    .vbg-comparison,
+    .vbg-result-group
+  )
+  + :is(.vbg-reading, .vbg-flow, h2, h3) {
   margin-block-start: var(--vbg-space-8);
 }
 
@@ -906,40 +1077,46 @@
   padding: clamp(32px, 5vw, 56px) clamp(24px, 4vw, 48px);
 }
 
-:where(.vbg-report) .vbg-band[data-tone="contrast"] :where(
-  h1,
-  h2,
-  h3,
-  h4,
-  .vbg-display,
-  .vbg-title,
-  .vbg-heading-24,
-  .vbg-heading-20,
-  .vbg-heading-16,
-  .vbg-lede,
-  .vbg-summary,
-  .vbg-stat-value,
-  .vbg-metric-value,
-  .vbg-identity,
-  strong
-) {
+:where(.vbg-report)
+  .vbg-band[data-tone="contrast"]
+  :where(
+    h1,
+    h2,
+    h3,
+    h4,
+    .vbg-display,
+    .vbg-title,
+    .vbg-heading-24,
+    .vbg-heading-20,
+    .vbg-heading-16,
+    .vbg-lede,
+    .vbg-summary,
+    .vbg-stat-value,
+    .vbg-metric-value,
+    .vbg-identity,
+    strong
+  ) {
   color: var(--vbg-text-on-contrast);
 }
 
-:where(.vbg-report) .vbg-band[data-tone="contrast"] :where(
-  .vbg-context,
-  .vbg-label,
-  .vbg-meta,
-  .vbg-helper,
-  .vbg-metric-detail,
-  .vbg-lede,
-  .vbg-summary,
-  figcaption
-) {
+:where(.vbg-report)
+  .vbg-band[data-tone="contrast"]
+  :where(
+    .vbg-context,
+    .vbg-label,
+    .vbg-meta,
+    .vbg-helper,
+    .vbg-metric-detail,
+    .vbg-lede,
+    .vbg-summary,
+    figcaption
+  ) {
   color: var(--vbg-text-on-contrast-secondary);
 }
 
-:where(.vbg-report) .vbg-band[data-tone="contrast"] :where(.vbg-action, .vbg-decision, .vbg-stat-strip) {
+:where(.vbg-report)
+  .vbg-band[data-tone="contrast"]
+  :where(.vbg-action, .vbg-decision, .vbg-stat-strip) {
   border-color: var(--vbg-border-on-contrast);
 }
 
@@ -956,24 +1133,32 @@
   color: var(--vbg-text-on-contrast);
 }
 
-:where(.vbg-report) .vbg-band[data-tone="contrast"] :where(button, .vbg-button) {
+:where(.vbg-report)
+  .vbg-band[data-tone="contrast"]
+  :where(button, .vbg-button) {
   border-color: var(--vbg-border-on-contrast);
   background: transparent;
   color: var(--vbg-text-on-contrast);
 }
 
-:where(.vbg-report) .vbg-band[data-tone="contrast"] :where(button, .vbg-button)[data-variant="primary"] {
+:where(.vbg-report)
+  .vbg-band[data-tone="contrast"]
+  :where(button, .vbg-button)[data-variant="primary"] {
   border-color: var(--vbg-text-on-contrast);
   background: var(--vbg-text-on-contrast);
   color: var(--vbg-surface-contrast);
 }
 
-:where(.vbg-report) .vbg-band[data-tone="contrast"] :where(button, .vbg-button):hover {
+:where(.vbg-report)
+  .vbg-band[data-tone="contrast"]
+  :where(button, .vbg-button):hover {
   border-color: var(--vbg-text-on-contrast-secondary);
   background: var(--vbg-border-on-contrast);
 }
 
-:where(.vbg-report) .vbg-band[data-tone="contrast"] :where(button, .vbg-button)[data-variant="primary"]:hover {
+:where(.vbg-report)
+  .vbg-band[data-tone="contrast"]
+  :where(button, .vbg-button)[data-variant="primary"]:hover {
   border-color: var(--vbg-text-on-contrast);
   background: var(--vbg-gray-200);
   color: var(--vbg-gray-1000);
@@ -1065,22 +1250,20 @@
   grid-row: 2;
 }
 
-:where(.vbg-report) .vbg-opening :where(
-  .vbg-opening-claim,
-  .vbg-opening-proof,
-  .vbg-opening-context
-) > * {
+:where(.vbg-report)
+  .vbg-opening
+  :where(.vbg-opening-claim, .vbg-opening-proof, .vbg-opening-context)
+  > * {
   max-inline-size: 100%;
 }
 
 /* The opening grid owns space between its regions; child margins own only
  * rhythm within a region. This prevents the last heading or paragraph margin
  * from being added to the grid gap. */
-:where(.vbg-report) .vbg-opening :where(
-  .vbg-opening-claim,
-  .vbg-opening-proof,
-  .vbg-opening-context
-) > :last-child {
+:where(.vbg-report)
+  .vbg-opening
+  :where(.vbg-opening-claim, .vbg-opening-proof, .vbg-opening-context)
+  > :last-child {
   margin-block-end: 0;
 }
 
@@ -1098,7 +1281,10 @@
  */
 @media (min-width: 801px) {
   @supports not (grid-template-rows: subgrid) {
-    :where(.vbg-report) .vbg-comparison[data-align="rows"] > .vbg-stack:has(> :nth-child(2):last-child) > :first-child {
+    :where(.vbg-report)
+      .vbg-comparison[data-align="rows"]
+      > .vbg-stack:has(> :nth-child(2):last-child)
+      > :first-child {
       min-block-size: calc(2 * var(--vbg-leading-subsection));
     }
   }
@@ -1108,7 +1294,9 @@
       row-gap: var(--vbg-flow-copy);
     }
 
-    :where(.vbg-report) .vbg-comparison[data-align="rows"] > .vbg-stack:has(> :nth-child(2):last-child) {
+    :where(.vbg-report)
+      .vbg-comparison[data-align="rows"]
+      > .vbg-stack:has(> :nth-child(2):last-child) {
       grid-row: span 2;
       grid-template-rows: subgrid;
       row-gap: var(--vbg-flow-copy);
@@ -1180,7 +1368,10 @@
   background: var(--vbg-text-secondary);
 }
 
-:where(.vbg-report) .vbg-bar-list:has(> .vbg-bar[data-role="primary"]) > .vbg-bar:not([data-role="primary"]) .vbg-bar-fill {
+:where(.vbg-report)
+  .vbg-bar-list:has(> .vbg-bar[data-role="primary"])
+  > .vbg-bar:not([data-role="primary"])
+  .vbg-bar-fill {
   background: var(--vbg-text-secondary);
 }
 
@@ -1188,12 +1379,24 @@
   background: var(--vbg-text-primary);
 }
 
-:where(.vbg-report) .vbg-span-4 { grid-column: span 4; }
-:where(.vbg-report) .vbg-span-5 { grid-column: span 5; }
-:where(.vbg-report) .vbg-span-6 { grid-column: span 6; }
-:where(.vbg-report) .vbg-span-7 { grid-column: span 7; }
-:where(.vbg-report) .vbg-span-8 { grid-column: span 8; }
-:where(.vbg-report) .vbg-span-12 { grid-column: 1 / -1; }
+:where(.vbg-report) .vbg-span-4 {
+  grid-column: span 4;
+}
+:where(.vbg-report) .vbg-span-5 {
+  grid-column: span 5;
+}
+:where(.vbg-report) .vbg-span-6 {
+  grid-column: span 6;
+}
+:where(.vbg-report) .vbg-span-7 {
+  grid-column: span 7;
+}
+:where(.vbg-report) .vbg-span-8 {
+  grid-column: span 8;
+}
+:where(.vbg-report) .vbg-span-12 {
+  grid-column: 1 / -1;
+}
 
 /* Explicit full-span table ownership must survive page-owned grid placement. */
 :where(.vbg-report) .vbg-table-wrap.vbg-span-12 {
@@ -1234,10 +1437,11 @@
 }
 
 /* Containment is opt-in. Use it only when a region has a real boundary. */
-:where(.vbg-report) :where(
-  .vbg-surface[data-variant="contained"],
-  .vbg-surface[data-contained="true"]
-) {
+:where(.vbg-report)
+  :where(
+    .vbg-surface[data-variant="contained"],
+    .vbg-surface[data-contained="true"]
+  ) {
   border: 1px solid var(--vbg-border-subtle);
   border-radius: var(--vbg-radius);
   background: var(--vbg-surface-primary);
@@ -1276,7 +1480,9 @@
   padding-block: 0;
 }
 
-:where(.vbg-report) :where(.vbg-action, .vbg-decision, .vbg-recommendation) > :where(p, ul, ol) {
+:where(.vbg-report)
+  :where(.vbg-action, .vbg-decision, .vbg-recommendation)
+  > :where(p, ul, ol) {
   max-inline-size: var(--vbg-reading-width);
 }
 
@@ -1290,7 +1496,10 @@
 }
 
 @supports selector(.vbg-decision:has(> .vbg-table-wrap:last-child)) {
-  :where(.vbg-report) :where(.vbg-decision, .vbg-recommendation):has(> :where(.vbg-stat-strip, .vbg-table-wrap):last-child) {
+  :where(.vbg-report)
+    :where(.vbg-decision, .vbg-recommendation):has(
+      > :where(.vbg-stat-strip, .vbg-table-wrap):last-child
+    ) {
     border-bottom: 0;
   }
 }
@@ -1301,11 +1510,15 @@
 }
 
 @supports selector(.vbg-next-step:has(> :nth-child(2):last-child)) {
-  :where(.vbg-report) .vbg-next-step:has(> :nth-child(2):last-child) > :first-child {
+  :where(.vbg-report)
+    .vbg-next-step:has(> :nth-child(2):last-child)
+    > :first-child {
     grid-column: 1;
   }
 
-  :where(.vbg-report) .vbg-next-step:has(> :nth-child(2):last-child) > :nth-child(2) {
+  :where(.vbg-report)
+    .vbg-next-step:has(> :nth-child(2):last-child)
+    > :nth-child(2) {
     grid-column: 2;
   }
 }
@@ -1336,11 +1549,9 @@
 }
 
 /* A sole peer group has no sibling topology to preserve, so it owns its grid. */
-:where(.vbg-report) .vbg-grid > :is(
-  .vbg-stat-strip,
-  .vbg-metrics,
-  .vbg-result-group
-):only-child {
+:where(.vbg-report)
+  .vbg-grid
+  > :is(.vbg-stat-strip, .vbg-metrics, .vbg-result-group):only-child {
   grid-column: 1 / -1 !important;
 }
 
@@ -1357,20 +1568,15 @@
   margin-block: 0;
 }
 
-:where(.vbg-report) :is(
-  .vbg-stat-label,
-  .vbg-stat > .vbg-label:first-child
-) {
+:where(.vbg-report) :is(.vbg-stat-label, .vbg-stat > .vbg-label:first-child) {
   color: var(--vbg-text-secondary);
   font-size: var(--vbg-type-compact);
   font-weight: var(--vbg-weight-regular);
   line-height: var(--vbg-leading-compact);
 }
 
-:where(.vbg-report) :is(
-  .vbg-stat-value,
-  .vbg-stat > :is(strong, output):nth-child(2)
-) {
+:where(.vbg-report)
+  :is(.vbg-stat-value, .vbg-stat > :is(strong, output):nth-child(2)) {
   color: var(--vbg-text-primary);
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: var(--vbg-weight-heading);
@@ -1382,24 +1588,19 @@
   word-break: normal;
 }
 
-:where(.vbg-report) .vbg-stat[data-priority="primary"] :is(
-  .vbg-stat-value,
-  :is(strong, output):nth-child(2)
-) {
+:where(.vbg-report)
+  .vbg-stat[data-priority="primary"]
+  :is(.vbg-stat-value, :is(strong, output):nth-child(2)) {
   font-size: clamp(2rem, 4vw, 2.5rem);
 }
 
-:where(.vbg-report) .vbg-stat[data-priority="supporting"] :is(
-  .vbg-stat-value,
-  :is(strong, output):nth-child(2)
-) {
+:where(.vbg-report)
+  .vbg-stat[data-priority="supporting"]
+  :is(.vbg-stat-value, :is(strong, output):nth-child(2)) {
   font-size: clamp(1.25rem, 2vw, 1.5rem);
 }
 
-:where(.vbg-report) :is(
-  .vbg-stat-detail,
-  .vbg-stat > .vbg-meta
-) {
+:where(.vbg-report) :is(.vbg-stat-detail, .vbg-stat > .vbg-meta) {
   color: var(--vbg-text-secondary);
   font-size: var(--vbg-type-metadata);
   font-weight: var(--vbg-weight-regular);
@@ -1412,20 +1613,16 @@
   gap: var(--vbg-space-2);
 }
 
-:where(.vbg-report) :is(
-  .vbg-metric-label,
-  .vbg-metric > .vbg-label:first-child
-) {
+:where(.vbg-report)
+  :is(.vbg-metric-label, .vbg-metric > .vbg-label:first-child) {
   color: var(--vbg-text-secondary);
   font-size: var(--vbg-type-compact);
   font-weight: var(--vbg-weight-regular);
   line-height: var(--vbg-leading-compact);
 }
 
-:where(.vbg-report) :is(
-  .vbg-metric-value,
-  .vbg-metric > :is(strong, output):nth-child(2)
-) {
+:where(.vbg-report)
+  :is(.vbg-metric-value, .vbg-metric > :is(strong, output):nth-child(2)) {
   color: var(--vbg-text-primary);
   font-size: clamp(1.5rem, 3vw, 2rem);
   font-weight: var(--vbg-weight-heading);
@@ -1437,10 +1634,7 @@
   word-break: normal;
 }
 
-:where(.vbg-report) :is(
-  .vbg-metric-detail,
-  .vbg-metric > .vbg-meta
-) {
+:where(.vbg-report) :is(.vbg-metric-detail, .vbg-metric > .vbg-meta) {
   color: var(--vbg-text-secondary);
   font-size: 0.875rem;
   line-height: var(--vbg-leading-compact);
@@ -1458,29 +1652,46 @@
   padding: 0;
 }
 
-:where(.vbg-report) :where(
-  .vbg-callout[data-variant="contained"],
-  .vbg-callout[data-contained="true"],
-  .vbg-callout[data-tone="info"],
-  .vbg-callout[data-tone="success"],
-  .vbg-callout[data-tone="warning"],
-  .vbg-callout[data-tone="error"]
-) {
+:where(.vbg-report)
+  :where(
+    .vbg-callout[data-variant="contained"],
+    .vbg-callout[data-contained="true"],
+    .vbg-callout[data-tone="info"],
+    .vbg-callout[data-tone="success"],
+    .vbg-callout[data-tone="warning"],
+    .vbg-callout[data-tone="error"]
+  ) {
   border: 0;
   border-radius: var(--vbg-radius);
   background: var(--vbg-background-200);
   padding: var(--vbg-space-5);
 }
 
-:where(.vbg-report) .vbg-callout[data-tone="info"] { background: var(--vbg-blue-100); }
-:where(.vbg-report) .vbg-callout[data-tone="success"] { background: var(--vbg-green-100); }
-:where(.vbg-report) .vbg-callout[data-tone="warning"] { background: var(--vbg-amber-100); }
-:where(.vbg-report) .vbg-callout[data-tone="error"] { background: var(--vbg-red-100); }
+:where(.vbg-report) .vbg-callout[data-tone="info"] {
+  background: var(--vbg-blue-100);
+}
+:where(.vbg-report) .vbg-callout[data-tone="success"] {
+  background: var(--vbg-green-100);
+}
+:where(.vbg-report) .vbg-callout[data-tone="warning"] {
+  background: var(--vbg-amber-100);
+}
+:where(.vbg-report) .vbg-callout[data-tone="error"] {
+  background: var(--vbg-red-100);
+}
 
-:where(.vbg-report) .vbg-note[data-tone="info"] { border-color: var(--vbg-color-info); }
-:where(.vbg-report) .vbg-note[data-tone="success"] { border-color: var(--vbg-color-success); }
-:where(.vbg-report) .vbg-note[data-tone="warning"] { border-color: var(--vbg-color-warning); }
-:where(.vbg-report) .vbg-note[data-tone="error"] { border-color: var(--vbg-color-error); }
+:where(.vbg-report) .vbg-note[data-tone="info"] {
+  border-color: var(--vbg-color-info);
+}
+:where(.vbg-report) .vbg-note[data-tone="success"] {
+  border-color: var(--vbg-color-success);
+}
+:where(.vbg-report) .vbg-note[data-tone="warning"] {
+  border-color: var(--vbg-color-warning);
+}
+:where(.vbg-report) .vbg-note[data-tone="error"] {
+  border-color: var(--vbg-color-error);
+}
 
 :where(.vbg-report) .vbg-table-wrap {
   position: relative;
@@ -1532,12 +1743,85 @@
 
 /* Full-width evidence is resilient when a shell-level reading wrapper is used by mistake. */
 @supports (width: 1cqi) {
-  :where(.vbg-report) .vbg-shell > :where(.vbg-reading, .vbg-section.vbg-reading) > :is(.vbg-table-wrap, .vbg-chart, .vbg-figure, .vbg-evidence, .vbg-comparison, .vbg-calculator, .vbg-result-group),
-  :where(.vbg-report) .vbg-shell > .vbg-section > .vbg-reading > :is(.vbg-table-wrap, .vbg-chart, .vbg-figure, .vbg-evidence, .vbg-comparison, .vbg-calculator, .vbg-result-group),
-  :where(.vbg-report) .vbg-shell > main > :where(.vbg-reading, .vbg-section.vbg-reading) > :is(.vbg-table-wrap, .vbg-chart, .vbg-figure, .vbg-evidence, .vbg-comparison, .vbg-calculator, .vbg-result-group),
-  :where(.vbg-report) .vbg-shell > main > .vbg-section > .vbg-reading > :is(.vbg-table-wrap, .vbg-chart, .vbg-figure, .vbg-evidence, .vbg-comparison, .vbg-calculator, .vbg-result-group),
-  :where(.vbg-report) .vbg-shell > .vbg-section > :where(.vbg-reading, .vbg-flow) > :is(.vbg-table-wrap, .vbg-chart, .vbg-figure, .vbg-evidence, .vbg-comparison, .vbg-calculator, .vbg-result-group),
-  :where(.vbg-report) .vbg-shell > main > .vbg-section > :where(.vbg-reading, .vbg-flow) > :is(.vbg-table-wrap, .vbg-chart, .vbg-figure, .vbg-evidence, .vbg-comparison, .vbg-calculator, .vbg-result-group) {
+  :where(.vbg-report)
+    .vbg-shell
+    > :where(.vbg-reading, .vbg-section.vbg-reading)
+    > :is(
+      .vbg-table-wrap,
+      .vbg-chart,
+      .vbg-figure,
+      .vbg-evidence,
+      .vbg-comparison,
+      .vbg-calculator,
+      .vbg-result-group
+    ),
+  :where(.vbg-report)
+    .vbg-shell
+    > .vbg-section
+    > .vbg-reading
+    > :is(
+      .vbg-table-wrap,
+      .vbg-chart,
+      .vbg-figure,
+      .vbg-evidence,
+      .vbg-comparison,
+      .vbg-calculator,
+      .vbg-result-group
+    ),
+  :where(.vbg-report)
+    .vbg-shell
+    > main
+    > :where(.vbg-reading, .vbg-section.vbg-reading)
+    > :is(
+      .vbg-table-wrap,
+      .vbg-chart,
+      .vbg-figure,
+      .vbg-evidence,
+      .vbg-comparison,
+      .vbg-calculator,
+      .vbg-result-group
+    ),
+  :where(.vbg-report)
+    .vbg-shell
+    > main
+    > .vbg-section
+    > .vbg-reading
+    > :is(
+      .vbg-table-wrap,
+      .vbg-chart,
+      .vbg-figure,
+      .vbg-evidence,
+      .vbg-comparison,
+      .vbg-calculator,
+      .vbg-result-group
+    ),
+  :where(.vbg-report)
+    .vbg-shell
+    > .vbg-section
+    > :where(.vbg-reading, .vbg-flow)
+    > :is(
+      .vbg-table-wrap,
+      .vbg-chart,
+      .vbg-figure,
+      .vbg-evidence,
+      .vbg-comparison,
+      .vbg-calculator,
+      .vbg-result-group
+    ),
+  :where(.vbg-report)
+    .vbg-shell
+    > main
+    > .vbg-section
+    > :where(.vbg-reading, .vbg-flow)
+    > :is(
+      .vbg-table-wrap,
+      .vbg-chart,
+      .vbg-figure,
+      .vbg-evidence,
+      .vbg-comparison,
+      .vbg-calculator,
+      .vbg-result-group
+    ) {
     width: 100cqi;
     max-width: 100cqi;
   }
@@ -1622,7 +1906,9 @@
   font-family: var(--vbg-font-mono);
 }
 
-:where(.vbg-report) .vbg-chart :is(.vbg-chart-direct-label, .vbg-chart-annotation, .vbg-chart-value) {
+:where(.vbg-report)
+  .vbg-chart
+  :is(.vbg-chart-direct-label, .vbg-chart-annotation, .vbg-chart-value) {
   font-size: 12px;
   line-height: 16px;
 }
@@ -1763,12 +2049,18 @@
 }
 
 /* Let long technical identifiers yield inside semantic ledger columns. */
-:where(.vbg-report) .vbg-table-wrap > table :is(th, td):not([data-align="numeric"]):not(.vbg-numeric) .vbg-mono:not(.vbg-numeric) {
+:where(.vbg-report)
+  .vbg-table-wrap
+  > table
+  :is(th, td):not([data-align="numeric"]):not(.vbg-numeric)
+  .vbg-mono:not(.vbg-numeric) {
   overflow-wrap: anywhere;
   word-break: normal;
 }
 
-:where(.vbg-report) tbody tr:last-child > :where(th, td) { border-bottom-color: var(--vbg-border-default); }
+:where(.vbg-report) tbody tr:last-child > :where(th, td) {
+  border-bottom-color: var(--vbg-border-default);
+}
 :where(.vbg-report) .vbg-numeric {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -1786,21 +2078,34 @@
   padding: 5px var(--vbg-space-2);
 }
 
-:where(.vbg-report) .vbg-table-wrap[data-variant="comparison"] tbody tr[data-recommended="true"],
-:where(.vbg-report) .vbg-table-wrap[data-variant="comparison"] :where(th, td)[data-recommended="true"],
+:where(.vbg-report)
+  .vbg-table-wrap[data-variant="comparison"]
+  tbody
+  tr[data-recommended="true"],
+:where(.vbg-report)
+  .vbg-table-wrap[data-variant="comparison"]
+  :where(th, td)[data-recommended="true"],
 :where(.vbg-report) :where(tr, th, td).vbg-table-emphasis {
   background: var(--vbg-background-200);
 }
 
-:where(.vbg-report) .vbg-table-wrap[data-variant="comparison"] tbody tr[data-recommended="true"] > :first-child {
+:where(.vbg-report)
+  .vbg-table-wrap[data-variant="comparison"]
+  tbody
+  tr[data-recommended="true"]
+  > :first-child {
   font-weight: var(--vbg-weight-medium);
 }
 
-:where(.vbg-report) .vbg-table-wrap[data-variant="comparison"] :where(th, td)[data-recommended="true"] {
+:where(.vbg-report)
+  .vbg-table-wrap[data-variant="comparison"]
+  :where(th, td)[data-recommended="true"] {
   box-shadow: none;
 }
 
-:where(.vbg-report) .vbg-table-wrap[data-sticky-first="true"] :where(th, td):first-child {
+:where(.vbg-report)
+  .vbg-table-wrap[data-sticky-first="true"]
+  :where(th, td):first-child {
   position: sticky;
   inset-inline-start: 0;
   z-index: 1;
@@ -1808,13 +2113,22 @@
   box-shadow: inset -1px 0 var(--vbg-border-subtle);
 }
 
-:where(.vbg-report) .vbg-table-wrap[data-sticky-first="true"] thead th:first-child {
+:where(.vbg-report)
+  .vbg-table-wrap[data-sticky-first="true"]
+  thead
+  th:first-child {
   z-index: 2;
   background: var(--vbg-surface-secondary);
 }
 
-:where(.vbg-report) .vbg-table-wrap[data-sticky-first="true"][data-variant="comparison"] tbody tr[data-recommended="true"] > :first-child,
-:where(.vbg-report) .vbg-table-wrap[data-sticky-first="true"] :where(th, td):first-child.vbg-table-emphasis {
+:where(.vbg-report)
+  .vbg-table-wrap[data-sticky-first="true"][data-variant="comparison"]
+  tbody
+  tr[data-recommended="true"]
+  > :first-child,
+:where(.vbg-report)
+  .vbg-table-wrap[data-sticky-first="true"]
+  :where(th, td):first-child.vbg-table-emphasis {
   background: var(--vbg-background-200);
   box-shadow: inset -1px 0 var(--vbg-border-subtle);
 }
@@ -1845,69 +2159,122 @@
   background: var(--vbg-series-color, var(--vbg-chart-1));
 }
 
-:where(.vbg-report) .vbg-series-1 { --vbg-series-color: var(--vbg-chart-1); }
-:where(.vbg-report) .vbg-series-2 { --vbg-series-color: var(--vbg-chart-2); }
-:where(.vbg-report) .vbg-series-3 { --vbg-series-color: var(--vbg-chart-3); }
-:where(.vbg-report) .vbg-series-4 { --vbg-series-color: var(--vbg-chart-4); }
-:where(.vbg-report) .vbg-series-5 { --vbg-series-color: var(--vbg-chart-5); }
-:where(.vbg-report) .vbg-series-6 { --vbg-series-color: var(--vbg-chart-6); }
+:where(.vbg-report) .vbg-series-1 {
+  --vbg-series-color: var(--vbg-chart-1);
+}
+:where(.vbg-report) .vbg-series-2 {
+  --vbg-series-color: var(--vbg-chart-2);
+}
+:where(.vbg-report) .vbg-series-3 {
+  --vbg-series-color: var(--vbg-chart-3);
+}
+:where(.vbg-report) .vbg-series-4 {
+  --vbg-series-color: var(--vbg-chart-4);
+}
+:where(.vbg-report) .vbg-series-5 {
+  --vbg-series-color: var(--vbg-chart-5);
+}
+:where(.vbg-report) .vbg-series-6 {
+  --vbg-series-color: var(--vbg-chart-6);
+}
 
 /* Stroke patterns keep monochrome series distinguishable without color alone. */
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-stroke.vbg-series-2,
-  .vbg-series-2 .vbg-series-stroke
-) { stroke-dasharray: 8 4; }
+:where(.vbg-report)
+  .vbg-chart
+  :where(.vbg-series-stroke.vbg-series-2, .vbg-series-2 .vbg-series-stroke) {
+  stroke-dasharray: 8 4;
+}
 
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-stroke.vbg-series-3,
-  .vbg-series-3 .vbg-series-stroke
-) { stroke-dasharray: 3 3; }
+:where(.vbg-report)
+  .vbg-chart
+  :where(.vbg-series-stroke.vbg-series-3, .vbg-series-3 .vbg-series-stroke) {
+  stroke-dasharray: 3 3;
+}
 
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-stroke.vbg-series-4,
-  .vbg-series-4 .vbg-series-stroke
-) { stroke-dasharray: 10 3 2 3; }
+:where(.vbg-report)
+  .vbg-chart
+  :where(.vbg-series-stroke.vbg-series-4, .vbg-series-4 .vbg-series-stroke) {
+  stroke-dasharray: 10 3 2 3;
+}
 
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-stroke.vbg-series-5,
-  .vbg-series-5 .vbg-series-stroke
-) { stroke-dasharray: 1 4; }
+:where(.vbg-report)
+  .vbg-chart
+  :where(.vbg-series-stroke.vbg-series-5, .vbg-series-5 .vbg-series-stroke) {
+  stroke-dasharray: 1 4;
+}
 
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-stroke.vbg-series-6,
-  .vbg-series-6 .vbg-series-stroke
-) { stroke-dasharray: 12 4 3 4; }
+:where(.vbg-report)
+  .vbg-chart
+  :where(.vbg-series-stroke.vbg-series-6, .vbg-series-6 .vbg-series-stroke) {
+  stroke-dasharray: 12 4 3 4;
+}
 
 /* Narrative roles add emphasis without changing an assigned category color. */
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-primary:not(.vbg-series-1, .vbg-series-2, .vbg-series-3, .vbg-series-4, .vbg-series-5, .vbg-series-6),
-  [data-role="primary"]:not(.vbg-series-1, .vbg-series-2, .vbg-series-3, .vbg-series-4, .vbg-series-5, .vbg-series-6)
-) {
+:where(.vbg-report)
+  .vbg-chart
+  :where(
+    .vbg-series-primary:not(
+      .vbg-series-1,
+      .vbg-series-2,
+      .vbg-series-3,
+      .vbg-series-4,
+      .vbg-series-5,
+      .vbg-series-6
+    ),
+    [data-role="primary"]:not(
+      .vbg-series-1,
+      .vbg-series-2,
+      .vbg-series-3,
+      .vbg-series-4,
+      .vbg-series-5,
+      .vbg-series-6
+    )
+  ) {
   --vbg-series-color: var(--vbg-chart-1);
 }
 
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-stroke.vbg-series-primary,
-  .vbg-series-primary .vbg-series-stroke,
-  .vbg-series-stroke[data-role="primary"],
-  [data-role="primary"] .vbg-series-stroke
-) {
+:where(.vbg-report)
+  .vbg-chart
+  :where(
+    .vbg-series-stroke.vbg-series-primary,
+    .vbg-series-primary .vbg-series-stroke,
+    .vbg-series-stroke[data-role="primary"],
+    [data-role="primary"] .vbg-series-stroke
+  ) {
   stroke-width: 2.5;
 }
 
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-reference:not(.vbg-series-1, .vbg-series-2, .vbg-series-3, .vbg-series-4, .vbg-series-5, .vbg-series-6),
-  [data-role="reference"]:not(.vbg-series-1, .vbg-series-2, .vbg-series-3, .vbg-series-4, .vbg-series-5, .vbg-series-6)
-) {
+:where(.vbg-report)
+  .vbg-chart
+  :where(
+    .vbg-series-reference:not(
+      .vbg-series-1,
+      .vbg-series-2,
+      .vbg-series-3,
+      .vbg-series-4,
+      .vbg-series-5,
+      .vbg-series-6
+    ),
+    [data-role="reference"]:not(
+      .vbg-series-1,
+      .vbg-series-2,
+      .vbg-series-3,
+      .vbg-series-4,
+      .vbg-series-5,
+      .vbg-series-6
+    )
+  ) {
   --vbg-series-color: var(--vbg-gray-900);
 }
 
-:where(.vbg-report) .vbg-chart :where(
-  .vbg-series-stroke.vbg-series-reference,
-  .vbg-series-reference .vbg-series-stroke,
-  .vbg-series-stroke[data-role="reference"],
-  [data-role="reference"] .vbg-series-stroke
-) {
+:where(.vbg-report)
+  .vbg-chart
+  :where(
+    .vbg-series-stroke.vbg-series-reference,
+    .vbg-series-reference .vbg-series-stroke,
+    .vbg-series-stroke[data-role="reference"],
+    [data-role="reference"] .vbg-series-stroke
+  ) {
   stroke-dasharray: 4 4;
   stroke-width: 1.5;
 }
@@ -1925,7 +2292,8 @@
   background: var(--vbg-background-100);
   color: var(--vbg-gray-1000);
   padding: 7px var(--vbg-space-4);
-  font: var(--vbg-weight-medium) 0.875rem/var(--vbg-leading-compact) var(--vbg-font-sans);
+  font: var(--vbg-weight-medium) 0.875rem/var(--vbg-leading-compact)
+    var(--vbg-font-sans);
   text-align: center;
   text-decoration: none;
   overflow-wrap: break-word;
@@ -1933,7 +2301,9 @@
   white-space: normal;
   cursor: pointer;
   touch-action: manipulation;
-  transition: background-color 150ms ease, border-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
 }
 
 :where(.vbg-report) :where(button, .vbg-button) > :where(img, svg) {
@@ -1961,16 +2331,32 @@
  * an explicit runtime theme switch. Pin ordinary and secondary actions to the
  * forced theme so reset controls never become light text on a light surface.
  */
-.vbg-report.light-theme :is(button, .vbg-button):is(:not([data-variant]), [data-variant="secondary"]):not(.vbg-band[data-tone="contrast"] *),
-.vbg-report[data-theme="light"]:not(.light-theme):not(.dark-theme) :is(button, .vbg-button):is(:not([data-variant]), [data-variant="secondary"]):not(.vbg-band[data-tone="contrast"] *) {
+.vbg-report.light-theme
+  :is(button, .vbg-button):is(
+    :not([data-variant]),
+    [data-variant="secondary"]
+  ):not(.vbg-band[data-tone="contrast"] *),
+.vbg-report[data-theme="light"]:not(.light-theme):not(.dark-theme)
+  :is(button, .vbg-button):is(
+    :not([data-variant]),
+    [data-variant="secondary"]
+  ):not(.vbg-band[data-tone="contrast"] *) {
   border-color: oklch(0 0 0 / 0.08);
   background: #ffffff;
   color: #1f1f1f;
   transition-property: border-color;
 }
 
-.vbg-report.dark-theme :is(button, .vbg-button):is(:not([data-variant]), [data-variant="secondary"]):not(.vbg-band[data-tone="contrast"] *),
-.vbg-report[data-theme="dark"]:not(.light-theme):not(.dark-theme) :is(button, .vbg-button):is(:not([data-variant]), [data-variant="secondary"]):not(.vbg-band[data-tone="contrast"] *) {
+.vbg-report.dark-theme
+  :is(button, .vbg-button):is(
+    :not([data-variant]),
+    [data-variant="secondary"]
+  ):not(.vbg-band[data-tone="contrast"] *),
+.vbg-report[data-theme="dark"]:not(.light-theme):not(.dark-theme)
+  :is(button, .vbg-button):is(
+    :not([data-variant]),
+    [data-variant="secondary"]
+  ):not(.vbg-band[data-tone="contrast"] *) {
   border-color: oklch(1 0 0 / 0.14);
   background: #1f1f1f;
   color: #ededed;
@@ -1988,7 +2374,8 @@
  * Keep quiet actions legible through that runtime override path.
  */
 .vbg-report.dark-theme :is(button, .vbg-button)[data-variant="tertiary"],
-.vbg-report[data-theme="dark"]:not(.light-theme):not(.dark-theme) :is(button, .vbg-button)[data-variant="tertiary"] {
+.vbg-report[data-theme="dark"]:not(.light-theme):not(.dark-theme)
+  :is(button, .vbg-button)[data-variant="tertiary"] {
   color: #ededed;
 }
 
@@ -2006,27 +2393,29 @@
   background: var(--vbg-gray-800);
 }
 
-:where(.vbg-report) :where(
-  button[aria-pressed="true"],
-  .vbg-button[aria-pressed="true"],
-  button[data-selected="true"],
-  .vbg-button[data-selected="true"],
-  button[data-state="active"],
-  .vbg-button[data-state="active"]
-) {
+:where(.vbg-report)
+  :where(
+    button[aria-pressed="true"],
+    .vbg-button[aria-pressed="true"],
+    button[data-selected="true"],
+    .vbg-button[data-selected="true"],
+    button[data-state="active"],
+    .vbg-button[data-state="active"]
+  ) {
   border-color: var(--vbg-gray-1000);
   background: var(--vbg-gray-1000);
   color: var(--vbg-background-100);
 }
 
-:where(.vbg-report) :where(
-  button[aria-pressed="true"],
-  .vbg-button[aria-pressed="true"],
-  button[data-selected="true"],
-  .vbg-button[data-selected="true"],
-  button[data-state="active"],
-  .vbg-button[data-state="active"]
-):hover {
+:where(.vbg-report)
+  :where(
+    button[aria-pressed="true"],
+    .vbg-button[aria-pressed="true"],
+    button[data-selected="true"],
+    .vbg-button[data-selected="true"],
+    button[data-state="active"],
+    .vbg-button[data-state="active"]
+  ):hover {
   border-color: var(--vbg-gray-900);
   background: var(--vbg-gray-900);
 }
@@ -2035,27 +2424,54 @@
  * Explicit theme overrides have higher specificity than the generic selected
  * state. Pin selected tertiary controls to definite accessible color pairs.
  */
-.vbg-report.light-theme :is(button, .vbg-button)[data-variant="tertiary"]:is([aria-pressed="true"], [data-selected="true"], [data-state="active"]):not(:disabled):not([aria-disabled="true"]),
-.vbg-report[data-theme="light"]:not(.light-theme):not(.dark-theme) :is(button, .vbg-button)[data-variant="tertiary"]:is([aria-pressed="true"], [data-selected="true"], [data-state="active"]):not(:disabled):not([aria-disabled="true"]) {
+.vbg-report.light-theme
+  :is(button, .vbg-button)[data-variant="tertiary"]:is(
+    [aria-pressed="true"],
+    [data-selected="true"],
+    [data-state="active"]
+  ):not(:disabled):not([aria-disabled="true"]),
+.vbg-report[data-theme="light"]:not(.light-theme):not(.dark-theme)
+  :is(button, .vbg-button)[data-variant="tertiary"]:is(
+    [aria-pressed="true"],
+    [data-selected="true"],
+    [data-state="active"]
+  ):not(:disabled):not([aria-disabled="true"]) {
   border-color: #1f1f1f;
   background: #1f1f1f;
   color: #ffffff;
 }
 
-.vbg-report.dark-theme :is(button, .vbg-button)[data-variant="tertiary"]:is([aria-pressed="true"], [data-selected="true"], [data-state="active"]):not(:disabled):not([aria-disabled="true"]),
-.vbg-report[data-theme="dark"]:not(.light-theme):not(.dark-theme) :is(button, .vbg-button)[data-variant="tertiary"]:is([aria-pressed="true"], [data-selected="true"], [data-state="active"]):not(:disabled):not([aria-disabled="true"]) {
+.vbg-report.dark-theme
+  :is(button, .vbg-button)[data-variant="tertiary"]:is(
+    [aria-pressed="true"],
+    [data-selected="true"],
+    [data-state="active"]
+  ):not(:disabled):not([aria-disabled="true"]),
+.vbg-report[data-theme="dark"]:not(.light-theme):not(.dark-theme)
+  :is(button, .vbg-button)[data-variant="tertiary"]:is(
+    [aria-pressed="true"],
+    [data-selected="true"],
+    [data-state="active"]
+  ):not(:disabled):not([aria-disabled="true"]) {
   border-color: #ededed;
   background: #ededed;
   color: #1f1f1f;
 }
 
-.vbg-report .vbg-band[data-tone="contrast"] :is(button, .vbg-button)[data-variant="tertiary"]:is([aria-pressed="true"], [data-selected="true"], [data-state="active"]):not(:disabled):not([aria-disabled="true"]) {
+.vbg-report
+  .vbg-band[data-tone="contrast"]
+  :is(button, .vbg-button)[data-variant="tertiary"]:is(
+    [aria-pressed="true"],
+    [data-selected="true"],
+    [data-state="active"]
+  ):not(:disabled):not([aria-disabled="true"]) {
   border-color: #ededed;
   background: #ededed;
   color: #1f1f1f;
 }
 
-:where(.vbg-report) :where(button, .vbg-button):where(:disabled, [aria-disabled="true"]) {
+:where(.vbg-report)
+  :where(button, .vbg-button):where(:disabled, [aria-disabled="true"]) {
   border-color: var(--vbg-gray-alpha-400);
   background: var(--vbg-gray-100);
   color: var(--vbg-gray-700);
@@ -2063,7 +2479,11 @@
   opacity: 1;
 }
 
-:where(.vbg-report) :where(button, .vbg-button)[data-variant="tertiary"]:where(:disabled, [aria-disabled="true"]) {
+:where(.vbg-report)
+  :where(button, .vbg-button)[data-variant="tertiary"]:where(
+    :disabled,
+    [aria-disabled="true"]
+  ) {
   border-color: transparent;
   background: transparent;
   color: var(--vbg-gray-700);
@@ -2083,7 +2503,12 @@
   margin-block: 0;
 }
 
-:where(.vbg-report) :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+:where(.vbg-report)
+  :where(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea
+  ) {
   width: 100%;
   min-height: var(--vbg-control-height);
   border: 1px solid var(--vbg-border-default);
@@ -2094,28 +2519,43 @@
   font: var(--vbg-weight-regular) 0.875rem/1.4 var(--vbg-font-sans);
 }
 
-:where(.vbg-report) :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea):hover {
+:where(.vbg-report)
+  :where(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea
+  ):hover {
   border-color: var(--vbg-border-strong);
 }
 
-:where(.vbg-report) :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea):disabled {
+:where(.vbg-report)
+  :where(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea
+  ):disabled {
   cursor: not-allowed;
   background: var(--vbg-background-200);
   color: var(--vbg-text-secondary);
   opacity: 0.7;
 }
 
-:where(.vbg-report) :where(
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"])[aria-invalid="true"],
-  select[aria-invalid="true"],
-  textarea[aria-invalid="true"],
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):user-invalid,
-  select:user-invalid,
-  textarea:user-invalid,
-  .vbg-field[data-invalid="true"] input,
-  .vbg-field[data-invalid="true"] select,
-  .vbg-field[data-invalid="true"] textarea
-) {
+:where(.vbg-report)
+  :where(
+    input:not([type="checkbox"]):not([type="radio"]):not(
+        [type="range"]
+      )[aria-invalid="true"],
+    select[aria-invalid="true"],
+    textarea[aria-invalid="true"],
+    input:not([type="checkbox"]):not([type="radio"]):not(
+        [type="range"]
+      ):user-invalid,
+    select:user-invalid,
+    textarea:user-invalid,
+    .vbg-field[data-invalid="true"] input,
+    .vbg-field[data-invalid="true"] select,
+    .vbg-field[data-invalid="true"] textarea
+  ) {
   border-color: var(--vbg-color-error);
 }
 
@@ -2213,10 +2653,11 @@
   padding: 0;
 }
 
-:where(.vbg-report) :where(
-  .vbg-calculator[data-variant="contained"],
-  .vbg-calculator[data-contained="true"]
-) {
+:where(.vbg-report)
+  :where(
+    .vbg-calculator[data-variant="contained"],
+    .vbg-calculator[data-contained="true"]
+  ) {
   border: 1px solid var(--vbg-border-subtle);
   border-radius: var(--vbg-radius);
   padding: var(--vbg-space-6);
@@ -2230,18 +2671,29 @@
 }
 
 @supports selector(.vbg-calculator:has(> .vbg-calculator-inputs)) {
-  :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) {
+  :where(.vbg-report)
+    :where(.vbg-calculator, .vbg-calculator-layout):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden])) {
     grid-template-columns: minmax(0, 5fr) minmax(260px, 4fr);
     grid-template-areas: "inputs output";
     gap: var(--vbg-space-8);
     align-items: stretch;
   }
 
-  :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-inputs {
+  :where(.vbg-report)
+    :where(.vbg-calculator, .vbg-calculator-layout):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))
+    > .vbg-calculator-inputs {
     grid-area: inputs;
   }
 
-  :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-output {
+  :where(.vbg-report)
+    :where(.vbg-calculator, .vbg-calculator-layout):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))
+    > .vbg-calculator-output {
     grid-area: output;
   }
 
@@ -2250,7 +2702,10 @@
    * first on narrow screens while desktop places one control column beside one
    * continuous result column. The generated grid line is the only divider.
    */
-  :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) {
+  :where(.vbg-report)
+    .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden])) {
     grid-template-columns: minmax(0, 5fr) 1px minmax(260px, 4fr);
     grid-template-rows: auto minmax(0, 1fr);
     grid-template-areas:
@@ -2261,26 +2716,41 @@
     align-items: start;
   }
 
-  :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden]))::before {
+  :where(.vbg-report)
+    .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))::before {
     content: "";
     grid-area: divider;
     align-self: stretch;
     background: var(--vbg-border-subtle);
   }
 
-  :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-result[data-priority="primary"] {
+  :where(.vbg-report)
+    .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))
+    > .vbg-result[data-priority="primary"] {
     grid-area: primary;
     border-block-start: 0;
     padding-block-start: 0;
     padding-inline-start: var(--vbg-space-8);
   }
 
-  :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-inputs {
+  :where(.vbg-report)
+    .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))
+    > .vbg-calculator-inputs {
     grid-area: inputs;
     padding-inline-end: var(--vbg-space-8);
   }
 
-  :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-output {
+  :where(.vbg-report)
+    .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))
+    > .vbg-calculator-output {
     grid-area: output;
     border-inline-start: 0;
     padding-inline-start: var(--vbg-space-8);
@@ -2301,7 +2771,11 @@
 
 /* The output owns the split boundary instead of inheriting it from source order. */
 @supports selector(.vbg-calculator:has(> .vbg-calculator-inputs)) {
-  :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-output {
+  :where(.vbg-report)
+    :where(.vbg-calculator, .vbg-calculator-layout):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))
+    > .vbg-calculator-output {
     border-inline-start: 1px solid var(--vbg-border-subtle);
     padding-inline-start: var(--vbg-space-8);
   }
@@ -2345,7 +2819,9 @@
   outline-offset: 2px;
 }
 
-:where(.vbg-report) .vbg-unit-field > input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+:where(.vbg-report)
+  .vbg-unit-field
+  > input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
   min-width: 0;
   min-height: calc(var(--vbg-control-height) - 2px);
   border: 0;
@@ -2355,7 +2831,9 @@
   outline: 0;
 }
 
-:where(.vbg-report) .vbg-unit-field > :where(.vbg-unit-prefix, .vbg-unit-suffix, .vbg-unit) {
+:where(.vbg-report)
+  .vbg-unit-field
+  > :where(.vbg-unit-prefix, .vbg-unit-suffix, .vbg-unit) {
   flex: none;
   color: var(--vbg-text-secondary);
   padding-inline: var(--vbg-space-3);
@@ -2372,12 +2850,13 @@
   padding-inline-start: 0;
 }
 
-:where(.vbg-report) :where(
-  .vbg-unit-field[data-invalid="true"],
-  .vbg-unit-field:has(> [aria-invalid="true"]),
-  .vbg-unit-field:has(> :user-invalid),
-  .vbg-field[data-invalid="true"] .vbg-unit-field
-) {
+:where(.vbg-report)
+  :where(
+    .vbg-unit-field[data-invalid="true"],
+    .vbg-unit-field:has(> [aria-invalid="true"]),
+    .vbg-unit-field:has(> :user-invalid),
+    .vbg-field[data-invalid="true"] .vbg-unit-field
+  ) {
   border-color: var(--vbg-color-error);
 }
 
@@ -2401,7 +2880,8 @@
   display: none;
 }
 
-:where(.vbg-report) :where(.vbg-calculator, .vbg-field, .vbg-result, .vbg-calculator > *) {
+:where(.vbg-report)
+  :where(.vbg-calculator, .vbg-field, .vbg-result, .vbg-calculator > *) {
   min-width: 0;
 }
 
@@ -2419,25 +2899,23 @@
   padding-block-start: 0;
 }
 
-:where(.vbg-report) .vbg-calculator-output > .vbg-result:nth-child(1 of .vbg-result) {
+:where(.vbg-report)
+  .vbg-calculator-output
+  > .vbg-result:nth-child(1 of .vbg-result) {
   border-top: 0;
   padding-block-start: 0;
 }
 
-:where(.vbg-report) :is(
-  .vbg-result-label,
-  .vbg-result > .vbg-label:first-child
-) {
+:where(.vbg-report)
+  :is(.vbg-result-label, .vbg-result > .vbg-label:first-child) {
   margin: 0;
   color: var(--vbg-text-secondary);
   font-size: var(--vbg-type-label);
   line-height: var(--vbg-leading-caption);
 }
 
-:where(.vbg-report) :is(
-  .vbg-result-value,
-  .vbg-result > :is(strong, output):nth-child(2)
-) {
+:where(.vbg-report)
+  :is(.vbg-result-value, .vbg-result > :is(strong, output):nth-child(2)) {
   margin: 0;
   color: var(--vbg-text-primary);
   font-size: clamp(1.5rem, 3vw, 2rem);
@@ -2450,22 +2928,28 @@
   word-break: normal;
 }
 
-:where(.vbg-report) :where(.vbg-metric, .vbg-result)[data-priority="supporting"] :is(
-  .vbg-metric-value,
-  .vbg-result-value,
-  :is(strong, output):nth-child(2)
-),
-:where(.vbg-report) :where(.vbg-metric-value, .vbg-result-value)[data-priority="supporting"] {
+:where(.vbg-report)
+  :where(.vbg-metric, .vbg-result)[data-priority="supporting"]
+  :is(.vbg-metric-value, .vbg-result-value, :is(strong, output):nth-child(2)),
+:where(.vbg-report)
+  :where(.vbg-metric-value, .vbg-result-value)[data-priority="supporting"] {
   font-size: clamp(1.25rem, 2vw, 1.5rem);
 }
 
-:where(.vbg-report) :where(.vbg-stat, .vbg-metric, .vbg-result)[data-priority="primary"] :is(
-  .vbg-stat-value,
-  .vbg-metric-value,
-  .vbg-result-value,
-  :is(strong, output):nth-child(2)
-),
-:where(.vbg-report) :where(.vbg-stat-value, .vbg-metric-value, .vbg-result-value)[data-priority="primary"],
+:where(.vbg-report)
+  :where(.vbg-stat, .vbg-metric, .vbg-result)[data-priority="primary"]
+  :is(
+    .vbg-stat-value,
+    .vbg-metric-value,
+    .vbg-result-value,
+    :is(strong, output):nth-child(2)
+  ),
+:where(.vbg-report)
+  :where(
+    .vbg-stat-value,
+    .vbg-metric-value,
+    .vbg-result-value
+  )[data-priority="primary"],
 :where(.vbg-report) .vbg-value-primary {
   color: var(--vbg-text-primary);
   font-size: clamp(2rem, 4vw, 2.5rem);
@@ -2479,61 +2963,85 @@
 }
 
 @supports (font-size: 1cqi) {
-  :where(.vbg-report) :where(.vbg-stat-strip, .vbg-metrics, .vbg-result-group, .vbg-stat, .vbg-metric, .vbg-result) {
+  :where(.vbg-report)
+    :where(
+      .vbg-stat-strip,
+      .vbg-metrics,
+      .vbg-result-group,
+      .vbg-stat,
+      .vbg-metric,
+      .vbg-result
+    ) {
     container-type: inline-size;
   }
 
-  :where(.vbg-report) :is(
-    .vbg-stat-value,
-    .vbg-metric-value,
-    .vbg-result-value,
-    .vbg-stat > :is(strong, output):nth-child(2),
-    .vbg-metric > :is(strong, output):nth-child(2),
-    .vbg-result > :is(strong, output):nth-child(2)
-  ) {
+  :where(.vbg-report)
+    :is(
+      .vbg-stat-value,
+      .vbg-metric-value,
+      .vbg-result-value,
+      .vbg-stat > :is(strong, output):nth-child(2),
+      .vbg-metric > :is(strong, output):nth-child(2),
+      .vbg-result > :is(strong, output):nth-child(2)
+    ) {
     font-size: clamp(1.25rem, 12cqi, 2rem);
   }
 
-  :where(.vbg-report) :where(.vbg-stat, .vbg-metric, .vbg-result)[data-priority="primary"] :is(
-    .vbg-stat-value,
-    .vbg-metric-value,
-    .vbg-result-value,
-    :is(strong, output):nth-child(2)
-  ),
-  :where(.vbg-report) :where(.vbg-stat-value, .vbg-metric-value, .vbg-result-value)[data-priority="primary"] {
+  :where(.vbg-report)
+    :where(.vbg-stat, .vbg-metric, .vbg-result)[data-priority="primary"]
+    :is(
+      .vbg-stat-value,
+      .vbg-metric-value,
+      .vbg-result-value,
+      :is(strong, output):nth-child(2)
+    ),
+  :where(.vbg-report)
+    :where(
+      .vbg-stat-value,
+      .vbg-metric-value,
+      .vbg-result-value
+    )[data-priority="primary"] {
     font-size: clamp(1.5rem, 14cqi, 2.5rem);
   }
 }
 
 /* Visual peers keep one value role; priority must be expressed outside the peer group. */
-:where(.vbg-report) :is(
-  .vbg-stat-strip > .vbg-stat,
-  .vbg-metrics > .vbg-metric,
-  .vbg-result-group > .vbg-result
-) :is(.vbg-stat-value, .vbg-metric-value, .vbg-result-value) {
+:where(.vbg-report)
+  :is(
+    .vbg-stat-strip > .vbg-stat,
+    .vbg-metrics > .vbg-metric,
+    .vbg-result-group > .vbg-result
+  )
+  :is(.vbg-stat-value, .vbg-metric-value, .vbg-result-value) {
   font-size: clamp(1.5rem, 3vw, 2rem);
 }
 
-:where(.vbg-report) :is(
-  .vbg-stat-strip > .vbg-stat,
-  .vbg-metrics > .vbg-metric,
-  .vbg-result-group > .vbg-result
-) > :is(strong, output):nth-child(2) {
+:where(.vbg-report)
+  :is(
+    .vbg-stat-strip > .vbg-stat,
+    .vbg-metrics > .vbg-metric,
+    .vbg-result-group > .vbg-result
+  )
+  > :is(strong, output):nth-child(2) {
   font-size: clamp(1.5rem, 3vw, 2rem);
 }
 
 /* Keep peer values responsive to their owned track, including narrow split proofs. */
 @supports (font-size: 1cqi) {
-  :where(.vbg-report) :is(
-    .vbg-stat-strip > .vbg-stat,
-    .vbg-metrics > .vbg-metric,
-    .vbg-result-group > .vbg-result
-  ) :is(.vbg-stat-value, .vbg-metric-value, .vbg-result-value),
-  :where(.vbg-report) :is(
-    .vbg-stat-strip > .vbg-stat,
-    .vbg-metrics > .vbg-metric,
-    .vbg-result-group > .vbg-result
-  ) > :is(strong, output):nth-child(2) {
+  :where(.vbg-report)
+    :is(
+      .vbg-stat-strip > .vbg-stat,
+      .vbg-metrics > .vbg-metric,
+      .vbg-result-group > .vbg-result
+    )
+    :is(.vbg-stat-value, .vbg-metric-value, .vbg-result-value),
+  :where(.vbg-report)
+    :is(
+      .vbg-stat-strip > .vbg-stat,
+      .vbg-metrics > .vbg-metric,
+      .vbg-result-group > .vbg-result
+    )
+    > :is(strong, output):nth-child(2) {
     font-size: clamp(1.25rem, 4cqi, 2rem);
   }
 }
@@ -2544,16 +3052,20 @@
  * dates, and units never break internally. Stacked mobile values remain atomic.
  */
 @media (min-width: 801px) {
-  :where(.vbg-report) :is(
-    .vbg-stat-strip > .vbg-stat,
-    .vbg-metrics > .vbg-metric,
-    .vbg-result-group > .vbg-result
-  ) :is(.vbg-stat-value, .vbg-metric-value, .vbg-result-value).vbg-numeric,
-  :where(.vbg-report) :is(
-    .vbg-stat-strip > .vbg-stat,
-    .vbg-metrics > .vbg-metric,
-    .vbg-result-group > .vbg-result
-  ) > :is(strong, output).vbg-numeric:nth-child(2) {
+  :where(.vbg-report)
+    :is(
+      .vbg-stat-strip > .vbg-stat,
+      .vbg-metrics > .vbg-metric,
+      .vbg-result-group > .vbg-result
+    )
+    :is(.vbg-stat-value, .vbg-metric-value, .vbg-result-value).vbg-numeric,
+  :where(.vbg-report)
+    :is(
+      .vbg-stat-strip > .vbg-stat,
+      .vbg-metrics > .vbg-metric,
+      .vbg-result-group > .vbg-result
+    )
+    > :is(strong, output).vbg-numeric:nth-child(2) {
     white-space: normal;
     overflow-wrap: normal;
     word-break: normal;
@@ -2561,10 +3073,7 @@
   }
 }
 
-:where(.vbg-report) :is(
-  .vbg-result-detail,
-  .vbg-result > .vbg-meta
-) {
+:where(.vbg-report) :is(.vbg-result-detail, .vbg-result > .vbg-meta) {
   margin: var(--vbg-space-1) 0 0;
   color: var(--vbg-text-secondary);
   font-size: var(--vbg-type-compact);
@@ -2586,7 +3095,13 @@
 /* Three equal peers stay one row on wide layouts and one deliberate stack on narrow layouts. */
 @media (min-width: 801px) {
   @supports selector(.vbg-stat-strip:has(> :nth-child(3):last-child)) {
-    :where(.vbg-report) :is(.vbg-stat-strip, .vbg-metrics, .vbg-comparison, .vbg-result-group):has(> :nth-child(3):last-child) {
+    :where(.vbg-report)
+      :is(
+        .vbg-stat-strip,
+        .vbg-metrics,
+        .vbg-comparison,
+        .vbg-result-group
+      ):has(> :nth-child(3):last-child) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
@@ -2594,7 +3109,13 @@
 
 @media (max-width: 800px) {
   @supports selector(.vbg-stat-strip:has(> :nth-child(3):last-child)) {
-    :where(.vbg-report) :is(.vbg-stat-strip, .vbg-metrics, .vbg-comparison, .vbg-result-group):has(> :nth-child(3):last-child) {
+    :where(.vbg-report)
+      :is(
+        .vbg-stat-strip,
+        .vbg-metrics,
+        .vbg-comparison,
+        .vbg-result-group
+      ):has(> :nth-child(3):last-child) {
       grid-template-columns: minmax(0, 1fr);
     }
   }
@@ -2611,11 +3132,18 @@
  * two compact lines for labels in engines without subgrid support.
  */
 @supports not (grid-template-rows: subgrid) {
-  :where(.vbg-report) :is(
-    .vbg-stat-strip > .vbg-stat > :is(.vbg-stat-label, .vbg-label):first-child,
-    .vbg-metrics > .vbg-metric > :is(.vbg-metric-label, .vbg-label):first-child,
-    .vbg-result-group > .vbg-result > :is(.vbg-result-label, .vbg-label):first-child
-  ) {
+  :where(.vbg-report)
+    :is(
+      .vbg-stat-strip
+        > .vbg-stat
+        > :is(.vbg-stat-label, .vbg-label):first-child,
+      .vbg-metrics
+        > .vbg-metric
+        > :is(.vbg-metric-label, .vbg-label):first-child,
+      .vbg-result-group
+        > .vbg-result
+        > :is(.vbg-result-label, .vbg-label):first-child
+    ) {
     min-block-size: calc(2 * var(--vbg-leading-compact));
   }
 }
@@ -2625,28 +3153,32 @@
     row-gap: var(--vbg-space-2);
   }
 
-  :where(.vbg-report) :is(
-    .vbg-stat-strip > .vbg-stat,
-    .vbg-metrics > .vbg-metric,
-    .vbg-result-group > .vbg-result
-  ) {
+  :where(.vbg-report)
+    :is(
+      .vbg-stat-strip > .vbg-stat,
+      .vbg-metrics > .vbg-metric,
+      .vbg-result-group > .vbg-result
+    ) {
     grid-row: span 3;
     grid-template-rows: subgrid;
     row-gap: var(--vbg-space-2);
     container-type: normal;
   }
 
-  :where(.vbg-report) :is(
-    .vbg-stat-strip > .vbg-stat,
-    .vbg-metrics > .vbg-metric,
-    .vbg-result-group > .vbg-result
-  ):not(:last-child) {
+  :where(.vbg-report)
+    :is(
+      .vbg-stat-strip > .vbg-stat,
+      .vbg-metrics > .vbg-metric,
+      .vbg-result-group > .vbg-result
+    ):not(:last-child) {
     margin-block-end: calc(var(--vbg-space-8) - var(--vbg-space-2));
   }
 }
 
 /* Frame a flat evidence or table region with a parent .vbg-surface; do not combine the classes on one node. */
-:where(.vbg-report) :where(.vbg-surface, .vbg-evidence, .vbg-calculator) :is(.vbg-surface, .vbg-evidence, .vbg-calculator, .vbg-table-wrap) {
+:where(.vbg-report)
+  :where(.vbg-surface, .vbg-evidence, .vbg-calculator)
+  :is(.vbg-surface, .vbg-evidence, .vbg-calculator, .vbg-table-wrap) {
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -2683,7 +3215,9 @@
 }
 
 @supports selector(.vbg-footer:has(> :nth-child(2):last-child)) {
-  :where(.vbg-report) .vbg-footer:has(> .vbg-logo:first-child):has(> :nth-child(2):last-child) > :nth-child(2) {
+  :where(.vbg-report)
+    .vbg-footer:has(> .vbg-logo:first-child):has(> :nth-child(2):last-child)
+    > :nth-child(2) {
     grid-column: 8 / -1;
     justify-self: end;
     text-align: end;
@@ -2694,7 +3228,10 @@
   background-color: var(--vbg-background-100);
 }
 
-:where(.vbg-report) textarea { min-height: 96px; resize: vertical; }
+:where(.vbg-report) textarea {
+  min-height: 96px;
+  resize: vertical;
+}
 
 :where(.vbg-report) details {
   border-top: 1px solid var(--vbg-border-subtle);
@@ -2726,7 +3263,14 @@
   background: var(--vbg-gray-1000, #000000);
   color: var(--vbg-background-100, #ffffff);
   padding: var(--vbg-space-2, 8px) var(--vbg-space-3, 12px);
-  font-family: var(--vbg-font-sans, "Geist", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-family: var(
+    --vbg-font-sans,
+    "Geist",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif
+  );
   font-size: 0.875rem;
   font-weight: var(--vbg-weight-medium, 500);
   line-height: 1.25rem;
@@ -2744,7 +3288,8 @@
 
 @supports selector(.vbg-stat-strip:has(> .vbg-stat)) {
   @media (min-width: 801px) and (max-width: 900px) {
-    :where(.vbg-report) .vbg-stat-strip:has(> .vbg-stat:nth-child(4):last-child) {
+    :where(.vbg-report)
+      .vbg-stat-strip:has(> .vbg-stat:nth-child(4):last-child) {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
@@ -2776,16 +3321,21 @@
   }
 
   :where(.vbg-report) .vbg-header > :where(.vbg-summary, .vbg-lede),
-  :where(.vbg-report) .vbg-section > :where(h2, h3, h4, p, ul, ol, dl, blockquote, .vbg-reading) {
+  :where(.vbg-report)
+    .vbg-section
+    > :where(h2, h3, h4, p, ul, ol, dl, blockquote, .vbg-reading) {
     grid-column: 1 / span 4;
   }
 
-  :where(.vbg-report) :where(.vbg-span-6, .vbg-span-7, .vbg-span-8, .vbg-span-12) {
+  :where(.vbg-report)
+    :where(.vbg-span-6, .vbg-span-7, .vbg-span-8, .vbg-span-12) {
     grid-column: 1 / -1;
   }
 
   @supports selector(.vbg-footer:has(> :nth-child(2):last-child)) {
-    :where(.vbg-report) .vbg-footer:has(> .vbg-logo:first-child):has(> :nth-child(2):last-child) > :nth-child(2) {
+    :where(.vbg-report)
+      .vbg-footer:has(> .vbg-logo:first-child):has(> :nth-child(2):last-child)
+      > :nth-child(2) {
       grid-column: 4 / -1;
     }
   }
@@ -2807,8 +3357,12 @@
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  :where(.vbg-report) .vbg-header > :where(h1, .vbg-title, .vbg-display, .vbg-summary, .vbg-lede),
-  :where(.vbg-report) .vbg-section > :where(h2, h3, h4, p, ul, ol, dl, blockquote, .vbg-reading) {
+  :where(.vbg-report)
+    .vbg-header
+    > :where(h1, .vbg-title, .vbg-display, .vbg-summary, .vbg-lede),
+  :where(.vbg-report)
+    .vbg-section
+    > :where(h2, h3, h4, p, ul, ol, dl, blockquote, .vbg-reading) {
     grid-column: 1 / -1;
   }
 
@@ -2817,7 +3371,9 @@
   }
 
   @supports selector(.vbg-footer:has(> :nth-child(2):last-child)) {
-    :where(.vbg-report) .vbg-footer:has(> .vbg-logo:first-child):has(> :nth-child(2):last-child) > :nth-child(2) {
+    :where(.vbg-report)
+      .vbg-footer:has(> .vbg-logo:first-child):has(> :nth-child(2):last-child)
+      > :nth-child(2) {
       grid-column: 2 / -1;
     }
   }
@@ -2830,8 +3386,12 @@
 
   :where(.vbg-report) .vbg-shell {
     width: 100%;
-    padding-inline-start: calc(var(--vbg-space-4) + env(safe-area-inset-left, 0px));
-    padding-inline-end: calc(var(--vbg-space-4) + env(safe-area-inset-right, 0px));
+    padding-inline-start: calc(
+      var(--vbg-space-4) + env(safe-area-inset-left, 0px)
+    );
+    padding-inline-end: calc(
+      var(--vbg-space-4) + env(safe-area-inset-right, 0px)
+    );
     padding-block: var(--vbg-space-10);
   }
 
@@ -2878,8 +3438,12 @@
 
   /* Match the desktop :has() specificity so known regions truly stack. */
   @supports selector(.vbg-masthead:has(> .vbg-identity)) {
-    :where(.vbg-report) .vbg-masthead:has(> .vbg-identity):has(> .vbg-document-meta) > .vbg-identity,
-    :where(.vbg-report) .vbg-masthead:has(> .vbg-identity):has(> .vbg-document-meta) > .vbg-document-meta {
+    :where(.vbg-report)
+      .vbg-masthead:has(> .vbg-identity):has(> .vbg-document-meta)
+      > .vbg-identity,
+    :where(.vbg-report)
+      .vbg-masthead:has(> .vbg-identity):has(> .vbg-document-meta)
+      > .vbg-document-meta {
       grid-column: 1 / -1;
       grid-row: auto;
     }
@@ -2902,31 +3466,60 @@
   }
 
   @supports selector(.vbg-calculator:has(> .vbg-calculator-inputs)) {
-    :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) {
+    :where(.vbg-report)
+      :where(.vbg-calculator, .vbg-calculator-layout):has(
+        > .vbg-calculator-inputs:not([hidden])
+      ):has(> .vbg-calculator-output:not([hidden])) {
       grid-template-columns: minmax(0, 1fr);
       grid-template-areas: none;
       gap: var(--vbg-space-6);
     }
 
-    :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-inputs,
-    :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-output {
+    :where(.vbg-report)
+      :where(.vbg-calculator, .vbg-calculator-layout):has(
+        > .vbg-calculator-inputs:not([hidden])
+      ):has(> .vbg-calculator-output:not([hidden]))
+      > .vbg-calculator-inputs,
+    :where(.vbg-report)
+      :where(.vbg-calculator, .vbg-calculator-layout):has(
+        > .vbg-calculator-inputs:not([hidden])
+      ):has(> .vbg-calculator-output:not([hidden]))
+      > .vbg-calculator-output {
       grid-area: auto;
     }
 
-    :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden]))::before {
+    :where(.vbg-report)
+      .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+        > .vbg-calculator-inputs:not([hidden])
+      ):has(> .vbg-calculator-output:not([hidden]))::before {
       display: none;
     }
 
-    :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) {
+    :where(.vbg-report)
+      .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+        > .vbg-calculator-inputs:not([hidden])
+      ):has(> .vbg-calculator-output:not([hidden])) {
       grid-template-columns: minmax(0, 1fr);
       grid-template-rows: none;
       grid-template-areas: none;
       gap: var(--vbg-space-6);
     }
 
-    :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-result[data-priority="primary"],
-    :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-inputs,
-    :where(.vbg-report) .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-output {
+    :where(.vbg-report)
+      .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+        > .vbg-calculator-inputs:not([hidden])
+      ):has(> .vbg-calculator-output:not([hidden]))
+      > .vbg-result[data-priority="primary"],
+    :where(.vbg-report)
+      .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+        > .vbg-calculator-inputs:not([hidden])
+      ):has(> .vbg-calculator-output:not([hidden]))
+      > .vbg-calculator-inputs,
+    :where(.vbg-report)
+      .vbg-calculator:has(> .vbg-result[data-priority="primary"]):has(
+        > .vbg-calculator-inputs:not([hidden])
+      ):has(> .vbg-calculator-output:not([hidden]))
+      > .vbg-calculator-output {
       grid-area: auto;
       padding-inline: 0;
     }
@@ -2939,14 +3532,22 @@
     padding-inline-start: 0;
   }
 
-  :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-output:not(:first-child) {
+  :where(.vbg-report)
+    :where(.vbg-calculator, .vbg-calculator-layout):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))
+    > .vbg-calculator-output:not(:first-child) {
     border-block-start: 1px solid var(--vbg-border-subtle);
     border-inline-start: 0;
     padding-block-start: var(--vbg-space-6);
     padding-inline-start: 0;
   }
 
-  :where(.vbg-report) :where(.vbg-calculator, .vbg-calculator-layout):has(> .vbg-calculator-inputs:not([hidden])):has(> .vbg-calculator-output:not([hidden])) > .vbg-calculator-output:first-child:not(:last-child) {
+  :where(.vbg-report)
+    :where(.vbg-calculator, .vbg-calculator-layout):has(
+      > .vbg-calculator-inputs:not([hidden])
+    ):has(> .vbg-calculator-output:not([hidden]))
+    > .vbg-calculator-output:first-child:not(:last-child) {
     border-block-end: 1px solid var(--vbg-border-subtle);
     border-inline-start: 0;
     padding-block-end: var(--vbg-space-6);
@@ -2963,31 +3564,47 @@
 
   /* Match the desktop exact-pair placement when the grid collapses. */
   @supports selector(.vbg-next-step:has(> :nth-child(2):last-child)) {
-    :where(.vbg-report) .vbg-next-step:has(> :nth-child(2):last-child) > :first-child,
-    :where(.vbg-report) .vbg-next-step:has(> :nth-child(2):last-child) > :nth-child(2) {
+    :where(.vbg-report)
+      .vbg-next-step:has(> :nth-child(2):last-child)
+      > :first-child,
+    :where(.vbg-report)
+      .vbg-next-step:has(> :nth-child(2):last-child)
+      > :nth-child(2) {
       grid-column: 1 / -1;
       grid-row: auto;
     }
   }
 
-  :where(.vbg-report) :where(
-    .vbg-surface[data-variant="contained"],
-    .vbg-surface[data-contained="true"],
-    .vbg-calculator[data-variant="contained"],
-    .vbg-calculator[data-contained="true"]
-  ) {
+  :where(.vbg-report)
+    :where(
+      .vbg-surface[data-variant="contained"],
+      .vbg-surface[data-contained="true"],
+      .vbg-calculator[data-variant="contained"],
+      .vbg-calculator[data-contained="true"]
+    ) {
     padding: var(--vbg-space-4);
   }
 
-  :where(.vbg-report) .vbg-evidence { padding-block: 0; }
+  :where(.vbg-report) .vbg-evidence {
+    padding-block: 0;
+  }
 
-  :where(.vbg-report) :where(.vbg-surface, .vbg-evidence, .vbg-calculator) :is(.vbg-surface, .vbg-evidence, .vbg-calculator, .vbg-table-wrap) {
+  :where(.vbg-report)
+    :where(.vbg-surface, .vbg-evidence, .vbg-calculator)
+    :is(.vbg-surface, .vbg-evidence, .vbg-calculator, .vbg-table-wrap) {
     padding: 0;
   }
 
-  :where(.vbg-report) :where(button, .vbg-button) { min-height: var(--vbg-control-height-touch); }
+  :where(.vbg-report) :where(button, .vbg-button) {
+    min-height: var(--vbg-control-height-touch);
+  }
 
-  :where(.vbg-report) :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+  :where(.vbg-report)
+    :where(
+      input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+      select,
+      textarea
+    ) {
     min-height: var(--vbg-control-height-touch);
     font-size: 16px;
   }
@@ -2996,7 +3613,9 @@
     min-height: var(--vbg-control-height-touch);
   }
 
-  :where(.vbg-report) .vbg-unit-field > input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
+  :where(.vbg-report)
+    .vbg-unit-field
+    > input:not([type="checkbox"]):not([type="radio"]):not([type="range"]) {
     min-height: calc(var(--vbg-control-height-touch) - 2px);
   }
 
@@ -3008,12 +3627,17 @@
     display: block;
   }
 
-  :where(.vbg-report) .vbg-chart:not([data-mobile="scroll"]) :where(.vbg-chart-plot, .vbg-chart-viewport > svg) {
+  :where(.vbg-report)
+    .vbg-chart:not([data-mobile="scroll"])
+    :where(.vbg-chart-plot, .vbg-chart-viewport > svg) {
     min-width: 0 !important;
     max-width: 100%;
   }
 
-  :where(.vbg-report) .vbg-chart[data-mobile="scroll"] .vbg-chart-viewport > :where(svg, .vbg-chart-plot) {
+  :where(.vbg-report)
+    .vbg-chart[data-mobile="scroll"]
+    .vbg-chart-viewport
+    > :where(svg, .vbg-chart-plot) {
     min-width: var(--vbg-chart-min-width) !important;
     max-width: none;
   }
@@ -3023,52 +3647,99 @@
   }
 
   /* Preserve readable columns locally instead of compressing wide evidence into character-level labels. */
-  :where(.vbg-report) .vbg-table-wrap:is(
-    :not([data-mobile="stack"]),
-    [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-    [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-  ) > table:has(> thead > tr > :nth-child(5)) {
+  :where(.vbg-report)
+    .vbg-table-wrap:is(
+      :not([data-mobile="stack"]),
+      [data-mobile="stack"]:has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      ),
+      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+    )
+    > table:has(> thead > tr > :nth-child(5)) {
     min-inline-size: 40rem;
   }
 
-  :where(.vbg-report) .vbg-table-wrap:is(
-    :not([data-mobile="stack"]),
-    [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-    [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-  ) > table:has(> thead > tr > :nth-child(7)) {
+  :where(.vbg-report)
+    .vbg-table-wrap:is(
+      :not([data-mobile="stack"]),
+      [data-mobile="stack"]:has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      ),
+      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+    )
+    > table:has(> thead > tr > :nth-child(7)) {
     min-inline-size: 52rem;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    ) {
     overflow: visible;
     border: 0;
   }
 
   /* A successfully stacked table no longer scrolls, so an adjacent cue is stale. */
-  :where(.vbg-report) .vbg-overflow-cue:has(
-    + .vbg-table-wrap[data-mobile="stack"]
-  ):not(:has(
-    + .vbg-table-wrap[data-mobile="stack"] :where(tbody, tfoot) td:not([data-label]),
-    + .vbg-table-wrap[data-mobile="stack"] :where(tbody, tfoot) td[data-label=""]
-  )):not(:has(
-    + .vbg-table-wrap[data-mobile="stack"] tbody > tr:nth-child(6)
-  )),
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) + .vbg-overflow-cue {
+  :where(.vbg-report)
+    .vbg-overflow-cue:has(+ .vbg-table-wrap[data-mobile="stack"]):not(
+      :has(
+        + .vbg-table-wrap[data-mobile="stack"]
+          :where(tbody, tfoot)
+          td:not([data-label]),
+        + .vbg-table-wrap[data-mobile="stack"]
+          :where(tbody, tfoot)
+          td[data-label=""]
+      )
+    ):not(:has(+ .vbg-table-wrap[data-mobile="stack"] tbody > tr:nth-child(6))),
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    + .vbg-overflow-cue {
     display: none;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) :where(table, tbody, tfoot, tr, th, td) {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    :where(table, tbody, tfoot, tr, th, td) {
     display: block;
     width: 100%;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) caption {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    caption {
     display: block;
     width: 100%;
     box-sizing: border-box;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) thead {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    thead {
     display: block !important;
     position: absolute !important;
     width: 1px !important;
@@ -3078,32 +3749,83 @@
     white-space: nowrap !important;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) :where(tbody, tfoot) tr {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    :where(tbody, tfoot)
+    tr {
     border-block: 1px solid var(--vbg-border-subtle);
     padding: var(--vbg-space-4) 0;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) :where(tbody, tfoot) tr + tr {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    :where(tbody, tfoot)
+    tr
+    + tr {
     margin-block-start: -1px;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) tfoot tr {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    tfoot
+    tr {
     margin-block-start: -1px;
     border-block-color: var(--vbg-border-strong);
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"][data-variant="comparison"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) tbody tr[data-recommended="true"] {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"][data-variant="comparison"]:not(
+      :has(tbody > tr:nth-child(6))
+    ):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    tbody
+    tr[data-recommended="true"] {
     border-color: var(--vbg-border-strong);
     background: var(--vbg-background-200);
     padding-inline: var(--vbg-space-3);
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) :where(tbody, tfoot) th {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    :where(tbody, tfoot)
+    th {
     border: 0;
     padding: 0 0 var(--vbg-space-2);
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) :where(tbody, tfoot) td {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    :where(tbody, tfoot)
+    td {
     display: grid;
     grid-template-columns: minmax(100px, 0.8fr) minmax(0, 1fr);
     gap: var(--vbg-space-3);
@@ -3112,20 +3834,56 @@
     text-align: start;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) tfoot :where(th, td) {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    tfoot
+    :where(th, td) {
     font-weight: var(--vbg-weight-medium);
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"][data-sticky-first="true"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) :where(th, td):first-child {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"][data-sticky-first="true"]:not(
+      :has(tbody > tr:nth-child(6))
+    ):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    :where(th, td):first-child {
     position: static;
     box-shadow: none;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"][data-sticky-first="true"][data-variant="comparison"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) tbody tr[data-recommended="true"] > :first-child {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"][data-sticky-first="true"][data-variant="comparison"]:not(
+      :has(tbody > tr:nth-child(6))
+    ):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    tbody
+    tr[data-recommended="true"]
+    > :first-child {
     box-shadow: none;
   }
 
-  :where(.vbg-report) .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""])) :where(tbody, tfoot) td::before {
+  :where(.vbg-report)
+    .vbg-table-wrap[data-mobile="stack"]:not(:has(tbody > tr:nth-child(6))):not(
+      :has(
+        :where(tbody, tfoot) td:not([data-label]),
+        :where(tbody, tfoot) td[data-label=""]
+      )
+    )
+    :where(tbody, tfoot)
+    td::before {
     content: attr(data-label);
     color: var(--vbg-text-secondary);
     font-weight: var(--vbg-weight-regular);
@@ -3133,7 +3891,6 @@
     word-break: normal;
     white-space: normal;
   }
-
 }
 
 /*
@@ -3143,21 +3900,33 @@
  * tables remain unchanged.
  */
 @media (max-width: 640px) {
-  @supports selector(.vbg-table-wrap:has(> table > thead > tr > :nth-child(5))) {
-    :where(.vbg-report) .vbg-table-wrap:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(5)) {
+  @supports selector(
+    .vbg-table-wrap:has(> table > thead > tr > :nth-child(5))
+  ) {
+    :where(.vbg-report)
+      .vbg-table-wrap:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(5)) {
       overflow-x: auto;
       overscroll-behavior-inline: contain;
     }
 
-    :where(.vbg-report) .vbg-table-wrap:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(5)):not(.vbg-overflow-cue + .vbg-table-wrap)::before {
+    :where(.vbg-report)
+      .vbg-table-wrap:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(5)):not(
+        .vbg-overflow-cue + .vbg-table-wrap
+      )::before {
       content: "Scroll horizontally to see all columns.  \2192";
       position: sticky;
       inset-inline-start: 0;
@@ -3173,19 +3942,32 @@
       white-space: normal;
     }
 
-    :where(.vbg-report[dir="rtl"]) .vbg-table-wrap:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(5)):not(.vbg-overflow-cue + .vbg-table-wrap)::before {
+    :where(.vbg-report[dir="rtl"])
+      .vbg-table-wrap:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(5)):not(
+        .vbg-overflow-cue + .vbg-table-wrap
+      )::before {
       content: "Scroll horizontally to see all columns.  \2190";
     }
 
-    :where(.vbg-report) .vbg-table-wrap:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(5)) :is(thead, tbody, tfoot) > tr > :first-child {
+    :where(.vbg-report)
+      .vbg-table-wrap:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(5))
+      :is(thead, tbody, tfoot)
+      > tr
+      > :first-child {
       position: sticky;
       inset-inline-start: 0;
       z-index: 2;
@@ -3193,29 +3975,48 @@
       box-shadow: inset -1px 0 var(--vbg-border-subtle);
     }
 
-    :where(.vbg-report) .vbg-table-wrap:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(5)) thead > tr > :first-child {
+    :where(.vbg-report)
+      .vbg-table-wrap:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(5))
+      thead
+      > tr
+      > :first-child {
       z-index: 3;
       background: var(--vbg-surface-secondary);
     }
 
-    :where(.vbg-report) .vbg-table-wrap:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(5))[data-variant="comparison"] tbody tr[data-recommended="true"] > :first-child {
+    :where(.vbg-report)
+      .vbg-table-wrap:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(5))[data-variant="comparison"]
+      tbody
+      tr[data-recommended="true"]
+      > :first-child {
       background: var(--vbg-background-200);
     }
 
     /* Replace a trailing authored cue with the source-ordered fallback above. */
-    :where(.vbg-report) .vbg-table-wrap:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(5)) + .vbg-overflow-cue {
+    :where(.vbg-report)
+      .vbg-table-wrap:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(5))
+      + .vbg-overflow-cue {
       display: none;
     }
   }
@@ -3228,29 +4029,52 @@
  * while the shell is narrower than the 32rem evidence floor.
  */
 @container vbg-shell (width < 32rem) {
-  @supports selector(.vbg-table-wrap:has(> table > thead > tr > :nth-child(4))) {
-    :where(.vbg-report) .vbg-table-wrap[data-variant="comparison"]:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(4)):not(:has(> table > thead > tr > :nth-child(5))):not(:has(> table > thead [colspan])) {
+  @supports selector(
+    .vbg-table-wrap:has(> table > thead > tr > :nth-child(4))
+  ) {
+    :where(.vbg-report)
+      .vbg-table-wrap[data-variant="comparison"]:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(4)):not(
+        :has(> table > thead > tr > :nth-child(5))
+      ):not(:has(> table > thead [colspan])) {
       overflow-x: auto;
       overscroll-behavior-inline: contain;
     }
 
-    :where(.vbg-report) .vbg-table-wrap[data-variant="comparison"]:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(4)):not(:has(> table > thead > tr > :nth-child(5))):not(:has(> table > thead [colspan])) > table {
+    :where(.vbg-report)
+      .vbg-table-wrap[data-variant="comparison"]:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(4)):not(
+        :has(> table > thead > tr > :nth-child(5))
+      ):not(:has(> table > thead [colspan]))
+      > table {
       min-inline-size: 32rem;
     }
 
-    :where(.vbg-report) .vbg-table-wrap[data-variant="comparison"]:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(4)):not(:has(> table > thead > tr > :nth-child(5))):not(:has(> table > thead [colspan])):not(.vbg-overflow-cue + .vbg-table-wrap)::before {
+    :where(.vbg-report)
+      .vbg-table-wrap[data-variant="comparison"]:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(4)):not(
+        :has(> table > thead > tr > :nth-child(5))
+      ):not(:has(> table > thead [colspan])):not(
+        .vbg-overflow-cue + .vbg-table-wrap
+      )::before {
       content: "Scroll horizontally to see all columns.  \2192";
       position: sticky;
       inset-inline-start: 0;
@@ -3266,19 +4090,36 @@
       white-space: normal;
     }
 
-    :where(.vbg-report[dir="rtl"]) .vbg-table-wrap[data-variant="comparison"]:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(4)):not(:has(> table > thead > tr > :nth-child(5))):not(:has(> table > thead [colspan])):not(.vbg-overflow-cue + .vbg-table-wrap)::before {
+    :where(.vbg-report[dir="rtl"])
+      .vbg-table-wrap[data-variant="comparison"]:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(4)):not(
+        :has(> table > thead > tr > :nth-child(5))
+      ):not(:has(> table > thead [colspan])):not(
+        .vbg-overflow-cue + .vbg-table-wrap
+      )::before {
       content: "Scroll horizontally to see all columns.  \2190";
     }
 
-    :where(.vbg-report) .vbg-table-wrap[data-variant="comparison"]:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(4)):not(:has(> table > thead > tr > :nth-child(5))):not(:has(> table > thead [colspan])) :is(thead, tbody, tfoot) > tr > :first-child {
+    :where(.vbg-report)
+      .vbg-table-wrap[data-variant="comparison"]:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(4)):not(
+        :has(> table > thead > tr > :nth-child(5))
+      ):not(:has(> table > thead [colspan]))
+      :is(thead, tbody, tfoot)
+      > tr
+      > :first-child {
       position: sticky;
       inset-inline-start: 0;
       z-index: 2;
@@ -3286,28 +4127,53 @@
       box-shadow: inset -1px 0 var(--vbg-border-subtle);
     }
 
-    :where(.vbg-report) .vbg-table-wrap[data-variant="comparison"]:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(4)):not(:has(> table > thead > tr > :nth-child(5))):not(:has(> table > thead [colspan])) thead > tr > :first-child {
+    :where(.vbg-report)
+      .vbg-table-wrap[data-variant="comparison"]:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(4)):not(
+        :has(> table > thead > tr > :nth-child(5))
+      ):not(:has(> table > thead [colspan]))
+      thead
+      > tr
+      > :first-child {
       z-index: 3;
       background: var(--vbg-surface-secondary);
     }
 
-    :where(.vbg-report) .vbg-table-wrap[data-variant="comparison"]:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(4)):not(:has(> table > thead > tr > :nth-child(5))):not(:has(> table > thead [colspan])) tbody tr[data-recommended="true"] > :first-child {
+    :where(.vbg-report)
+      .vbg-table-wrap[data-variant="comparison"]:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(4)):not(
+        :has(> table > thead > tr > :nth-child(5))
+      ):not(:has(> table > thead [colspan]))
+      tbody
+      tr[data-recommended="true"]
+      > :first-child {
       background: var(--vbg-background-200);
     }
 
-    :where(.vbg-report) .vbg-table-wrap[data-variant="comparison"]:is(
-      :not([data-mobile="stack"]),
-      [data-mobile="stack"]:has(:where(tbody, tfoot) td:not([data-label]), :where(tbody, tfoot) td[data-label=""]),
-      [data-mobile="stack"]:has(tbody > tr:nth-child(6))
-    ):has(> table > thead > tr > :nth-child(4)):not(:has(> table > thead > tr > :nth-child(5))):not(:has(> table > thead [colspan])) + .vbg-overflow-cue {
+    :where(.vbg-report)
+      .vbg-table-wrap[data-variant="comparison"]:is(
+        :not([data-mobile="stack"]),
+        [data-mobile="stack"]:has(
+          :where(tbody, tfoot) td:not([data-label]),
+          :where(tbody, tfoot) td[data-label=""]
+        ),
+        [data-mobile="stack"]:has(tbody > tr:nth-child(6))
+      ):has(> table > thead > tr > :nth-child(4)):not(
+        :has(> table > thead > tr > :nth-child(5))
+      ):not(:has(> table > thead [colspan]))
+      + .vbg-overflow-cue {
       display: none;
     }
   }
@@ -3329,11 +4195,27 @@
 }
 
 @media (forced-colors: active) {
-  :where(.vbg-report) :where(.vbg-surface, .vbg-callout, .vbg-table-wrap, .vbg-calculator, .vbg-evidence, .vbg-action, .vbg-decision, .vbg-recommendation, .vbg-next-step, .vbg-band, .vbg-stat-strip, .vbg-unit-field) {
+  :where(.vbg-report)
+    :where(
+      .vbg-surface,
+      .vbg-callout,
+      .vbg-table-wrap,
+      .vbg-calculator,
+      .vbg-evidence,
+      .vbg-action,
+      .vbg-decision,
+      .vbg-recommendation,
+      .vbg-next-step,
+      .vbg-band,
+      .vbg-stat-strip,
+      .vbg-unit-field
+    ) {
     border: 1px solid CanvasText;
   }
 
-  :where(.vbg-report) :where(.vbg-surface, .vbg-evidence, .vbg-calculator) :is(.vbg-surface, .vbg-evidence, .vbg-calculator, .vbg-table-wrap) {
+  :where(.vbg-report)
+    :where(.vbg-surface, .vbg-evidence, .vbg-calculator)
+    :is(.vbg-surface, .vbg-evidence, .vbg-calculator, .vbg-table-wrap) {
     border: 0;
   }
 
@@ -3348,7 +4230,20 @@
     color: CanvasText;
   }
 
-  :where(.vbg-report) .vbg-band[data-tone="contrast"] :where(h1, h2, h3, h4, p, a, .vbg-link, .vbg-label, .vbg-meta, .vbg-stat-value) {
+  :where(.vbg-report)
+    .vbg-band[data-tone="contrast"]
+    :where(
+      h1,
+      h2,
+      h3,
+      h4,
+      p,
+      a,
+      .vbg-link,
+      .vbg-label,
+      .vbg-meta,
+      .vbg-stat-value
+    ) {
     color: CanvasText;
   }
 
@@ -3356,14 +4251,15 @@
     outline-color: Highlight;
   }
 
-  :where(.vbg-report) :where(
-    button[aria-pressed="true"],
-    .vbg-button[aria-pressed="true"],
-    button[data-selected="true"],
-    .vbg-button[data-selected="true"],
-    button[data-state="active"],
-    .vbg-button[data-state="active"]
-  ) {
+  :where(.vbg-report)
+    :where(
+      button[aria-pressed="true"],
+      .vbg-button[aria-pressed="true"],
+      button[data-selected="true"],
+      .vbg-button[data-selected="true"],
+      button[data-state="active"],
+      .vbg-button[data-state="active"]
+    ) {
     border-color: Highlight;
     background: Highlight;
     color: HighlightText;

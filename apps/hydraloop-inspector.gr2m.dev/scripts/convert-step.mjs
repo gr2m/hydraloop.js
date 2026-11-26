@@ -9,8 +9,17 @@ import fs from "node:fs";
 import path from "node:path";
 import occtImport from "occt-import-js";
 import { Document, NodeIO } from "@gltf-transform/core";
-import { EXTMeshoptCompression, KHRMeshQuantization } from "@gltf-transform/extensions";
-import { dedup, prune, weld, reorder, quantize } from "@gltf-transform/functions";
+import {
+  EXTMeshoptCompression,
+  KHRMeshQuantization,
+} from "@gltf-transform/extensions";
+import {
+  dedup,
+  prune,
+  weld,
+  reorder,
+  quantize,
+} from "@gltf-transform/functions";
 import { MeshoptEncoder } from "meshoptimizer";
 
 const input = process.argv[2] ?? "3d-models/H600 Standard - Collection 25.stp";
@@ -44,7 +53,10 @@ const UNNAMED = {
 };
 
 function parseName(raw) {
-  const name = (raw ?? "").replace(/\s+/g, " ").replace(/ M \rM/, " M/M").trim();
+  const name = (raw ?? "")
+    .replace(/\s+/g, " ")
+    .replace(/ M \rM/, " M/M")
+    .trim();
   const match = name.match(/^(HYD\d{4})\s*-\s*(.*)$/);
   if (match) return { pn: match[1], name: match[2].trim() };
   return { pn: null, name };
@@ -74,7 +86,11 @@ function material(color) {
   if (!materials.has(key)) {
     materials.set(
       key,
-      doc.createMaterial(key).setBaseColorFactor([...rgb, 1]).setMetallicFactor(0.05).setRoughnessFactor(0.6),
+      doc
+        .createMaterial(key)
+        .setBaseColorFactor([...rgb, 1])
+        .setMetallicFactor(0.05)
+        .setRoughnessFactor(0.6),
     );
   }
   return materials.get(key);
@@ -105,29 +121,47 @@ let solidCount = 0;
 for (const child of top.children) {
   const parent = parseName(child.name);
   const id = `a${String(assemblyIndex++).padStart(2, "0")}`;
-  const group = doc.createNode(child.name).setExtras({ id, pn: parent.pn, name: parent.name });
+  const group = doc
+    .createNode(child.name)
+    .setExtras({ id, pn: parent.pn, name: parent.name });
   root.addChild(group);
 
   for (const meshIndex of child.meshes) {
     const m = result.meshes[meshIndex];
     let part = parseName(m.name);
-    if (!part.name) part = UNNAMED[parent.pn] ?? { pn: parent.pn, name: parent.name };
-    if (part.name === "Whyte acrylic plate") part = { pn: "HYD1010", name: "Logo backplate (white acrylic)" };
-    if (part.name === "Draadstift M4") part = { pn: null, name: "Draadstift M4" };
+    if (!part.name)
+      part = UNNAMED[parent.pn] ?? { pn: parent.pn, name: parent.name };
+    if (part.name === "Whyte acrylic plate")
+      part = { pn: "HYD1010", name: "Logo backplate (white acrylic)" };
+    if (part.name === "Draadstift M4")
+      part = { pn: null, name: "Draadstift M4" };
 
     const src = m.attributes.position.array;
     const pos = new Float32Array(src.length);
-    for (let i = 0; i < src.length; i += 3) pos.set(toYUp(src[i], src[i + 1], src[i + 2]), i);
+    for (let i = 0; i < src.length; i += 3)
+      pos.set(toYUp(src[i], src[i + 1], src[i + 2]), i);
     const prim = doc
       .createPrimitive()
-      .setAttribute("POSITION", doc.createAccessor().setType("VEC3").setArray(pos))
-      .setIndices(doc.createAccessor().setType("SCALAR").setArray(new Uint32Array(m.index.array)))
+      .setAttribute(
+        "POSITION",
+        doc.createAccessor().setType("VEC3").setArray(pos),
+      )
+      .setIndices(
+        doc
+          .createAccessor()
+          .setType("SCALAR")
+          .setArray(new Uint32Array(m.index.array)),
+      )
       .setMaterial(material(m.color));
     if (m.attributes.normal) {
       const n = m.attributes.normal.array;
       const nrm = new Float32Array(n.length);
-      for (let i = 0; i < n.length; i += 3) nrm.set([n[i], n[i + 2], -n[i + 1]], i);
-      prim.setAttribute("NORMAL", doc.createAccessor().setType("VEC3").setArray(nrm));
+      for (let i = 0; i < n.length; i += 3)
+        nrm.set([n[i], n[i + 2], -n[i + 1]], i);
+      prim.setAttribute(
+        "NORMAL",
+        doc.createAccessor().setType("VEC3").setArray(nrm),
+      );
     }
     const sid = `${id}-s${String(solidCount++).padStart(3, "0")}`;
     const mesh = doc.createMesh(part.name).addPrimitive(prim);
@@ -135,7 +169,12 @@ for (const child of top.children) {
       doc
         .createNode(part.name)
         .setMesh(mesh)
-        .setExtras({ id: sid, pn: part.pn, name: part.name, sub: SUB_ASSEMBLY[part.pn] ?? null }),
+        .setExtras({
+          id: sid,
+          pn: part.pn,
+          name: part.name,
+          sub: SUB_ASSEMBLY[part.pn] ?? null,
+        }),
     );
   }
 }
@@ -151,7 +190,10 @@ await doc.transform(
   reorder({ encoder: MeshoptEncoder }),
   quantize({ quantizePosition: 14, quantizeNormal: 10 }),
 );
-doc.getRoot().listExtensionsUsed().find((e) => e instanceof KHRMeshQuantization) ??
+doc
+  .getRoot()
+  .listExtensionsUsed()
+  .find((e) => e instanceof KHRMeshQuantization) ??
   doc.createExtension(KHRMeshQuantization).setRequired(true);
 
 fs.mkdirSync(path.dirname(output), { recursive: true });
@@ -159,4 +201,6 @@ const io = new NodeIO()
   .registerExtensions([EXTMeshoptCompression, KHRMeshQuantization])
   .registerDependencies({ "meshopt.encoder": MeshoptEncoder });
 await io.write(output, doc);
-console.log(`wrote ${output} (${(fs.statSync(output).size / 1e6).toFixed(1)} MB), ${solidCount} solids`);
+console.log(
+  `wrote ${output} (${(fs.statSync(output).size / 1e6).toFixed(1)} MB), ${solidCount} solids`,
+);

@@ -4,13 +4,13 @@ Structured JSON export of the Hydraloop troubleshooting reference database, revi
 
 ## Files
 
-| File | Rows | Description | Primary key |
-| --- | ---: | --- | --- |
-| `errors.json` | 28 | Code, title, summary, urgency, subsystem, H600 applicability and revision notes, official article links, and associated-component summary | `code` |
-| `causes.json` | 73 | Potential causes, what to check, suggested actions, conditions, associated parts and supporting links | `cause_id` |
-| `parts.json` | 57 | Deduplicated functional components/subsystems, their hardware-version caveats, and notes | `part_id` |
-| `error_parts.json` | 118 | Many-to-many error–component mapping, component relationship and related cause text | (`error_code`, `part_id`) |
-| `coverage.json` | 9 | Decisions about included, excluded, linked-only and unpublished catalogue entries | None |
+| File               | Rows | Description                                                                                                                               | Primary key               |
+| ------------------ | ---: | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `errors.json`      |   28 | Code, title, summary, urgency, subsystem, H600 applicability and revision notes, official article links, and associated-component summary | `code`                    |
+| `causes.json`      |   73 | Potential causes, what to check, suggested actions, conditions, associated parts and supporting links                                     | `cause_id`                |
+| `parts.json`       |   57 | Deduplicated functional components/subsystems, their hardware-version caveats, and notes                                                  | `part_id`                 |
+| `error_parts.json` |  118 | Many-to-many error–component mapping, component relationship and related cause text                                                       | (`error_code`, `part_id`) |
+| `coverage.json`    |    9 | Decisions about included, excluded, linked-only and unpublished catalogue entries                                                         | None                      |
 
 Each JSON file contains a **top-level array of objects**, preserving its source table's column names. All rows are included. Numerical counts are JSON numbers; empty cells are JSON `null`; other values remain strings. Unicode component names and full source URLs are preserved. Where the workbook stores a semicolon-separated summary of components in a cell (`errors.parts`, `causes.parts`), this export preserves that original text rather than treating it as the authoritative linkage.
 

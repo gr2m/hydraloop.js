@@ -134,7 +134,13 @@ export function buildModelIndex(solids: Solid[]) {
     const apn = s.assemblyPn ?? s.assemblyName;
     let a = assemblies.get(apn);
     if (!a) {
-      a = { pn: apn, name: s.assemblyName, instanceIds: [], solidIds: [], parts: [] };
+      a = {
+        pn: apn,
+        name: s.assemblyName,
+        instanceIds: [],
+        solidIds: [],
+        parts: [],
+      };
       assemblies.set(apn, a);
     }
     if (!a.instanceIds.includes(s.assemblyId)) a.instanceIds.push(s.assemblyId);
@@ -142,7 +148,14 @@ export function buildModelIndex(solids: Solid[]) {
     const key = `${apn}|${s.pn ?? ""}|${s.name}`;
     let p = a.parts.find((x) => x.key === key);
     if (!p) {
-      p = { key, pn: s.pn, name: s.name, sub: s.sub, assemblyPn: apn, solidIds: [] };
+      p = {
+        key,
+        pn: s.pn,
+        name: s.name,
+        sub: s.sub,
+        assemblyPn: apn,
+        solidIds: [],
+      };
       a.parts.push(p);
     }
     p.solidIds.push(s.id);
@@ -163,18 +176,29 @@ export type ModelIndex = ReturnType<typeof buildModelIndex>;
 const subPn = (sub: string | null) => sub?.match(/^HYD\d{4}/)?.[0] ?? null;
 
 export function solidMatches(s: Solid, target: string) {
-  return target === "HYD0950" || s.pn === target || s.assemblyPn === target || subPn(s.sub) === target;
+  return (
+    target === "HYD0950" ||
+    s.pn === target ||
+    s.assemblyPn === target ||
+    subPn(s.sub) === target
+  );
 }
 
 export function resolveTargets(targets: string[], solids: Solid[]) {
-  return solids.filter((s) => targets.some((t) => solidMatches(s, t))).map((s) => s.id);
+  return solids
+    .filter((s) => targets.some((t) => solidMatches(s, t)))
+    .map((s) => s.id);
 }
 
 /** Catalogue components whose mapped geometry includes this solid. */
 export function componentsForSolid(s: Solid) {
   return components.filter((c) => {
     const m = mappingFor(c.part_id);
-    return m.fidelity !== "none" && !m.targets.includes("HYD0950") && m.targets.some((t) => solidMatches(s, t));
+    return (
+      m.fidelity !== "none" &&
+      !m.targets.includes("HYD0950") &&
+      m.targets.some((t) => solidMatches(s, t))
+    );
   });
 }
 
@@ -187,11 +211,7 @@ export type SearchHit =
   | { type: "part"; score: number; part: ModelPart };
 
 const norm = (s: string) =>
-  s
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/[̀-ͯ]/g, "")
-    .replace(/[–—]/g, "-");
+  s.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[–—]/g, "-");
 
 function score(query: string[], fields: [string | null | undefined, number][]) {
   let total = 0;
@@ -220,7 +240,9 @@ export function search(raw: string, model: ModelIndex | null): SearchHit[] {
   const hits: SearchHit[] = [];
 
   for (const e of errors) {
-    const causeText = (causesByError.get(e.code) ?? []).map((c) => `${c.cause} ${c.what_to_check} ${c.suggested_action}`).join(" ");
+    const causeText = (causesByError.get(e.code) ?? [])
+      .map((c) => `${c.cause} ${c.what_to_check} ${c.suggested_action}`)
+      .join(" ");
     let s = score(terms, [
       [e.code, 10],
       [e.title, 6],
