@@ -1,0 +1,1064 @@
+[
+  {
+    "error_code": "HL0001",
+    "part_id": "BIO",
+    "part_name": "Bioreactor / biological treatment film",
+    "kind": "Potential cause",
+    "related_causes": "Initial startup / inactivity",
+    "part_revision": "All",
+    "source_url": "https://info.hydraloop.com/manuals/hl0001-bioreactor-buildup-period/"
+  },
+  {
+    "error_code": "HL0001",
+    "part_id": "T1",
+    "part_name": "T1 cleaning tank",
+    "kind": "Potential cause",
+    "related_causes": "Initial startup / inactivity",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0001-bioreactor-buildup-period/"
+  },
+  {
+    "error_code": "HL0001",
+    "part_id": "T2",
+    "part_name": "T2 cleaning tank",
+    "kind": "Potential cause",
+    "related_causes": "Initial startup / inactivity",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0001-bioreactor-buildup-period/"
+  },
+  {
+    "error_code": "HL0002",
+    "part_id": "ELECTRIC_WIRING",
+    "part_name": "Component wiring and electrical connectors",
+    "kind": "Potential cause",
+    "related_causes": "Greywater bypass valve faulty",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0002-no-water-recycled-in-5-days/"
+  },
+  {
+    "error_code": "HL0002",
+    "part_id": "INLET",
+    "part_name": "Greywater inlet / inlet piping",
+    "kind": "Potential cause",
+    "related_causes": "Inlet clogged; No greywater supplied",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0002-no-water-recycled-in-5-days/"
+  },
+  {
+    "error_code": "HL0002",
+    "part_id": "INLET_BYPASS",
+    "part_name": "Greywater bypass valve (top of device)",
+    "kind": "Potential cause",
+    "related_causes": "Greywater bypass valve faulty",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0002-no-water-recycled-in-5-days/"
+  },
+  {
+    "error_code": "HL0002",
+    "part_id": "INLET_LIFT",
+    "part_name": "Upstream greywater lift pump",
+    "kind": "Potential cause",
+    "related_causes": "Upstream lift pump failed",
+    "part_revision": "Only if installed",
+    "source_url": "https://info.hydraloop.com/manuals/hl0002-no-water-recycled-in-5-days/"
+  },
+  {
+    "error_code": "HL0002",
+    "part_id": "INLET_MANIFOLD",
+    "part_name": "Incoming greywater source connections / pipework",
+    "kind": "Potential cause",
+    "related_causes": "No greywater supplied",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0002-no-water-recycled-in-5-days/"
+  },
+  {
+    "error_code": "HL0002",
+    "part_id": "WC_OUT",
+    "part_name": "WC / toilet output line",
+    "kind": "HDM usage reference, not necessarily faulty",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0002-no-water-recycled-in-5-days/"
+  },
+  {
+    "error_code": "HL0002",
+    "part_id": "WM_OUT",
+    "part_name": "Washing-machine output line",
+    "kind": "HDM usage reference, not necessarily faulty",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0002-no-water-recycled-in-5-days/"
+  },
+  {
+    "error_code": "HL0003",
+    "part_id": "AUX_OUT",
+    "part_name": "Auxiliary output line",
+    "kind": "Potential cause",
+    "related_causes": "Wrong outlet used for reservoir",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0003-toilet-washing-machine-output-is-not-pressurized/"
+  },
+  {
+    "error_code": "HL0003",
+    "part_id": "BACKUP_SUPPLY",
+    "part_name": "Backup/mains-water supply and shutoff",
+    "kind": "Potential cause",
+    "related_causes": "No backup water",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0003-toilet-washing-machine-output-is-not-pressurized/"
+  },
+  {
+    "error_code": "HL0003",
+    "part_id": "DIST_CHECK",
+    "part_name": "Distribution check valve",
+    "kind": "Potential cause",
+    "related_causes": "Distribution pump / pressure loop",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0003-toilet-washing-machine-output-is-not-pressurized/"
+  },
+  {
+    "error_code": "HL0003",
+    "part_id": "DIST_PUMP",
+    "part_name": "Distribution / water delivery pump",
+    "kind": "Potential cause",
+    "related_causes": "Distribution pump / pressure loop",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0003-toilet-washing-machine-output-is-not-pressurized/"
+  },
+  {
+    "error_code": "HL0003",
+    "part_id": "PRESS_WCWM",
+    "part_name": "Toilet / washing-machine distribution pressure sensors",
+    "kind": "Potential cause",
+    "related_causes": "Distribution pump / pressure loop",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0003-toilet-washing-machine-output-is-not-pressurized/"
+  },
+  {
+    "error_code": "HL0003",
+    "part_id": "TOILET",
+    "part_name": "External toilet flush/float mechanism",
+    "kind": "Potential cause",
+    "related_causes": "Toilet leak / constant demand",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0003-toilet-washing-machine-output-is-not-pressurized/"
+  },
+  {
+    "error_code": "HL0003",
+    "part_id": "WC_OUT",
+    "part_name": "WC / toilet output line",
+    "kind": "Potential cause",
+    "related_causes": "Distribution pump / pressure loop; Toilet leak / constant demand; Wrong outlet used for reservoir",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0003-toilet-washing-machine-output-is-not-pressurized/"
+  },
+  {
+    "error_code": "HL0003",
+    "part_id": "WM_OUT",
+    "part_name": "Washing-machine output line",
+    "kind": "Potential cause",
+    "related_causes": "Distribution pump / pressure loop",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0003-toilet-washing-machine-output-is-not-pressurized/"
+  },
+  {
+    "error_code": "HL0004",
+    "part_id": "POWER",
+    "part_name": "Electrical supply / mains power",
+    "kind": "Potential cause",
+    "related_causes": "Device or router powered off",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0004-hl0032-device-is-offline-for-a-long-period/"
+  },
+  {
+    "error_code": "HL0004",
+    "part_id": "ROUTER",
+    "part_name": "Home router / internet connectivity",
+    "kind": "Potential cause",
+    "related_causes": "Device or router powered off; Network credentials changed; Weak/interfered/unstable network",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0004-hl0032-device-is-offline-for-a-long-period/"
+  },
+  {
+    "error_code": "HL0004",
+    "part_id": "WIFI",
+    "part_name": "Device Wi-Fi / Ethernet connectivity",
+    "kind": "Potential cause",
+    "related_causes": "Network credentials changed; Weak/interfered/unstable network",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0004-hl0032-device-is-offline-for-a-long-period/"
+  },
+  {
+    "error_code": "HL0006",
+    "part_id": "DIST_PUMP",
+    "part_name": "Distribution / water delivery pump",
+    "kind": "Potential cause",
+    "related_causes": "High outlet pipe resistance; Leaking toilet; More toilets than configured; Other valve/controls anomaly",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0006-the-distribution-pump-was-activated-in-excess/"
+  },
+  {
+    "error_code": "HL0006",
+    "part_id": "OUTLET_PIPES",
+    "part_name": "Reusable-water outlet pipework / restrictions",
+    "kind": "Potential cause",
+    "related_causes": "High outlet pipe resistance",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0006-the-distribution-pump-was-activated-in-excess/"
+  },
+  {
+    "error_code": "HL0006",
+    "part_id": "PRESS_WCWM",
+    "part_name": "Toilet / washing-machine distribution pressure sensors",
+    "kind": "Potential cause",
+    "related_causes": "High outlet pipe resistance",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0006-the-distribution-pump-was-activated-in-excess/"
+  },
+  {
+    "error_code": "HL0006",
+    "part_id": "TOILET",
+    "part_name": "External toilet flush/float mechanism",
+    "kind": "Potential cause",
+    "related_causes": "Leaking toilet; More toilets than configured",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0006-the-distribution-pump-was-activated-in-excess/"
+  },
+  {
+    "error_code": "HL0007",
+    "part_id": "DEVICE",
+    "part_name": "Whole unit / scheduled service",
+    "kind": "Potential cause",
+    "related_causes": "Scheduled service due",
+    "part_revision": "All",
+    "source_url": "https://info.hydraloop.com/manuals/hl0007-device-needs-maintenance/"
+  },
+  {
+    "error_code": "HL0008",
+    "part_id": "ELECTRIC_WIRING",
+    "part_name": "Component wiring and electrical connectors",
+    "kind": "Potential cause",
+    "related_causes": "UV wiring/connector loose",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0008-uv-light-not-working/"
+  },
+  {
+    "error_code": "HL0008",
+    "part_id": "UV_BALLAST",
+    "part_name": "UV lamp ballast / separate PSU",
+    "kind": "Potential cause",
+    "related_causes": "V1.x ballast failed",
+    "part_revision": "V1.x only",
+    "source_url": "https://info.hydraloop.com/manuals/hl0008-uv-light-not-working/"
+  },
+  {
+    "error_code": "HL0008",
+    "part_id": "UV_SENSOR",
+    "part_name": "UV lamp status sensor / feedback",
+    "kind": "Potential cause",
+    "related_causes": "UV module failed",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0008-uv-light-not-working/"
+  },
+  {
+    "error_code": "HL0008",
+    "part_id": "UV_V1",
+    "part_name": "UV mercury lamp",
+    "kind": "Potential cause",
+    "related_causes": "UV module failed",
+    "part_revision": "V1.x only",
+    "source_url": "https://info.hydraloop.com/manuals/hl0008-uv-light-not-working/"
+  },
+  {
+    "error_code": "HL0008",
+    "part_id": "UV_V2",
+    "part_name": "UV-C LED light module",
+    "kind": "Potential cause",
+    "related_causes": "UV module failed",
+    "part_revision": "V2.x only",
+    "source_url": "https://info.hydraloop.com/manuals/hl0008-uv-light-not-working/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "BIO",
+    "part_name": "Bioreactor / biological treatment film",
+    "kind": "Potential cause",
+    "related_causes": "Transfer tube clogged with biofilm",
+    "part_revision": "All",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "ELECTRIC_WIRING",
+    "part_name": "Component wiring and electrical connectors",
+    "kind": "Potential cause",
+    "related_causes": "Loose transfer valve wiring",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "IO_BOARD",
+    "part_name": "Water I/O control board",
+    "kind": "Potential cause",
+    "related_causes": "Water I/O board damaged",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "T1",
+    "part_name": "T1 cleaning tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "T2",
+    "part_name": "T2 cleaning tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "T3",
+    "part_name": "T3 treated-water storage tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "TRANSFER_TUBE",
+    "part_name": "Transfer tubing / biofilm-prone tubing",
+    "kind": "Potential cause",
+    "related_causes": "Transfer tube clogged with biofilm",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "UV_PATH",
+    "part_name": "UV water flow path",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "X42",
+    "part_name": "Motorized transfer valve B — x42",
+    "kind": "Potential cause",
+    "related_causes": "Loose transfer valve wiring; Transfer motor valve failed, side B",
+    "part_revision": "H600 side B only",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0009",
+    "part_id": "X6",
+    "part_name": "Motorized transfer valve A — x6",
+    "kind": "Potential cause",
+    "related_causes": "Loose transfer valve wiring; Transfer motor valve failed, side A",
+    "part_revision": "H600 side A; H300 equivalent",
+    "source_url": "https://info.hydraloop.com/manuals/hl0009-transfer-is-malfunctioning/"
+  },
+  {
+    "error_code": "HL0010",
+    "part_id": "ECU",
+    "part_name": "ECU / main controller",
+    "kind": "Potential cause",
+    "related_causes": "Pressure sensor/controller leak",
+    "part_revision": "V1.x main ECU replaces pressure board for T3 sensing",
+    "source_url": "https://info.hydraloop.com/manuals/hl0010-t3-max-level-detected/"
+  },
+  {
+    "error_code": "HL0010",
+    "part_id": "PRESS_BOARD",
+    "part_name": "Pressure sensor board",
+    "kind": "Potential cause",
+    "related_causes": "Pressure sensor/controller leak",
+    "part_revision": "V2.x (T3 troubleshooting guide)",
+    "source_url": "https://info.hydraloop.com/manuals/hl0010-t3-max-level-detected/"
+  },
+  {
+    "error_code": "HL0010",
+    "part_id": "T3",
+    "part_name": "T3 treated-water storage tank",
+    "kind": "Potential cause",
+    "related_causes": "T3 pressure sensing tube leaks",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0010-t3-max-level-detected/"
+  },
+  {
+    "error_code": "HL0010",
+    "part_id": "T3_COUPLINGS",
+    "part_name": "T3 sensing-tube couplings",
+    "kind": "Potential cause",
+    "related_causes": "T3 pressure sensing tube leaks",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0010-t3-max-level-detected/"
+  },
+  {
+    "error_code": "HL0010",
+    "part_id": "T3_SENSOR_TUBE",
+    "part_name": "T3 air-pressure sensing tube",
+    "kind": "Potential cause",
+    "related_causes": "T3 pressure sensing tube leaks",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0010-t3-max-level-detected/"
+  },
+  {
+    "error_code": "HL0011",
+    "part_id": "BACKUP_SUPPLY",
+    "part_name": "Backup/mains-water supply and shutoff",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0011-backup-water-valve-stuck-on-t4/"
+  },
+  {
+    "error_code": "HL0011",
+    "part_id": "BACKUP_VALVE",
+    "part_name": "3-port backup-water selector valve",
+    "kind": "Potential cause",
+    "related_causes": "Loose selector valve wire; Selector valve stuck or worn",
+    "part_revision": "V1.x / V2.x locations differ",
+    "source_url": "https://info.hydraloop.com/manuals/hl0011-backup-water-valve-stuck-on-t4/"
+  },
+  {
+    "error_code": "HL0011",
+    "part_id": "DIST_PUMP",
+    "part_name": "Distribution / water delivery pump",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0011-backup-water-valve-stuck-on-t4/"
+  },
+  {
+    "error_code": "HL0011",
+    "part_id": "ELECTRIC_WIRING",
+    "part_name": "Component wiring and electrical connectors",
+    "kind": "Potential cause",
+    "related_causes": "Loose selector valve wire",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0011-backup-water-valve-stuck-on-t4/"
+  },
+  {
+    "error_code": "HL0011",
+    "part_id": "IO_BOARD",
+    "part_name": "Water I/O control board",
+    "kind": "Potential cause",
+    "related_causes": "I/O board fault",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0011-backup-water-valve-stuck-on-t4/"
+  },
+  {
+    "error_code": "HL0011",
+    "part_id": "T3",
+    "part_name": "T3 treated-water storage tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0011-backup-water-valve-stuck-on-t4/"
+  },
+  {
+    "error_code": "HL0011",
+    "part_id": "T4",
+    "part_name": "T4 backup-water tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0011-backup-water-valve-stuck-on-t4/"
+  },
+  {
+    "error_code": "HL0012",
+    "part_id": "DEVICE",
+    "part_name": "Whole unit / scheduled service",
+    "kind": "Unspecified; no diagnosed failed part",
+    "related_causes": "Undiagnosed restart cause",
+    "part_revision": "All",
+    "source_url": "https://info.hydraloop.com/manuals/hl0012-too-many-restarts/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "ELECTRIC_WIRING",
+    "part_name": "Component wiring and electrical connectors",
+    "kind": "Potential cause",
+    "related_causes": "T1 waste-valve wiring loose",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "IO_BOARD",
+    "part_name": "Water I/O control board",
+    "kind": "Potential cause",
+    "related_causes": "I/O board damaged",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "OUTLET_LIFT",
+    "part_name": "Downstream wastewater lift pump",
+    "kind": "Potential cause",
+    "related_causes": "Downstream lift pump stopped",
+    "part_revision": "Only if installed",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "SEWER",
+    "part_name": "Downstream wastewater drain / sewer line",
+    "kind": "Potential cause",
+    "related_causes": "Sewer blockage / ventilation",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "SEWER_VENT",
+    "part_name": "Drain vent / air break / downstream water trap",
+    "kind": "Potential cause",
+    "related_causes": "Sewer blockage / ventilation",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "T1",
+    "part_name": "T1 cleaning tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "T1_UBEND",
+    "part_name": "T1 U-bend PVC drain section",
+    "kind": "Potential cause",
+    "related_causes": "T1 U-bend clogged",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "T1_WASTE",
+    "part_name": "T1/T2 tank waste valve",
+    "kind": "Potential cause",
+    "related_causes": "T1 waste valve stuck/broken; T1 waste-valve wiring loose",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0013",
+    "part_id": "T2",
+    "part_name": "T2 cleaning tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0013-unable-to-release-water-out-of-t1-properly/"
+  },
+  {
+    "error_code": "HL0015",
+    "part_id": "DIST_PUMP",
+    "part_name": "Distribution / water delivery pump",
+    "kind": "Potential cause",
+    "related_causes": "Toilet flapper/float/flush stuck",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0015-big-leaking-toilet/"
+  },
+  {
+    "error_code": "HL0015",
+    "part_id": "TOILET",
+    "part_name": "External toilet flush/float mechanism",
+    "kind": "Potential cause",
+    "related_causes": "Toilet flapper/float/flush stuck",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0015-big-leaking-toilet/"
+  },
+  {
+    "error_code": "HL0015",
+    "part_id": "WC_OUT",
+    "part_name": "WC / toilet output line",
+    "kind": "Potential cause",
+    "related_causes": "Toilet flapper/float/flush stuck",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0015-big-leaking-toilet/"
+  },
+  {
+    "error_code": "HL0016",
+    "part_id": "AIR_CIRCUIT",
+    "part_name": "Air-pressure subsystem — unspecified",
+    "kind": "Unspecified subsystem",
+    "related_causes": "Air pressure not maintained",
+    "part_revision": "Exact component not identified by published article",
+    "source_url": "https://info.hydraloop.com/manuals/hl0016-could-not-keep-air-pressure/"
+  },
+  {
+    "error_code": "HL0017",
+    "part_id": "BACKUP_SUPPLY",
+    "part_name": "Backup/mains-water supply and shutoff",
+    "kind": "Affected equipment; failure cause unconfirmed",
+    "related_causes": "Backup tank high water / leak",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0017-t4-overflow/"
+  },
+  {
+    "error_code": "HL0017",
+    "part_id": "T4",
+    "part_name": "T4 backup-water tank",
+    "kind": "Affected equipment; failure cause unconfirmed",
+    "related_causes": "Backup tank high water / leak",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0017-t4-overflow/"
+  },
+  {
+    "error_code": "HL0018",
+    "part_id": "ELECTRIC_WIRING",
+    "part_name": "Component wiring and electrical connectors",
+    "kind": "Potential cause",
+    "related_causes": "T3 waste-valve wire loose",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0018-unable-to-release-water-out-of-t3-properly/"
+  },
+  {
+    "error_code": "HL0018",
+    "part_id": "IO_BOARD",
+    "part_name": "Water I/O control board",
+    "kind": "Potential cause",
+    "related_causes": "Water I/O board damaged",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0018-unable-to-release-water-out-of-t3-properly/"
+  },
+  {
+    "error_code": "HL0018",
+    "part_id": "OUTLET_LIFT",
+    "part_name": "Downstream wastewater lift pump",
+    "kind": "Potential cause",
+    "related_causes": "Downstream lift pump stopped",
+    "part_revision": "Only if installed",
+    "source_url": "https://info.hydraloop.com/manuals/hl0018-unable-to-release-water-out-of-t3-properly/"
+  },
+  {
+    "error_code": "HL0018",
+    "part_id": "SEWER",
+    "part_name": "Downstream wastewater drain / sewer line",
+    "kind": "Potential cause",
+    "related_causes": "Insufficient drain venting / resistance; Sewer blockage/water trap",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0018-unable-to-release-water-out-of-t3-properly/"
+  },
+  {
+    "error_code": "HL0018",
+    "part_id": "SEWER_VENT",
+    "part_name": "Drain vent / air break / downstream water trap",
+    "kind": "Potential cause",
+    "related_causes": "Insufficient drain venting / resistance; Sewer blockage/water trap",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0018-unable-to-release-water-out-of-t3-properly/"
+  },
+  {
+    "error_code": "HL0018",
+    "part_id": "T3",
+    "part_name": "T3 treated-water storage tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0018-unable-to-release-water-out-of-t3-properly/"
+  },
+  {
+    "error_code": "HL0018",
+    "part_id": "T3_WASTE",
+    "part_name": "T3 waste/drain valve",
+    "kind": "Potential cause",
+    "related_causes": "T3 waste valve worn/stuck; T3 waste-valve wire loose",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0018-unable-to-release-water-out-of-t3-properly/"
+  },
+  {
+    "error_code": "HL0019",
+    "part_id": "T3",
+    "part_name": "T3 treated-water storage tank",
+    "kind": "Affected equipment; failure cause unconfirmed",
+    "related_causes": "Unspecified overflow condition",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0019-t3-overflow/"
+  },
+  {
+    "error_code": "HL0020",
+    "part_id": "BACKUP_SUPPLY",
+    "part_name": "Backup/mains-water supply and shutoff",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0020-backup-water-valve-stuck-on-t3/"
+  },
+  {
+    "error_code": "HL0020",
+    "part_id": "BACKUP_VALVE",
+    "part_name": "3-port backup-water selector valve",
+    "kind": "Potential cause",
+    "related_causes": "Selector valve stuck or worn",
+    "part_revision": "V1.x / V2.x locations differ",
+    "source_url": "https://info.hydraloop.com/manuals/hl0020-backup-water-valve-stuck-on-t3/"
+  },
+  {
+    "error_code": "HL0020",
+    "part_id": "DIST_PUMP",
+    "part_name": "Distribution / water delivery pump",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0020-backup-water-valve-stuck-on-t3/"
+  },
+  {
+    "error_code": "HL0020",
+    "part_id": "IO_BOARD",
+    "part_name": "Water I/O control board",
+    "kind": "Potential cause",
+    "related_causes": "I/O board fault",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0020-backup-water-valve-stuck-on-t3/"
+  },
+  {
+    "error_code": "HL0020",
+    "part_id": "T3",
+    "part_name": "T3 treated-water storage tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0020-backup-water-valve-stuck-on-t3/"
+  },
+  {
+    "error_code": "HL0020",
+    "part_id": "T4",
+    "part_name": "T4 backup-water tank",
+    "kind": "Affected / functional context",
+    "related_causes": null,
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0020-backup-water-valve-stuck-on-t3/"
+  },
+  {
+    "error_code": "HL0021",
+    "part_id": "ECU",
+    "part_name": "ECU / main controller",
+    "kind": "Potential cause",
+    "related_causes": "Bad connector or wire; Water-damaged board/connector",
+    "part_revision": "V1.x main ECU replaces pressure board for T3 sensing",
+    "source_url": "https://info.hydraloop.com/manuals/hl0021-disconnected-io-board/"
+  },
+  {
+    "error_code": "HL0021",
+    "part_id": "ELECTRIC_WIRING",
+    "part_name": "Component wiring and electrical connectors",
+    "kind": "Potential cause",
+    "related_causes": "Bad connector or wire; Water-damaged board/connector",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0021-disconnected-io-board/"
+  },
+  {
+    "error_code": "HL0021",
+    "part_id": "IO_BOARD",
+    "part_name": "Water I/O control board",
+    "kind": "Potential cause",
+    "related_causes": "Bad connector or wire; Water-damaged board/connector",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0021-disconnected-io-board/"
+  },
+  {
+    "error_code": "HL0023",
+    "part_id": "AUX_FLOAT",
+    "part_name": "External reservoir float valve",
+    "kind": "Potential cause",
+    "related_causes": "Auxiliary destination closed",
+    "part_revision": "Only if installed",
+    "source_url": "https://info.hydraloop.com/manuals/hl0023-auxiliary-output-malfunction/"
+  },
+  {
+    "error_code": "HL0023",
+    "part_id": "AUX_OUT",
+    "part_name": "Auxiliary output line",
+    "kind": "Potential cause",
+    "related_causes": "Auxiliary destination closed",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0023-auxiliary-output-malfunction/"
+  },
+  {
+    "error_code": "HL0025",
+    "part_id": "BACKUP_SUPPLY",
+    "part_name": "Backup/mains-water supply and shutoff",
+    "kind": "Potential cause",
+    "related_causes": "No backup water",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0025-circulation-path-not-working-properly/"
+  },
+  {
+    "error_code": "HL0025",
+    "part_id": "BACKUP_VALVE",
+    "part_name": "3-port backup-water selector valve",
+    "kind": "Potential cause",
+    "related_causes": "Backup-water selector valve faulty",
+    "part_revision": "V1.x / V2.x locations differ",
+    "source_url": "https://info.hydraloop.com/manuals/hl0025-circulation-path-not-working-properly/"
+  },
+  {
+    "error_code": "HL0025",
+    "part_id": "CIRC_HOSES",
+    "part_name": "Circulation tubing / water hoses",
+    "kind": "Potential cause",
+    "related_causes": "Wrong/unseated tubing",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0025-circulation-path-not-working-properly/"
+  },
+  {
+    "error_code": "HL0025",
+    "part_id": "DIST_PUMP",
+    "part_name": "Distribution / water delivery pump",
+    "kind": "Potential cause",
+    "related_causes": "Distribution pump faulty",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0025-circulation-path-not-working-properly/"
+  },
+  {
+    "error_code": "HL0025",
+    "part_id": "UV_PATH",
+    "part_name": "UV water flow path",
+    "kind": "Potential cause",
+    "related_causes": "Wrong/unseated tubing",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0025-circulation-path-not-working-properly/"
+  },
+  {
+    "error_code": "HL0025",
+    "part_id": "X12",
+    "part_name": "Circulation solenoid valve — x12",
+    "kind": "Potential cause",
+    "related_causes": "Circulation path valve faulty",
+    "part_revision": "Check revision",
+    "source_url": "https://info.hydraloop.com/manuals/hl0025-circulation-path-not-working-properly/"
+  },
+  {
+    "error_code": "HL0027",
+    "part_id": "BATTERY",
+    "part_name": "Device batteries",
+    "kind": "Potential cause",
+    "related_causes": "Battery bad/misinstalled",
+    "part_revision": "Confirm type from wiring diagram",
+    "source_url": "https://info.hydraloop.com/manuals/hl0027-battery-is-not-functioning/"
+  },
+  {
+    "error_code": "HL0027",
+    "part_id": "BATTERY_LEAD",
+    "part_name": "Battery holder/wiring",
+    "kind": "Potential cause",
+    "related_causes": "Battery bad/misinstalled",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0027-battery-is-not-functioning/"
+  },
+  {
+    "error_code": "HL0028",
+    "part_id": "BUZZER",
+    "part_name": "Audible buzzer / sounder",
+    "kind": "Potential cause",
+    "related_causes": "ECU or buzzer fault; Physical buzzer obstruction",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0028-buzzer-broken/"
+  },
+  {
+    "error_code": "HL0028",
+    "part_id": "BUZZER_OBSTR",
+    "part_name": "Physical obstruction near buzzer",
+    "kind": "Potential cause",
+    "related_causes": "Physical buzzer obstruction",
+    "part_revision": "e.g. protective paper shown in guide",
+    "source_url": "https://info.hydraloop.com/manuals/hl0028-buzzer-broken/"
+  },
+  {
+    "error_code": "HL0028",
+    "part_id": "ECU",
+    "part_name": "ECU / main controller",
+    "kind": "Potential cause",
+    "related_causes": "ECU or buzzer fault",
+    "part_revision": "V1.x main ECU replaces pressure board for T3 sensing",
+    "source_url": "https://info.hydraloop.com/manuals/hl0028-buzzer-broken/"
+  },
+  {
+    "error_code": "HL0029",
+    "part_id": "INLET",
+    "part_name": "Greywater inlet / inlet piping",
+    "kind": "Potential cause",
+    "related_causes": "Incorrect greywater collection connection",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0029-incoming-connection-problems/"
+  },
+  {
+    "error_code": "HL0029",
+    "part_id": "INLET_MANIFOLD",
+    "part_name": "Incoming greywater source connections / pipework",
+    "kind": "Potential cause",
+    "related_causes": "Incorrect greywater collection connection",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0029-incoming-connection-problems/"
+  },
+  {
+    "error_code": "HL0030",
+    "part_id": "SOLENOID_INSIDE",
+    "part_name": "Solenoid valve seal / spring / internal passages",
+    "kind": "Potential cause",
+    "related_causes": "x10 solenoid contaminated/stuck",
+    "part_revision": "Relevant to x10 and x12",
+    "source_url": "https://info.hydraloop.com/manuals/hl0030-back-flush-valve-stuck-open/"
+  },
+  {
+    "error_code": "HL0030",
+    "part_id": "X10",
+    "part_name": "Backflush solenoid valve — x10",
+    "kind": "Potential cause",
+    "related_causes": "x10 solenoid contaminated/stuck",
+    "part_revision": "Check revision",
+    "source_url": "https://info.hydraloop.com/manuals/hl0030-back-flush-valve-stuck-open/"
+  },
+  {
+    "error_code": "HL0031",
+    "part_id": "SOLENOID_INSIDE",
+    "part_name": "Solenoid valve seal / spring / internal passages",
+    "kind": "Potential cause",
+    "related_causes": "x12 solenoid contaminated/stuck",
+    "part_revision": "Relevant to x10 and x12",
+    "source_url": "https://info.hydraloop.com/manuals/hl0031-circulation-valve-stuck-open/"
+  },
+  {
+    "error_code": "HL0031",
+    "part_id": "X12",
+    "part_name": "Circulation solenoid valve — x12",
+    "kind": "Potential cause",
+    "related_causes": "x12 solenoid contaminated/stuck",
+    "part_revision": "Check revision",
+    "source_url": "https://info.hydraloop.com/manuals/hl0031-circulation-valve-stuck-open/"
+  },
+  {
+    "error_code": "HL0032",
+    "part_id": "POWER",
+    "part_name": "Electrical supply / mains power",
+    "kind": "Potential cause",
+    "related_causes": "Device or router powered off",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0004-hl0032-device-is-offline-for-a-long-period/"
+  },
+  {
+    "error_code": "HL0032",
+    "part_id": "ROUTER",
+    "part_name": "Home router / internet connectivity",
+    "kind": "Potential cause",
+    "related_causes": "Device or router powered off; Network credentials changed; Weak/interfered/unstable network",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0004-hl0032-device-is-offline-for-a-long-period/"
+  },
+  {
+    "error_code": "HL0032",
+    "part_id": "WIFI",
+    "part_name": "Device Wi-Fi / Ethernet connectivity",
+    "kind": "Potential cause",
+    "related_causes": "Network credentials changed; Weak/interfered/unstable network",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/hl0004-hl0032-device-is-offline-for-a-long-period/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "BIO",
+    "part_name": "Bioreactor / biological treatment film",
+    "kind": "Potential cause",
+    "related_causes": "Air diffuser clogged; Bleach / nonbiological cleaners; Hair dye / colorants; T1–T2 crossover clogged",
+    "part_revision": "All",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "DIFF",
+    "part_name": "Air diffuser",
+    "kind": "Potential cause",
+    "related_causes": "Air diffuser clogged",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "INLET",
+    "part_name": "Greywater inlet / inlet piping",
+    "kind": "Potential cause",
+    "related_causes": "Wrong incoming sources",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "INLET_CHECK",
+    "part_name": "Upstream lift-pump sewer backflow check valve",
+    "kind": "Potential cause",
+    "related_causes": "Upstream lift-pump backflow",
+    "part_revision": "Only if installed",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "INLET_LIFT",
+    "part_name": "Upstream greywater lift pump",
+    "kind": "Potential cause",
+    "related_causes": "Upstream lift-pump backflow",
+    "part_revision": "Only if installed",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "INLET_MANIFOLD",
+    "part_name": "Incoming greywater source connections / pipework",
+    "kind": "Potential cause",
+    "related_causes": "Wrong incoming sources",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "PREBUFFER",
+    "part_name": "Upstream greywater pre-buffer tank",
+    "kind": "Potential cause",
+    "related_causes": "Pre-buffering installed",
+    "part_revision": "Only if installed",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "T1",
+    "part_name": "T1 cleaning tank",
+    "kind": "Potential cause",
+    "related_causes": "T1–T2 crossover clogged",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "T1T2_BENDS",
+    "part_name": "T1–T2 connecting elbows / black 90° bends",
+    "kind": "Potential cause",
+    "related_causes": "T1–T2 crossover clogged",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  },
+  {
+    "error_code": "QUALITY",
+    "part_id": "T2",
+    "part_name": "T2 cleaning tank",
+    "kind": "Potential cause",
+    "related_causes": "T1–T2 crossover clogged",
+    "part_revision": "All / verify actual hardware",
+    "source_url": "https://info.hydraloop.com/manuals/bad-water-quality/"
+  }
+]

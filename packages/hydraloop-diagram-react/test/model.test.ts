@@ -249,6 +249,52 @@ describe("roomAt", () => {
     expect(room.partial).toBe(false);
   });
 
+  test("the pressure reset after a transfer replaces the venting during it", () => {
+    const ds = dataset({
+      routines: [
+        routine(0, "B", "TRANSFER"),
+        routine(30, "B", "STANDBY"),
+        routine(30, "B", "STANDBY", "PRESSURE_RESET"),
+      ],
+      // Vented for 3 minutes at the start of the transfer, then for 47 s by
+      // the pressure reset right after it, and for 11 s, too short to settle
+      io: {
+        release_air_b: io(
+          [0, 0],
+          [2, 1],
+          [5, 0],
+          [30, 1],
+          [30 + 47 / 60, 0],
+          [40, 1],
+          [40 + 11 / 60, 0],
+        ),
+      },
+      tanks: {
+        t1a: [],
+        t2a: [],
+        t1b: [],
+        t2b: io(
+          [2, 132],
+          [4, 132],
+          [29, 21],
+          [30.5, 28],
+          [30.75, 28],
+          [40.1, 60],
+        ),
+        t3: [],
+      },
+    });
+    expect(roomAt(ds, T0 + 20 * MINUTE).trains.B).toMatchObject({
+      liters: 2,
+      t2: 132,
+    });
+    expect(roomAt(ds, T0 + 45 * MINUTE).trains.B).toMatchObject({
+      liters: 106,
+      t2: 28,
+      accepting: true,
+    });
+  });
+
   test("the bypass during a scheduled restart doesn't count", () => {
     const ds = dataset({
       io: { [IO.bypass]: io([0, 0], [10, 1], [11, 0], [30, 1]) },

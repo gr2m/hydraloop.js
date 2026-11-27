@@ -10,10 +10,11 @@
 
 ## Apps
 
-| App                                                              | Content                                                                                                    |
-| ---------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| [`h600.gr2m.dev`](apps/h600.gr2m.dev/)                           | Dashboard of the live and historic status of an H600, with simulated data to try it without an HDM account |
-| [`hydraloop-diagram.gr2m.dev`](apps/hydraloop-diagram.gr2m.dev/) | Playground for `hydraloop-diagram-react`                                                                   |
+| App                                                                  | Content                                                                                                    |
+| -------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| [`h600.gr2m.dev`](apps/h600.gr2m.dev/)                               | Dashboard of the live and historic status of an H600, with simulated data to try it without an HDM account |
+| [`hydraloop-diagram.gr2m.dev`](apps/hydraloop-diagram.gr2m.dev/)     | Playground for `hydraloop-diagram-react`                                                                   |
+| [`hydraloop-inspector.gr2m.dev`](apps/hydraloop-inspector.gr2m.dev/) | 3D model of the H600 to find the parts involved in each error code                                         |
 
 See [`examples/`](examples/) for examples and [`spec/`](spec/) for the API specifications both SDKs are built on.
 
