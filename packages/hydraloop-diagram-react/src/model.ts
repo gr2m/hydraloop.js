@@ -707,7 +707,9 @@ export function stateAt(ds: Dataset, t: number): DeviceState {
 //   doesn't accept water for the ~4.5 h it lasts.
 // - The bypass opens when neither train can accept water. It is also tested
 //   for about a minute every 12 hours, while the trains accept water.
-// So T2 is taken from its last venting, which happens about once an hour.
+// So T2 is taken from its last venting. Besides each incoming water, T2 is
+// vented for 30–80 s by the PRESSURE_RESET of STANDBY, about every 2 hours
+// and right after each TRANSFER, which settles it just as well.
 // Greywater also fills T1, but T1 holds at most about 24 L.
 
 /** T2 at which a train is full and starts FILTH_REMOVAL */
@@ -786,8 +788,13 @@ function holdsPressure(ds: Dataset, side: Side, t: number) {
   return added > (released ?? -Infinity);
 }
 
-/** Vent openings shorter than this don't settle the levels */
-const MIN_VENT = 60_000;
+/**
+ * Vent openings shorter than this don't settle the levels. The vents of
+ * `STANDBY` · `PRESSURE_RESET` last 33–80 s and settle T2 within about
+ * 1–2 L of the long vents of `INCOMING_WATER`. Shorter openings, e.g. of
+ * 11 s during `FILTH_REMOVAL`, don't.
+ */
+const MIN_VENT = 30_000;
 
 /** Openings of a release air valve that are long enough to settle T2 */
 export function ventings(points: Point[] | undefined, until: number) {
